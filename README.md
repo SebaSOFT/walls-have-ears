@@ -19,3 +19,5 @@ In the setup screen, use the URL https://raw.githubusercontent.com/SebaSOFT/wall
 ## TO DO
 
 - Estimate L shaped rooms and track sound bouncing so it doesnt get muffled
+- Have three or more muffling densities and assign them to the wall they are listening through
+- Test with more and more sounds
