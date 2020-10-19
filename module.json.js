@@ -1,0 +1,38 @@
+{
+  "name": "walls-have-ears",
+  "title": "Walls Have Ears - Muffled sounds behind walls",
+  "description": "A simple-as-possible module to muffle sounds that are behind a wall for a player.",
+  "author": "SebaSOFT",
+  "version": "0.0.1",
+  "minimumCoreVersion": "0.6.6",
+  "compatibleCoreVersion": "0.7.4",
+  "esmodules": [
+    "scripts/settings.js",
+    "scripts/tokenmagic.js"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/walls-have-ears.en.json"
+    },
+    {
+      "lang": "fr",
+      "name": "French (FRANCE)",
+      "path": "lang/walls-have-ears.fr.json"
+    },
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/walls-have-ears.pt-BR.json"
+    },
+    {
+      "lang": "es",
+      "name": "Spanish",
+      "path": "lang/walls-have-ears.es.json"
+    }
+  ],
+  "url": "https://github.com/SebaSOFT/walls-have-ears",
+  "manifest": "https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/main/module.json.js",
+  "download": "https://github.com/SebaSOFT/walls-have-ears/releases/download/v0.0.1-alpha/walls-have-ears.zip"
+}
