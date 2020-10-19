@@ -1,5 +1,7 @@
 {
-  "WHE.walls-have-ears": "Las paredes escuchan",
-  "WHE.settings.title": "Las paredes escuchan",
-  "WHE.save": "Guardar"
+	"WHE.walls-have-ears": "Las paredes escuchan",
+	"WHE.settings.title": "Las paredes escuchan",
+	"WHE.save": "Guardar",
+	"WHE.settings_disable.title": "Desactivar la amortiguación del sonido",
+	"WHE.settings_disable.hint": "Este módulo permite amortiguar los sonidos para mejorar la inmersión. Pero puede desactivar esta función por motivos de rendimiento."
 }

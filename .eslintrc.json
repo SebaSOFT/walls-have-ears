@@ -1,0 +1,48 @@
+{
+    "env":
+    {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parser": "babel-eslint",
+    "parserOptions":
+    {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "globals":
+    {
+        "Hooks": "readonly",
+        "game": "readonly",
+        "canvas": "readonly",
+        "Token": "readonly",
+        "WallsLayer": "readonly",
+        "Ray": "readonly"
+    },
+    "rules":
+    {
+        "indent": [
+            "error",
+            4
+        ],
+        "no-tabs": [
+            "error",
+            {
+                "allowIndentationTabs": false
+            }
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ]
+    }
+}

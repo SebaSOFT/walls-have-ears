@@ -8,7 +8,7 @@
   "compatibleCoreVersion": "0.7.4",
   "esmodules": [
     "scripts/settings.js",
-    "scripts/tokenmagic.js"
+    "scripts/walls-have-ears.js"
   ],
   "languages": [
     {
