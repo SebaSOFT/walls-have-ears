@@ -13,12 +13,14 @@
     },
     "globals":
     {
-        "Hooks": "readonly",
         "game": "readonly",
         "canvas": "readonly",
-        "Token": "readonly",
+        "ui": "readonly",
+        "Hooks": "readonly",
         "WallsLayer": "readonly",
-        "Ray": "readonly"
+        "Token": "readonly",
+        "Ray": "readonly",
+        "Howler": "readonly"
     },
     "rules":
     {
