@@ -18,9 +18,11 @@ In the setup screen, use the URL https://raw.githubusercontent.com/SebaSOFT/wall
 
 ## TO DO
 
-- Estimate L shaped rooms and track sound bouncing so it doesnt get muffled
+- Estimate L shaped rooms and track sound bouncing so it doesnt get muffled (possible echo/delay effect)
 - Have three or more muffling densities and assign them to the wall they are listening through
 - Test with more and more sounds
+
+TO CHECK: I think you could prevent the native sound obscure logic by overriding `AmbientSound#computeFOV` Basically just copy the logic that is currently applied to global type sounds for all sound types
 
 ## Contributing
 
