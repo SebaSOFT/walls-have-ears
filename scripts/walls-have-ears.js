@@ -8,7 +8,7 @@ let audioOutput = null;
 /* ------------------------------------ */
 // Initialize module
 /* ------------------------------------ */
-Hooks.once('init', async function() {
+Hooks.once('init', async function () {
     console.log('walls-have-ears | Initializing foundry-ping-times');
 
     wallsSoundsDisabled = game.settings.get(WHE.MODULE, WHE.SETTING_DISABLE);
@@ -20,7 +20,7 @@ Hooks.once('init', async function() {
 /* ------------------------------------ */
 // Setup module
 /* ------------------------------------ */
-Hooks.once('setup', function() {
+Hooks.once('setup', function () {
     console.log('walls-have-ears | module setup started');
     // Do anything after initialization but before
 
@@ -31,7 +31,7 @@ Hooks.once('setup', function() {
 /* ------------------------------------ */
 // When ready
 /* ------------------------------------ */
-Hooks.once('ready', function() {
+Hooks.once('ready', function () {
     // Do anything once the module is ready
     const token = getActingToken();
 
@@ -80,7 +80,7 @@ function doTheMuffling() {
 
     const tokenPos = {
         x: listenerToken.x,
-        y: listenerToken.y
+        y: listenerToken.y,
     };
 
     const ambiSounds = canvas.sounds.placeables;
@@ -90,7 +90,7 @@ function doTheMuffling() {
             const sndMaxDist = snd.data.radius;
             const sndPos = {
                 x: snd.data.x,
-                y: snd.data.y
+                y: snd.data.y,
             };
             const sndHowl = snd.howl;
             const sndDist = canvas.grid.measureDistance(tokenPos, sndPos);
@@ -159,7 +159,7 @@ function getActingToken({ actor, limitActorTokensToControlledIfHaveSome = true, 
                 if (linked) return t.data.actorLink && t.data.actorId === this._id;
                 return t.data.actorId === this._id;
             }));
-            tokens.push(...actor.getActiveTokens().filter(t => canvas.tokens.controlled.some(tc => tc._id == t._id)));
+            tokens.push(...actor.getActiveTokens().filter(t => canvas.tokens.controlled.some(tc => tc._id === t._id)));
         } else {
             tokens.push(...actor.getActiveTokens());
         }
