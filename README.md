@@ -10,15 +10,21 @@ In the setup screen, use the URL https://raw.githubusercontent.com/SebaSOFT/wall
 ## Release Notes
 
 - v0.0.1: Initial release.
+- v0.0.2: Added translations and now compatible with FoundryVTT 0.8.x
 
 ## Features
 
 - Detects sound that are in range but through a wall, and muffles them
 - Ignores open doors so sound should not be muffled if listened throughan open door
 
+## How it works
+- Set sound occlussion to limited or none as needed
+- It will detect walls and muffle the sound
+- It also works with sound easing
+
 ## TO DO
 
-- Estimate L shaped rooms and track sound bouncing so it doesnt get muffled (possible echo/delay effect)
+- Estimate L shaped rooms and track sound bouncing, so it doesn't get muffled (possible echo/delay effect)
 - Have three or more muffling densities and assign them to the wall they are listening through
 - Test with more and more sounds
 

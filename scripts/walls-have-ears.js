@@ -158,7 +158,7 @@ function doTheMuffling() {
 
                     console.log('walls-have-ears | RESUME', soundMediaSource.volume, soundMediaSource.container.gainNode.gain.value);
                     const volume = soundMediaSource.volum;
-                    if (howManyWallsBetween(soundPosition, tokenPosition) > 3) {
+                    if (howManyWallsBetween(soundPosition, tokenPosition) >= 2) {
                         injectFilterIfPossible(soundMediaSource.container.gainNode, audioMuffler, null);
                     } else {
                         clearSound(soundMediaSource.container.gainNode);
@@ -169,7 +169,7 @@ function doTheMuffling() {
             } else {
                 if (currentSoundRadius >= Math.floor(distanceToSound)) {
                     soundMediaSource.on('start', function (soundSource) {
-                        if (howManyWallsBetween(soundPosition, tokenPosition) > 3) {
+                        if (howManyWallsBetween(soundPosition, tokenPosition) >= 2) {
                             injectFilterIfPossible(soundSource.container.gainNode, audioMuffler, null);
                         } else {
                             clearSound(soundSource.container.gainNode);
