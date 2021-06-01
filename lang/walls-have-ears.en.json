@@ -2,6 +2,6 @@
     "WHE.walls-have-ears": "Walls Have Ears",
     "WHE.settings.title": "Walls Have Ears",
     "WHE.save": "Save",
-    "WHE.settings_disable.title": "Geräuschdämpfung deaktivieren",
-    "WHE.settings_disable.hint": "Mit diesem Modul können Geräusche gedämpft werden, um das Eintauchen zu verbessern. Sie können diese Funktion jedoch aus Leistungsgründen deaktivieren."
+    "WHE.settings_disable.title": "Disable sound muffling",
+    "WHE.settings_disable.hint": "This module allows for sounds to be muffled for improved inmersion. But you can disable this feature for performance reasons."
 }
