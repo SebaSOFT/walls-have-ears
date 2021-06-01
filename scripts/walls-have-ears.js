@@ -2,8 +2,7 @@ import WHE from './WHE.js';
 
 let wallsSoundsDisabled = true;
 let listenerToken = null;
-let audioMuffler = null;
-let audioOutput = null;
+let LATEST_FILTER = null;
 
 /* ------------------------------------ */
 // Initialize module
@@ -31,18 +30,14 @@ Hooks.once('setup', function () {
 /* ------------------------------------ */
 // When ready
 /* ------------------------------------ */
-Hooks.once('ready', function () {
+Hooks.once('ready', async function () {
     // Do anything once the module is ready
     const token = getActingToken();
 
-    //Creating the filter
-    audioMuffler = Howler.ctx.createBiquadFilter();
-    audioMuffler.type = 'lowpass';
-    audioMuffler.frequency.value = 200; // Awful = 100 / Heavy = 352 / Med = 979 / light = 5500
-    audioMuffler.Q.value = 1; // 30 for a weird as metalic sound, this should be 0
-    audioOutput = Howler.ctx.destination;
+    await game.audio.awaitFirstGesture();
 
-    console.log('walls-have-ears | Filter initialized', audioMuffler);
+    //Creating the filter
+    getAudioMuffler(game.audio.getAudioContext());
 
     if (!token) return;
     listenerToken = token;
@@ -52,11 +47,28 @@ Hooks.once('ready', function () {
 
 // Add any additional hooks if necessary
 // eslint-disable-next-line no-unused-vars
-Hooks.on('preUpdateToken', (scene, token, updateData, { diff }, userId) => {
+Hooks.on('preUpdateToken', (token, updateData, options, userId) => {
     console.log('walls-have-ears | preUpdateToken called');
-    if (!diff) console.warn('walls-have-ears | preUpdateToken NODIF');
+    if (updateData) {
+        console.log('walls-have-ears | Something changed', token, updateData, options);
+    } else {
+        console.warn('walls-have-ears | preUpdateToken NODIF', listenerToken);
+    }
+    if (listenerToken) {
+        doTheMuffling();
+    }
+});
 
-    doTheMuffling();
+Hooks.on('preUpdateAmbientSound', (ambientSound, updateData, options, userId) => {
+    console.log('walls-have-ears | preUpdateAmbientSound called');
+    if (updateData) {
+        console.log('walls-have-ears | Something changed', ambientSound, updateData, options);
+    } else {
+        console.warn('walls-have-ears | preUpdateToken NODIF', listenerToken);
+    }
+    if (listenerToken) {
+        doTheMuffling();
+    }
 });
 
 // If its a gamemaster, lets get the controlled token
@@ -69,72 +81,169 @@ Hooks.on('controlToken', (token, selected) => {
         listenerToken = token;
     }
     if (!listenerToken) {
-        console.log('walls-have-ears | You should be Gamemaster or DM');
+        console.log('walls-have-ears | Looks like you are the GM');
+    } else {
+        doTheMuffling();
     }
-    doTheMuffling();
+
 });
+
+/**
+ * This will create filter nodes and assign to global variables for reuse.
+ * This could be changes in the future as some sounds or sound listening
+ * events may need different parameters depending the occasion
+ *
+ * @param context : AudioContext
+ */
+function getAudioMuffler(context) {
+    console.log('walls-have-ears | Now we have a context', context);
+    const audioMuffler = context.createBiquadFilter(); // Walls have ears!
+
+    audioMuffler.type = 'lowpass';
+    audioMuffler.frequency.value = 352; // Awful = 100 / Heavy = 352 / Med = 979 / light = 5500
+    audioMuffler.Q.value = 0; // 30 for a weird ass metallic sound, this should be 0
+
+    console.log('walls-have-ears | Filter initialized', audioMuffler);
+    return audioMuffler;
+}
 
 function doTheMuffling() {
     if (wallsSoundsDisabled) return;
     if (!listenerToken) return;
 
-    const tokenPos = {
+    const tokenPosition = {
         x: listenerToken.x,
         y: listenerToken.y,
     };
+    console.log('walls-have-ears | Token is at: ', tokenPosition);
+    /**
+     * @type {AmbientSound[]}
+     */
+    const ambientSounds = canvas.sounds.placeables;
+    if (ambientSounds && ambientSounds.length > 0) {
+        for (var i = 0; i < ambientSounds.length; i++) {
+            const currentAmbientSound = ambientSounds[i];
+            /**
+             * @type {Sound}
+             */
+            const soundMediaSource = currentAmbientSound.sound;
 
-    const ambiSounds = canvas.sounds.placeables;
-    if (ambiSounds && ambiSounds.length > 0) {
-        for (var i = 0; i < ambiSounds.length; i++) {
-            const snd = ambiSounds[i];
-            const sndMaxDist = snd.data.radius;
-            const sndPos = {
-                x: snd.data.x,
-                y: snd.data.y,
+            //Added in 0.8.x for Darkness range setting
+            if (!currentAmbientSound.isAudible) {
+                console.warn('walls-have-ears | Not Audible for some reason');
+                continue;
+            }
+            if (!soundMediaSource.context) {
+                console.warn('walls-have-ears | No Audio Context, waiting for user interaction');
+                continue;
+            }
+            if (currentAmbientSound.type !== 'l') {
+                console.warn('walls-have-ears | Ignoring global ambients sounds (for now)');
+                continue;
+            }
+
+            const currentSoundRadius = currentAmbientSound.data.radius;
+            const soundPosition = {
+                x: currentAmbientSound.center.x,
+                y: currentAmbientSound.center.y,
             };
-            const sndHowl = snd.howl;
-            const sndDist = canvas.grid.measureDistance(tokenPos, sndPos);
 
-            // console.log('walls-have-ears | Sound ' + i, sndPos, sndMaxDist, sndDist);
+            const distanceToSound = canvas.grid.measureDistance(tokenPosition, soundPosition);
 
-            if (sndMaxDist >= sndDist) {
-                let sndSource = null;
-                if (!sndHowl.playing()) {
-                    sndHowl.play();
-                    sndSource = sndHowl._sounds[0]._node.bufferSource;
-                    console.log('walls-have-ears | Sound Needs to SOUND MUFFLED!', sndHowl);
-                    sndSource.disconnect(0);
-                    audioMuffler.disconnect(0);
-                    sndSource.connect(audioMuffler);
-                    audioMuffler.connect(audioOutput);
-                    sndHowl.play();
+            const audioMuffler = getAudioMuffler(soundMediaSource.context);
+            console.log('walls-have-ears | Sound ' + i, soundMediaSource, currentSoundRadius, distanceToSound);
+
+            if (soundMediaSource.playing) {
+                if (currentSoundRadius >= Math.floor(distanceToSound)) {
+
+                    console.log('walls-have-ears | RESUME', soundMediaSource.volume, soundMediaSource.container.gainNode.gain.value);
+                    const volume = soundMediaSource.volum;
+                    if (howManyWallsBetween(soundPosition, tokenPosition) > 3) {
+                        injectFilterIfPossible(soundMediaSource.container.gainNode, audioMuffler, null);
+                    } else {
+                        clearSound(soundMediaSource.container.gainNode);
+                    }
                 } else {
-                    sndSource = sndHowl._sounds[0]._node.bufferSource;
-                    console.log('walls-have-ears | Sound Is playing, you be played normally', sndHowl.playing());
-                    sndSource.disconnect(0);
-                    audioMuffler.disconnect(0);
-                    sndSource.connect(audioOutput);
+                    console.log('walls-have-ears | Im FAR AWAY! and IS PLAYING', soundMediaSource.container.gainNode);
                 }
             } else {
-                if (sndHowl.playing()) {
-                    console.log('walls-have-ears | Stopping sound, weird!');
-                    sndHowl.stop();
+                if (currentSoundRadius >= Math.floor(distanceToSound)) {
+                    soundMediaSource.on('start', function (soundSource) {
+                        if (howManyWallsBetween(soundPosition, tokenPosition) > 3) {
+                            injectFilterIfPossible(soundSource.container.gainNode, audioMuffler, null);
+                        } else {
+                            clearSound(soundSource.container.gainNode);
+                        }
+                    });
+                } else {
+                    console.log('walls-have-ears | Im FAR AWAY!', soundMediaSource.container.gainNode);
                 }
             }
         }
     }
 }
 
+/**
+ * inhecta a filterNode (probable any AudioNode) into the fron tof the node's path
+ * connects the filter to the context destination, socurrently doesnt allos filter
+ * stacking
+ *
+ * @param sourceNode: AudioNode
+ * @param filterNode: AudioNode
+ * @param volume: float
+ */
+function injectFilterIfPossible(sourceNode, filterNode, volume) {
+
+    if (sourceNode.numberOfOutputs !== 1) {
+        return;
+    }
+    let targetNode = null;
+    if (volume !== null && isFinite(volume)) {
+        console.log('walls-have-ears | Injecting Filter at volume', volume);
+        targetNode = sourceNode.context.createGain();
+        targetNode.gain.value = parseFloat(volume);
+        targetNode.connect(sourceNode.context.destination);
+    } else {
+        console.log('walls-have-ears | Injecting Filter at volume', 'current');
+        targetNode = sourceNode.context.destination;
+    }
+
+    sourceNode.disconnect(0);
+    filterNode.disconnect(0);
+    sourceNode.connect(filterNode);
+    filterNode.connect(targetNode);
+}
+
+/**
+ * Removes any node after the sourceNode so the sound can be heard clearly.
+ * This could be done in a loop to clear an entire path
+ *
+ * @param sourceNode: AudioNode
+ */
+function clearSound(sourceNode) {
+    if (sourceNode.destination === sourceNode.context.destination) {
+        return;
+    }
+    const filterNode = sourceNode.destination;
+    //filterNode.disconnect(0);
+    sourceNode.disconnect(0);
+    sourceNode.connect(sourceNode.context.destination);
+}
+
 // Get if ywo points have a wall
 function howManyWallsBetween({ x: x1, y: y1 }, { x: x2, y: y2 }) {
     const ray = new Ray({ x: x1, y: y1 }, { x: x2, y: y2 });
-    const collisions = WallsLayer.getWallCollisionsForRay(ray, canvas.walls.blockVision);
+    const collisions = canvas.walls.getRayCollisions(ray, {
+        type: 'movement',
+        mode: 'all'
+    });
 
     let res = (collisions && collisions.length !== undefined) ? collisions.length : 0;
     if (res > 0) {
         // Avoid mufflin through open doors
         for (var i = 0; i < collisions.length; i++) {
             const wall = collisions[i];
+            console.log('walls-have-ears | Checking collisions on this wall', wall);
             //If it's a door
             if (wall.door !== 0) {
                 //If it is open
@@ -149,7 +258,12 @@ function howManyWallsBetween({ x: x1, y: y1 }, { x: x2, y: y2 }) {
 }
 
 //“Too complex to use” way to get active token:
-function getActingToken({ actor, limitActorTokensToControlledIfHaveSome = true, warn = true, linked = false } = {}) {
+function getActingToken({
+    actor,
+    limitActorTokensToControlledIfHaveSome = true,
+    warn = true,
+    linked = false
+} = {}) {
     const tokens = [];
     const character = game.user.character;
     if (actor) {

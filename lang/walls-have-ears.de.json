@@ -1,0 +1,7 @@
+{
+    "WHE.walls-have-ears": "Wände haben Ohren",
+    "WHE.settings.title": "Wände haben Ohren",
+    "WHE.save": "Speichern",
+    "WHE.settings_disable.title": "Desactivar la amortiguación del sonido",
+    "WHE.settings_disable.hint": "Este módulo permite amortiguar los sonidos para mejorar la inmersión. Pero puede desactivar esta función por motivos de rendimiento."
+}
