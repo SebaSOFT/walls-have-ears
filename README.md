@@ -27,7 +27,7 @@ In the setup screen, use the URL https://raw.githubusercontent.com/SebaSOFT/wall
 
 See:
 
-![Test cases for Muffling logic](/mufflinLogic.jpg)
+![Test cases for Muffling logic](mufflinLogic.jpg)
 
 ## TO DO
 
