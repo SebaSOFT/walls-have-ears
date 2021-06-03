@@ -233,26 +233,11 @@ function clearSound(sourceNode) {
 // Get if ywo points have a wall
 function howManyWallsBetween({ x: x1, y: y1 }, { x: x2, y: y2 }) {
     const ray = new Ray({ x: x1, y: y1 }, { x: x2, y: y2 });
-    const collisions = canvas.walls.getRayCollisions(ray, {
-        type: 'movement',
-        mode: 'all'
-    });
+
+    //This already takes into account open doors
+    const collisions = canvas.walls.getRayCollisions(ray, { type: 'movement', mode: 'all' });
 
     let res = (collisions && collisions.length !== undefined) ? collisions.length : 0;
-    if (res > 0) {
-        // Avoid mufflin through open doors
-        for (var i = 0; i < collisions.length; i++) {
-            const wall = collisions[i];
-            console.log('walls-have-ears | Checking collisions on this wall', wall);
-            //If it's a door
-            if (wall.door !== 0) {
-                //If it is open
-                if (wall.ds === 1) {
-                    res--;
-                }
-            }
-        }
-    }
 
     return res;
 }
