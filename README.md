@@ -11,7 +11,7 @@ In the setup screen, use the URL https://raw.githubusercontent.com/SebaSOFT/wall
 
 - v0.0.1: Initial release.
 - v0.0.2: Added translations and now compatible with FoundryVTT 0.8.x
-- v0.0.3: Cleaned up a lot of code, console logs. Update on more events
+- v0.0.3: Cleaned up a lot of code, console logs. Update on more events. Added 4 levels of muffling
 
 ## Features
 
@@ -22,6 +22,12 @@ In the setup screen, use the URL https://raw.githubusercontent.com/SebaSOFT/wall
 - Set sound occlussion to limited or none as needed
 - It will detect walls and muffle the sound
 - It also works with sound easing
+- Windows are less likely to muffle
+- Terrain walls dont muffle
+
+See:
+
+![Test cases for Muffling logic](/mufflinLogic.jpg)
 
 ## TO DO
 
