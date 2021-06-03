@@ -1,6 +1,6 @@
 # Foundry VTT - Walls have ears
 
-"A simple-as-possible module to muffle sounds that are behind a wall for a player.
+"A simple-as-possible module to muffle sounds that are behind a wall for a player."
 
 ## Installation
 

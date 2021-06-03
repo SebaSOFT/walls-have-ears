@@ -1,6 +1,6 @@
 {
     "name": "walls-have-ears",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "description": "A simple-as-possible module to muffle sounds that are behind a wall for a player.",
     "main": "scripts/tokenmagic.js",
     "scripts": {
