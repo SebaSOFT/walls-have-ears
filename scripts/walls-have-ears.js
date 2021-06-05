@@ -4,7 +4,7 @@ import WHE from './WHE.js';
 let wallsSoundsDisabled = true;
 let listenerToken = null;
 
-const clamp = (num, min, max) => Math.min(Math.max(num, min), max)
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 /* ------------------------------------ */
 // Initialize module
@@ -49,8 +49,19 @@ Hooks.once('ready', async function () {
 /* ------------------------------------ */
 // When token is about to be moved
 /* ------------------------------------ */
-Hooks.on('preUpdateToken', (_token, _updateData, _options, _userId) => {
-    // console.log('walls-have-ears | preUpdateToken called');
+Hooks.on('updateToken', (_token, _updateData, _options, _userId) => {
+    // console.log('walls-have-ears | updateToken called');
+    //if (token != listenerToken) return;
+    if (listenerToken) {
+        doTheMuffling();
+    }
+});
+
+/* ------------------------------------ */
+// When a Door is about to be opened
+/* ------------------------------------ */
+Hooks.on('updateWall', (_token, _updateData, _options, _userId) => {
+    // console.log('walls-have-ears | updateWall called');
     //if (token != listenerToken) return;
     if (listenerToken) {
         doTheMuffling();
@@ -60,8 +71,8 @@ Hooks.on('preUpdateToken', (_token, _updateData, _options, _userId) => {
 /* ------------------------------------ */
 // When ambient sound is about to be moved
 /* ------------------------------------ */
-Hooks.on('preUpdateAmbientSound', (_ambientSound, _updateData, _options, _userId) => {
-    // console.log('walls-have-ears | preUpdateAmbientSound called');
+Hooks.on('updateAmbientSound', (_ambientSound, _updateData, _options, _userId) => {
+    // console.log('walls-have-ears | updateAmbientSound called');
     if (listenerToken) {
         doTheMuffling();
     }
@@ -95,8 +106,7 @@ Hooks.on('controlToken', (token, selected) => {
  * @param muffling : int
  */
 function getAudioMuffler(context, muffling) {
-
-    const clamped = Math.floor(clamp(muffling,0,4));
+    const clamped = Math.floor(clamp(muffling, 0, 4));
 
     const MUFF_LEVELS = [5500, 670, 352, 200, 100]; // This is not linear
 
@@ -116,16 +126,18 @@ function getAudioMuffler(context, muffling) {
 function doTheMuffling() {
     if (wallsSoundsDisabled) return;
     if (!listenerToken) return;
+    if (game.audio.locked) return;
 
     const tokenPosition = {
         x: listenerToken.center.x,
         y: listenerToken.center.y,
     };
-    console.log('walls-have-ears | Token is at: ', tokenPosition);
+
     /**
      * @type {AmbientSound[]}
      */
-    const ambientSounds = canvas.sounds.placeables;
+    const ambientSounds = game.canvas.sounds.placeables;
+
     if (ambientSounds && ambientSounds.length > 0) {
         for (var i = 0; i < ambientSounds.length; i++) {
             const currentAmbientSound = ambientSounds[i];
@@ -157,39 +169,49 @@ function doTheMuffling() {
             const distanceToSound = canvas.grid.measureDistance(tokenPosition, soundPosition);
             // console.log('walls-have-ears | Sound ' + i, soundMediaSource, currentSoundRadius, distanceToSound);
 
-            const muffleIndex = howManyWallsBetween(soundPosition, tokenPosition);
+            if (currentSoundRadius < Math.floor(distanceToSound)) {
+                continue;
+            }
+
+            const muffleIndex = getMufflingIndex(soundPosition, tokenPosition);
+            if (muffleIndex < 0) {
+                // clearSound(soundMediaSource.container.gainNode);
+                // console.log('walls-have-ears | Sound ' + i, currentAmbientSound, soundMediaSource);
+                continue;
+            }
+
             const shouldBeMuffled = muffleIndex >= 1;
-            console.log('walls-have-ears | muffle index: ', muffleIndex);
+            // console.log('walls-have-ears | muffle index: ', muffleIndex);
             const audioMuffler = getAudioMuffler(soundMediaSource.context, muffleIndex);
-            
+
             if (soundMediaSource.playing) {
                 if (currentSoundRadius >= Math.floor(distanceToSound)) {
                     // Muufle as needed
                     if (shouldBeMuffled) {
+                        // console.log('walls-have-ears | Muffling');
                         injectFilterIfPossible(soundMediaSource.container.gainNode, audioMuffler);
                     } else {
+                        // console.log('walls-have-ears | Should not be muffled');
                         clearSound(soundMediaSource.container.gainNode);
                     }
                 } else {
-                    // console.log('walls-have-ears | Im FAR AWAY! and IS PLAYING', soundMediaSource.container.gainNode);
+                    console.log('walls-have-ears | Im FAR AWAY! and IS PLAYING');
+                    // clearSound(soundMediaSource.container.gainNode);
                     continue;
                 }
             } else {
-                if (currentSoundRadius >= Math.floor(distanceToSound)) {
-                    // Schedule on start to take into consideration the moment
-                    // the user hasn-t yet interacted with the browser so sound is unavailable
-                    soundMediaSource.on('start', function (soundSource) {
-                        // Muffle as needed
-                        if (shouldBeMuffled) {
-                            injectFilterIfPossible(soundSource.container.gainNode, audioMuffler);
-                        } else {
-                            clearSound(soundSource.container.gainNode);
-                        }
-                    });
-                } else {
-                    // console.log('walls-have-ears | Im FAR AWAY!', soundMediaSource.container.gainNode);
-                    continue;
-                }
+                // Schedule on start to take into consideration the moment
+                // the user hasn-t yet interacted with the browser so sound is unavailable
+                // console.log('walls-have-ears | WIll muffle on start');
+                soundMediaSource.on('start', function (soundSource) {
+                    // Muffle as needed
+                    if (shouldBeMuffled) {
+                        injectFilterIfPossible(soundSource.container.gainNode, audioMuffler);
+                    } else {
+                        console.log('walls-have-ears | ON START Should not be muffled');
+                        // clearSound(soundSource.container.gainNode);
+                    }
+                });
             }
         }
     }
@@ -230,8 +252,16 @@ function clearSound(sourceNode) {
 }
 
 // Get if ywo points have a wall
-function howManyWallsBetween({ x: x1, y: y1 }, { x: x2, y: y2 }) {
+function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
     const ray = new Ray({ x: x1, y: y1 }, { x: x2, y: y2 });
+
+    const hasSoundOccluded = canvas.walls.getRayCollisions(ray, {
+        type: 'sound',
+        mode: 'any',
+    });
+    if (hasSoundOccluded) {
+        return -1;
+    }
 
     // If you dont see it, it's muffled
     const sensesCollision = canvas.walls.getRayCollisions(ray, {
