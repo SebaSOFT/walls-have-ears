@@ -12,6 +12,11 @@ In the setup screen, use the URL https://raw.githubusercontent.com/SebaSOFT/wall
 - v0.0.1: Initial release.
 - v0.0.2: Added translations and now compatible with FoundryVTT 0.8.x
 - v0.0.3: Cleaned up a lot of code, console logs. Update on more events. Added 4 levels of muffling
+- v0.0.4: Better event detection
+  - Better event detection when opening doors etc.
+  - Simpler logic won't take into consideration har await sounds, occluded sounds and more.
+  - Better initialization detection. All sound needs to start after first user interaction.
+  - GitHub Workflow for more automated releases
 
 ## Features
 
