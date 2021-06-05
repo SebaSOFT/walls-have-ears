@@ -14,27 +14,27 @@
     {
       "lang": "de",
       "name": "Deutsch (German)",
-      "path": "lang/walls-have-ears.de.json"
+      "path": "languages/walls-have-ears.de.json"
     },
     {
       "lang": "en",
       "name": "English",
-      "path": "lang/walls-have-ears.en.json"
+      "path": "languages/walls-have-ears.en.json"
     },
     {
       "lang": "es",
       "name": "Español (Spanish)",
-      "path": "lang/walls-have-ears.es.json"
+      "path": "languages/walls-have-ears.es.json"
     },
     {
       "lang": "fr",
       "name": "French (French)",
-      "path": "lang/walls-have-ears.fr.json"
+      "path": "languages/walls-have-ears.fr.json"
     },
     {
       "lang": "pt-BR",
       "name": "Português (Portuguese)",
-      "path": "lang/walls-have-ears.pt-BR.json"
+      "path": "languages/walls-have-ears.pt-BR.json"
     }
   ],
   "url": "https://github.com/SebaSOFT/walls-have-ears",
