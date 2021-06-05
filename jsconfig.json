@@ -1,5 +1,5 @@
 {
     "compilerOptions": {
-        "types": "foundry-pc-types"
+        "types": ["foundry-vtt-types"]
     }
 }
