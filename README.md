@@ -1,10 +1,12 @@
 # Foundry VTT - Walls have ears
 
+[![GitHub license](https://img.shields.io/github/license/SebaSOFT/walls-have-ears)](https://github.com/SebaSOFT/walls-have-ears/blob/main/LICENSE) ![GitHub release (latest by date and asset including pre-releases)](https://img.shields.io/github/downloads-pre/SebaSOFT/walls-have-ears/latest/module.zip?label=downloads) [![Foundry Installs](https://img.shields.io/badge/dynamic/json?color=green&label=Foundry%20installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fwalls-have-ears)](https://forge-vtt.com/bazaar#package=walls-have-ears) [![Minimum Foundry VTT version](https://img.shields.io/badge/dynamic/json?label=Foundry%20VTT%20version&query=%24.minimumCoreVersion&suffix=%20or%20later&url=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json)](https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json)
+
 "A simple-as-possible module to muffle sounds that are behind a wall for a player."
 
 ## Installation
 
-In the setup screen, use the URL https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/main/module.json to install the module.
+In the setup screen, use the URL https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json to install the module.
 
 
 ## Release Notes
