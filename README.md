@@ -19,6 +19,8 @@ In the setup screen, use the URL https://github.com/SebaSOFT/walls-have-ears/rel
   - Simpler logic won't take into consideration har await sounds, occluded sounds and more.
   - Better initialization detection. All sound needs to start after first user interaction.
   - GitHub Workflow for more automated releases
+- latest:
+  - Added Badges to README 
 
 ## Features
 
