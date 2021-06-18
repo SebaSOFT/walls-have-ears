@@ -110,7 +110,7 @@ function getAudioMuffler(context, muffling) {
 
     const MUFF_LEVELS = [5500, 670, 352, 200, 100]; // This is not linear
 
-    if (clamped == 0) return null;
+    if (clamped === 0) return null;
 
     // console.log('walls-have-ears | Now we have a context', context);
     const audioMuffler = context.createBiquadFilter(); // Walls have ears!
@@ -197,7 +197,7 @@ function doTheMuffling() {
                 } else {
                     console.log('walls-have-ears | Im FAR AWAY! and IS PLAYING');
                     // clearSound(soundMediaSource.container.gainNode);
-                    continue;
+                    // continue;
                 }
             } else {
                 // Schedule on start to take into consideration the moment
@@ -270,7 +270,7 @@ function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
     });
 
     // Then again if terrain collissions exist, you are in the same room
-    const noTerrainSightCollisions = sensesCollision.filter((item) => item.type != 2);
+    const noTerrainSightCollisions = sensesCollision.filter((item) => item.type !== 2);
 
     //This already takes into account open doors
     const moveCollisions = canvas.walls.getRayCollisions(ray, {
@@ -283,7 +283,7 @@ function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
     const finalMuffling = Math.floor((noTerrainSightCollisions.length + moveCollisions.length) / 2);
 
     // Account for ethereal walls
-    if (sensesCollision.length >= 1 && moveCollisions.length == 0) {
+    if (sensesCollision.length >= 1 && moveCollisions.length === 0) {
         return 0;
     }
 
