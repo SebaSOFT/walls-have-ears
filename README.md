@@ -1,8 +1,12 @@
 # Foundry VTT - Walls have ears
 
-[![GitHub license](https://img.shields.io/github/license/SebaSOFT/walls-have-ears)](https://github.com/SebaSOFT/walls-have-ears/blob/main/LICENSE) ![GitHub release (latest by date and asset including pre-releases)](https://img.shields.io/github/downloads-pre/SebaSOFT/walls-have-ears/latest/module.zip?label=downloads) [![Foundry Installs](https://img.shields.io/badge/dynamic/json?color=green&label=Foundry%20installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fwalls-have-ears)](https://forge-vtt.com/bazaar#package=walls-have-ears) [![Minimum Foundry VTT version](https://img.shields.io/badge/dynamic/json?label=Foundry%20VTT%20version&query=%24.minimumCoreVersion&suffix=%20or%20later&url=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json)](https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json)
+[![GitHub license](https://img.shields.io/github/license/SebaSOFT/walls-have-ears)](https://github.com/SebaSOFT/walls-have-ears/blob/main/LICENSE) 
+[![GitHub release](https://img.shields.io/github/downloads-pre/SebaSOFT/walls-have-ears/latest/module.zip?label=downloads)](https://github.com/SebaSOFT/walls-have-ears/releases/) 
+[![Foundry HUB Installs](https://img.shields.io/badge/dynamic/json?color=green&label=FoundryHUB%20installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fwalls-have-ears)](https://forge-vtt.com/bazaar#package=walls-have-ears) 
+[![Foundry HUB Endorsements](https://img.shields.io/badge/dynamic/json?label=FoundryHUB%20Endorsements&query=%24.endorsements&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fwalls-have-ears)](https://forge-vtt.com/bazaar#package=walls-have-ears)
+[![Minimum Foundry VTT version](https://img.shields.io/badge/dynamic/json?label=Foundry%20VTT%20version&query=%24.minimumCoreVersion&suffix=%20or%20later&url=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json)](https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json)
 
-"A simple-as-possible module to muffle sounds that are behind a wall for a player."
+"A simple-as-possible module to muffle sounds that are behind a wall for a player or token."
 
 ## Installation
 
@@ -32,7 +36,8 @@ In the setup screen, use the URL https://github.com/SebaSOFT/walls-have-ears/rel
 - It will detect walls and muffle the sound
 - It also works with sound easing
 - Windows are less likely to muffle
-- Terrain walls dont muffle
+- Terrain walls dont contribute to muffling
+- Ethereal Walls dont contribute to muffling
 
 See:
 
@@ -41,8 +46,8 @@ See:
 ## TO DO
 
 - Estimate L shaped rooms and track sound bouncing, so it doesn't get muffled (possible echo/delay effect)
-- Have three or more muffling densities and assign them to the wall they are listening through
-- Have a setting for disable sound muffling, useful for muffled sounds or ambient global sounds you may want to eclude
+- ~~Have three or more muffling densities and assign them to the wall they are listening through~~
+- ~~Have a setting for disable sound muffling, useful for muffled sounds or ambient global sounds you may want to eclude~~
 
 ## Contributing
 
