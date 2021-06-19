@@ -2,7 +2,7 @@
     "name": "walls-have-ears",
     "version": "0.0.4",
     "description": "A simple-as-possible module to muffle sounds that are behind a wall for a player.",
-    "main": "scripts/tokenmagic.js",
+    "main": "scripts/main.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "lint": "eslint --fix scripts/*.js"

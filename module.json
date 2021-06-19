@@ -9,11 +9,10 @@
   "version": "0.0.4",
   "minimumCoreVersion": "0.8.5",
   "compatibleCoreVersion": "0.8.7",
-  "scripts": [
-    "scripts/main.js",
-    "scripts/settings.js"
-  ],
+  "scripts": [],
   "esmodules": [
+    "scripts/settings.js",
+    "scripts/main.js",
     "scripts/WHE.js"
   ],
   "styles": [],

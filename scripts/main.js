@@ -10,12 +10,10 @@ const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 // Initialize module
 /* ------------------------------------ */
 Hooks.once('init', async function () {
-    // console.log('walls-have-ears | Initializing foundry-ping-times');
-
-    // Get User Options
-    wallsSoundsDisabled = game.settings.get(WHE.MODULE, WHE.SETTING_DISABLE);
+    // console.log('walls-have-ears | Initializing walls have ears');
 
     // Register custom sheets (if any)
+
     // console.log('walls-have-ears | init finished');
 });
 
@@ -24,8 +22,12 @@ Hooks.once('init', async function () {
 /* ------------------------------------ */
 Hooks.once('setup', function () {
     // console.log('walls-have-ears | module setup started');
-    // Do anything after initialization but before
-    // ready
+
+    // Do anything after initialization but before ready
+
+    // Get User Options
+    wallsSoundsDisabled = game.settings.get(WHE.MODULE, WHE.SETTING_DISABLE);
+
     // console.log('walls-have-ears | module setup finished');
 });
 
@@ -51,7 +53,7 @@ Hooks.once('ready', async function () {
 /* ------------------------------------ */
 Hooks.on('updateToken', (_token, _updateData, _options, _userId) => {
     // console.log('walls-have-ears | updateToken called');
-    //if (token != listenerToken) return;
+
     if (listenerToken) {
         doTheMuffling();
     }
@@ -62,7 +64,7 @@ Hooks.on('updateToken', (_token, _updateData, _options, _userId) => {
 /* ------------------------------------ */
 Hooks.on('updateWall', (_token, _updateData, _options, _userId) => {
     // console.log('walls-have-ears | updateWall called');
-    //if (token != listenerToken) return;
+
     if (listenerToken) {
         doTheMuffling();
     }
@@ -91,6 +93,7 @@ Hooks.on('controlToken', (token, selected) => {
         listenerToken = token;
     }
     if (listenerToken) {
+        // console.log('walls-have-ears | Got a Token, Doing the Muffling');
         doTheMuffling();
     } else {
         // console.log('walls-have-ears | Looks like you are the GM');
@@ -124,6 +127,7 @@ function getAudioMuffler(context, muffling) {
 }
 
 function doTheMuffling() {
+
     if (wallsSoundsDisabled) return;
     if (!listenerToken) return;
     if (game.audio.locked) return;
@@ -137,9 +141,9 @@ function doTheMuffling() {
      * @type {AmbientSound[]}
      */
     const ambientSounds = game.canvas.sounds.placeables;
-
+    // console.log('walls-have-ears | The SOUNDS: ', ambientSounds);
     if (ambientSounds && ambientSounds.length > 0) {
-        for (var i = 0; i < ambientSounds.length; i++) {
+        for (let i = 0; i < ambientSounds.length; i++) {
             const currentAmbientSound = ambientSounds[i];
             /**
              * @type {Sound}
@@ -148,15 +152,15 @@ function doTheMuffling() {
 
             //Added in 0.8.x for Darkness range setting
             if (!currentAmbientSound.isAudible) {
-                // console.warn('walls-have-ears | Sound not Audible for some reason');
+                console.warn('walls-have-ears | Sound not Audible for some reason');
                 continue;
             }
             if (!soundMediaSource.context) {
-                // console.warn('walls-have-ears | No Audio Context, waiting for user interaction');
+                console.warn('walls-have-ears | No Audio Context, waiting for user interaction');
                 continue;
             }
             if (currentAmbientSound.type !== 'l') {
-                // console.warn('walls-have-ears | Ignoring global ambients sounds (for now)');
+                console.warn('walls-have-ears | Ignoring global ambients sounds (for now)');
                 continue;
             }
 
@@ -167,7 +171,7 @@ function doTheMuffling() {
             };
 
             const distanceToSound = canvas.grid.measureDistance(tokenPosition, soundPosition);
-            // console.log('walls-have-ears | Sound ' + i, soundMediaSource, currentSoundRadius, distanceToSound);
+            console.debug('walls-have-ears | Sound ' + i, soundMediaSource, currentSoundRadius, distanceToSound);
 
             if (currentSoundRadius < Math.floor(distanceToSound)) {
                 continue;
@@ -195,7 +199,7 @@ function doTheMuffling() {
                         clearSound(soundMediaSource.container.gainNode);
                     }
                 } else {
-                    console.log('walls-have-ears | Im FAR AWAY! and IS PLAYING');
+                    // console.log('walls-have-ears | Im FAR AWAY! and IS PLAYING');
                     // clearSound(soundMediaSource.container.gainNode);
                     // continue;
                 }
@@ -208,7 +212,7 @@ function doTheMuffling() {
                     if (shouldBeMuffled) {
                         injectFilterIfPossible(soundSource.container.gainNode, audioMuffler);
                     } else {
-                        console.log('walls-have-ears | ON START Should not be muffled');
+                        // console.log('walls-have-ears | ON START Should not be muffled');
                         // clearSound(soundSource.container.gainNode);
                     }
                 });

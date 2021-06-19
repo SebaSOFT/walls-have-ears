@@ -14,4 +14,6 @@ Hooks.once('init', async function () {
         default: false
     });
 
+    // Register custom sheets (if any)
+    // console.log('walls-have-ears | settings registration finished');
 });

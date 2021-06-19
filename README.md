@@ -23,6 +23,7 @@ See [CHANGELOG](CHANGELOG.md)
 - Ignores open doors so sound should not be muffled if listened throughan open door
 
 ## How it works
+- Enable Token Vision on the scene (this is a MUST)
 - Set sound occlussion to limited or none as needed
 - It will detect walls and muffle the sound
 - It also works with sound easing
