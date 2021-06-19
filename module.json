@@ -9,10 +9,12 @@
   "version": "0.0.4",
   "minimumCoreVersion": "0.8.5",
   "compatibleCoreVersion": "0.8.7",
-  "scripts": [],
+  "scripts": [
+    "scripts/main.js",
+    "scripts/settings.js"
+  ],
   "esmodules": [
-    "scripts/settings.js",
-    "scripts/walls-have-ears.js"
+    "scripts/WHE.js"
   ],
   "styles": [],
   "languages": [

@@ -15,16 +15,7 @@ In the setup screen, use the URL https://github.com/SebaSOFT/walls-have-ears/rel
 
 ## Release Notes
 
-- v0.0.1: Initial release.
-- v0.0.2: Added translations and now compatible with FoundryVTT 0.8.x
-- v0.0.3: Cleaned up a lot of code, console logs. Update on more events. Added 4 levels of muffling
-- v0.0.4: Better event detection
-  - Better event detection when opening doors etc.
-  - Simpler logic won't take into consideration har await sounds, occluded sounds and more.
-  - Better initialization detection. All sound needs to start after first user interaction.
-  - GitHub Workflow for more automated releases
-- latest:
-  - Added Badges to README 
+See [CHANGELOG](CHANGELOG.md)
 
 ## Features
 
@@ -36,12 +27,25 @@ In the setup screen, use the URL https://github.com/SebaSOFT/walls-have-ears/rel
 - It will detect walls and muffle the sound
 - It also works with sound easing
 - Windows are less likely to muffle
-- Terrain walls dont contribute to muffling
-- Ethereal Walls dont contribute to muffling
+- Terrain walls don't contribute to muffling
+- Ethereal Walls don't contribute to muffling
 
 See:
 
 ![Test cases for Muffling logic](https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/develop/mufflingLogic.jpg)
+
+Demo videos:
+
+
+### Nightclub demo
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=EXkrlQVEeAo
+" target="_blank"><img src="http://img.youtube.com/vi/EXkrlQVEeAo/0.jpg"
+alt="Nightclub demo" width="240" height="180" border="10" /></a>
+
+### Test suite demo
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=hlsi4gw1YIA
+" target="_blank"><img src="http://img.youtube.com/vi/hlsi4gw1YIA/0.jpg"
+alt="Test suite demo" width="240" height="180" border="10" /></a>
 
 ## TO DO
 
