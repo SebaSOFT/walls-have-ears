@@ -106,3 +106,5 @@ dist
 # IntelliJ IDEs
 .idea/
 .vscode/
+
+walls-have-ears.lock
