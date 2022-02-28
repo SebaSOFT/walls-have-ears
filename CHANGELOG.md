@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [1.0.0] 2022-02-28
+
+### CHANGED
+
+-   Added compatibility with v9, all other versions are not compatible now.
+
+### ADDED
+
+-   Better logging for debugging. End users not affected.
+
 ## [0.1.0] 2021-06-19
 
 ### CHANGED
