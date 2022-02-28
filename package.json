@@ -2,7 +2,7 @@
     "name": "walls-have-ears",
     "version": "0.0.4",
     "description": "A simple-as-possible module to muffle sounds that are behind a wall for a player.",
-    "main": "scripts/tokenmagic.js",
+    "main": "scripts/main.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "lint": "eslint --fix scripts/*.js"
@@ -24,7 +24,7 @@
     },
     "homepage": "https://github.com/SebaSOFT/walls-have-ears#readme",
     "devDependencies": {
-        "@league-of-foundry-developers/foundry-vtt-types": "^0.7.10-0",
+        "@league-of-foundry-developers/foundry-vtt-types": "^9.249.4",
         "babel-eslint": "^10.1.0",
         "eslint": "^7.11.0",
         "prettier-eslint": "^12.0.0"
