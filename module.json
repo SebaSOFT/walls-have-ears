@@ -6,9 +6,9 @@
   "authors": [],
   "url": "https://github.com/SebaSOFT/walls-have-ears",
   "flags": {},
-  "version": "0.1.0",
-  "minimumCoreVersion": "0.8.5",
-  "compatibleCoreVersion": "0.8.8",
+  "version": "1.0.0",
+  "minimumCoreVersion": "9",
+  "compatibleCoreVersion": "9",
   "scripts": [],
   "esmodules": [
     "scripts/settings.js",
@@ -47,7 +47,7 @@
   "dependencies": [],
   "socket": false,
   "manifest": "https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json",
-  "download": "https://github.com/SebaSOFT/walls-have-ears/releases/download/0.0.4/module.zip",
+  "download": "https://github.com/SebaSOFT/walls-have-ears/releases/download/1.0.0/module.zip",
   "protected": false,
   "coreTranslation": false
 }

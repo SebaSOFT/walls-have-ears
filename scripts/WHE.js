@@ -22,10 +22,10 @@ export default class WHE {
      * @param message Some text message to show on the console
      * @param args Optional more arguments that will be sent to console.log
      */
-    static logMessage(message, args) {
+    static logMessage(message, ...args) {
         if (!this.debug) {
             return;
         }
-        console.log('WHE | ' + message, args);
+        console.log('WHE | ' + message, ...args);
     }
 }
