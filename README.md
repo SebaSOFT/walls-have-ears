@@ -23,13 +23,14 @@ See [CHANGELOG](CHANGELOG.md)
 - Ignores open doors so sound should not be muffled if listened throughan open door
 
 ## How it works
-- Enable Token Vision on the scene (this is a MUST)
-- Set sound occlussion to limited or none as needed
-- It will detect walls and muffle the sound
-- It also works with sound easing
-- Windows are less likely to muffle
-- Terrain walls don't contribute to muffling
-- Ethereal Walls don't contribute to muffling
+- Enable Token Vision on the scene (this is a **MUST**)
+- **EITHER** Set sound occlussion on Walls to limited or none as needed
+- **OR** Disable "Constrained by Walls" on the Sound
+- It works with sound easing (volume changing)
+- It will detect walls and muffle the sound (see table below)
+- Windows are less likely to muffle (see table below)
+- Terrain walls don't contribute to muffling (see table below)
+- Ethereal Walls don't contribute to muffling (see table below)
 
 See:
 
@@ -53,6 +54,10 @@ alt="Test suite demo" width="240" height="180" border="10" /></a>
 - Estimate L shaped rooms and track sound bouncing, so it doesn't get muffled (possible echo/delay effect)
 - ~~Have three or more muffling densities and assign them to the wall they are listening through~~
 - ~~Have a setting for disable sound muffling, useful for muffled sounds or ambient global sounds you may want to eclude~~
+
+## Known Issues
+
+- If the first action you do when accessing the site is selecting a token, it won't be muffled, just select another token or move it one time.
 
 ## Contributing
 
