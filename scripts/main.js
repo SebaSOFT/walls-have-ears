@@ -275,9 +275,8 @@ function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
 
     // Then again if terrain collissions exist, you are in the same room
     const noTerrainSightCollisions = sensesCollision.filter((impactVertex) => {
-        const wall = impactVertex?.edges?.first()?.wall;
-        if (!wall) return false;
-        return !wall.document.limited;
+        const wall = impactVertex?.edges?.first()?.isLimited;
+        return !wall;
     });
 
     //This already takes into account open doors
