@@ -83,7 +83,7 @@ Hooks.on('updateAmbientSound', (_ambientSound, _updateData, _options, _userId) =
 });
 
 // If its a gamemaster, lets get the controlled token
-Hooks.on('controlToken', (token, selected) => {
+Hooks.on('controlToken', async (token, selected) => {
     if (!selected) {
         WHE.logMessage('No token selected but getting from user');
         listenerToken = getActingToken({
@@ -96,6 +96,7 @@ Hooks.on('controlToken', (token, selected) => {
     }
     if (listenerToken) {
         WHE.logMessage('Got a Token, Doing the Muffling');
+        await game.audio.awaitFirstGesture();
         doTheMuffling();
     } else {
         WHE.logMessage('Looks like you are the GM');
@@ -159,10 +160,6 @@ function doTheMuffling() {
             }
             if (!soundMediaSource.context) {
                 console.warn('WHE | No Audio Context, waiting for user interaction');
-                continue;
-            }
-            if (currentAmbientSound.type !== 'l') {
-                console.warn('WHE | Ignoring global ambients sounds (for now)');
                 continue;
             }
 
@@ -261,26 +258,31 @@ function clearSound(sourceNode) {
 function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
     const ray = new Ray({ x: x1, y: y1 }, { x: x2, y: y2 });
 
-    const hasSoundOccluded = canvas.walls.getRayCollisions(ray, {
+    const hasSoundOccluded = canvas.walls.checkCollision(ray, {
         type: 'sound',
         mode: 'any',
     });
     if (hasSoundOccluded) {
+        WHE.logMessage('NO ABLE TO HEAR');
         return -1;
     }
 
     // If you dont see it, it's muffled
-    const sensesCollision = canvas.walls.getRayCollisions(ray, {
+    const sensesCollision = canvas.walls.checkCollision(ray, {
         type: 'sight',
         mode: 'all',
     });
 
     // Then again if terrain collissions exist, you are in the same room
-    const noTerrainSightCollisions = sensesCollision.filter((item) => item.type !== 2);
+    const noTerrainSightCollisions = sensesCollision.filter((impactVertex) => {
+        const wall = impactVertex?.edges?.first()?.wall;
+        if (!wall) return false;
+        return !wall.document.limited;
+    });
 
     //This already takes into account open doors
-    const moveCollisions = canvas.walls.getRayCollisions(ray, {
-        type: 'movement',
+    const moveCollisions = canvas.walls.checkCollision(ray, {
+        type: 'move',
         mode: 'all',
     });
 
@@ -288,6 +290,7 @@ function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
     // See image:
     const finalMuffling = Math.floor((noTerrainSightCollisions.length + moveCollisions.length) / 2);
 
+    WHE.logMessage('MOVE SENSE Coll', moveCollisions, sensesCollision);
     // Account for ethereal walls
     if (sensesCollision.length >= 1 && moveCollisions.length === 0) {
         return 0;
