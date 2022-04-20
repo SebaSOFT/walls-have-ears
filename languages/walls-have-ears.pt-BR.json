@@ -1,7 +1,9 @@
 {
-    "WHE.walls-have-ears": "As paredes têm orelhas",
-    "WHE.settings.title": "As paredes têm orelhas",
-    "WHE.save": "Salvar",
-    "WHE.settings_disable.title": "Desativar abafamento de som",
-    "WHE.settings_disable.hint": "Este módulo permite que os sons sejam abafados para uma melhor imersão. Mas você pode desativar esse recurso por motivos de desempenho."
+  "WHE.walls-have-ears": "As paredes têm orelhas",
+  "WHE.settings.title": "As paredes têm orelhas",
+  "WHE.save": "Salvar",
+  "WHE.settings_disable.title": "Desativar abafamento de som",
+  "WHE.settings_disable.hint": "Este módulo permite que os sons sejam abafados para uma melhor imersão. Mas você pode desativar esse recurso por motivos de desempenho.",
+  "WHE.settings_debug.title": "Ativar o modo de depuração",
+  "WHE.settings_debug.hint": "Para solucionar problemas de suas cenas, ative isso para ver o índice de abafamento ao selecionar/mover seus tokens."
 }

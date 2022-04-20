@@ -3,5 +3,7 @@
     "WHE.settings.title": "Wände haben Ohren",
     "WHE.save": "Speichern",
     "WHE.settings_disable.title": "Geräuschdämpfung deaktivieren",
-    "WHE.settings_disable.hint": "Mit diesem Modul können Geräusche gedämpft werden, um das Eintauchen zu verbessern. Sie können diese Funktion jedoch aus Leistungsgründen deaktivieren."
+    "WHE.settings_disable.hint": "Mit diesem Modul können Geräusche gedämpft werden, um das Eintauchen zu verbessern. Sie können diese Funktion jedoch aus Leistungsgründen deaktivieren.",
+    "WHE.settings_debug.title": "Aktivieren Sie den Debug-Modus",
+    "WHE.settings_debug.hint": "Um Fehler in Ihren Szenen zu beheben, aktivieren Sie dies, um den Dämpfungsindex anzuzeigen, wenn Sie Ihre Token auswählen/verschieben."
 }

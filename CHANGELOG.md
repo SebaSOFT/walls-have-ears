@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [1.0.1] 2022-04-20
+
+### CHANGED
+
+-   Corrected some translations and improved code commenting
+
+### ADDED
+
+-   Debug setting, so you can see the inner workings of the module and troubleshoot your scenes
+
 ## [1.0.0] 2022-02-28
 
 ### CHANGED
