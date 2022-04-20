@@ -1,7 +1,9 @@
 {
-    "WHE.walls-have-ears": "Les murs ont des oreilles",
-    "WHE.settings.title": "Les murs ont des oreilles",
-    "WHE.save": "Enregistrer",
-    "WHE.settings_disable.title": "Désactiver le silencieux",
-    "WHE.settings_disable.hint": "Ce module permet d'étouffer les sons pour une meilleure intégration. Mais vous pouvez désactiver cette fonctionnalité pour des raisons de performances."
+  "WHE.walls-have-ears": "Les murs ont des oreilles",
+  "WHE.settings.title": "Les murs ont des oreilles",
+  "WHE.save": "Enregistrer",
+  "WHE.settings_disable.title": "Désactiver le silencieux",
+  "WHE.settings_disable.hint": "Ce module permet d'étouffer les sons pour une meilleure intégration. Mais vous pouvez désactiver cette fonctionnalité pour des raisons de performances.",
+  "WHE.settings_debug.title": "Activer le mode débogage",
+  "WHE.settings_debug.hint": "Afin de dépanner vos scènes, activez cette option pour voir l'indice d'étouffement lors de la sélection/déplacement de vos jetons."
 }

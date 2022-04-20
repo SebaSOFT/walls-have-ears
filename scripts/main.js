@@ -3,6 +3,7 @@ import WHE from './WHE.js';
 
 window.WHE = window.WHE || WHE;
 
+let debugEnabled = false;
 let wallsSoundsDisabled = true;
 let listenerToken = null;
 
@@ -29,8 +30,24 @@ Hooks.once('setup', function () {
 
     // Get User Options
     wallsSoundsDisabled = game.settings.get(WHE.MODULE, WHE.SETTING_DISABLE);
+    debugEnabled = game.settings.get(WHE.MODULE, WHE.SETTING_DEBUG);
+    WHE.debug = debugEnabled;
 
     WHE.logMessage('module setup finished');
+});
+
+/* ------------------------------------ */
+// Settings changed
+/* ------------------------------------ */
+Hooks.on('closeSettingsConfig', function () {
+    WHE.logMessage('updateToken called');
+
+    // Get User Options
+    wallsSoundsDisabled = game.settings.get(WHE.MODULE, WHE.SETTING_DISABLE);
+    debugEnabled = game.settings.get(WHE.MODULE, WHE.SETTING_DEBUG);
+    WHE.debug = debugEnabled;
+
+    WHE.logMessage('settings reloaded');
 });
 
 /* ------------------------------------ */
@@ -77,13 +94,18 @@ Hooks.on('updateWall', (_token, _updateData, _options, _userId) => {
 /* ------------------------------------ */
 Hooks.on('updateAmbientSound', (_ambientSound, _updateData, _options, _userId) => {
     WHE.logMessage('updateAmbientSound called');
+
     if (listenerToken) {
         doTheMuffling();
     }
 });
 
-// If its a gamemaster, lets get the controlled token
+/* ------------------------------------ */
+// When the user starts controlling a token
+/* ------------------------------------ */
 Hooks.on('controlToken', async (token, selected) => {
+    WHE.logMessage('controlToken called');
+
     if (!selected) {
         WHE.logMessage('No token selected but getting from user');
         listenerToken = getActingToken({
@@ -106,7 +128,7 @@ Hooks.on('controlToken', async (token, selected) => {
 /**
  * This will create filter nodes and assign to global variables for reuse.
  * This could be changes in the future as some sounds or sound listening
- * events may need different parameters depending the occasion
+ * events may need different parameters depending on the occasion
  *
  * @param context : AudioContext
  * @param muffling : int
@@ -129,6 +151,10 @@ function getAudioMuffler(context, muffling) {
     return audioMuffler;
 }
 
+/**
+ * Loops through the sounds in the scene and estimate if its audible and the eventual
+ * muffling index, after estimate that, applies the audio filter correspondingly
+ */
 function doTheMuffling() {
 
     if (wallsSoundsDisabled) return;
@@ -144,7 +170,7 @@ function doTheMuffling() {
      * @type {AmbientSound[]}
      */
     const ambientSounds = game.canvas.sounds.placeables;
-    WHE.logMessage('The SOUNDS: ', ambientSounds);
+    WHE.logMessage('The sounds: ', ambientSounds);
     if (ambientSounds && ambientSounds.length > 0) {
         for (let i = 0; i < ambientSounds.length; i++) {
             const currentAmbientSound = ambientSounds[i];
@@ -155,7 +181,7 @@ function doTheMuffling() {
 
             //Added in 0.8.x for Darkness range setting
             if (!currentAmbientSound.isAudible) {
-                console.warn('WHE | Sound not Audible for some reason');
+                console.warn('WHE | Sound not Audible for (probably is just turned off)');
                 continue;
             }
             if (!soundMediaSource.context) {
@@ -170,7 +196,7 @@ function doTheMuffling() {
             };
 
             const distanceToSound = canvas.grid.measureDistance(tokenPosition, soundPosition);
-            WHE.logMessage('WHE | Sound ' + i, soundMediaSource, currentSoundRadius, distanceToSound);
+            WHE.logMessage('Sound ' + i, soundMediaSource, currentSoundRadius, distanceToSound);
 
             if (currentSoundRadius < Math.floor(distanceToSound)) {
                 continue;
@@ -178,7 +204,6 @@ function doTheMuffling() {
 
             const muffleIndex = getMufflingIndex(soundPosition, tokenPosition);
             if (muffleIndex < 0) {
-                // clearSound(soundMediaSource.container.gainNode);
                 WHE.logMessage('Sound ' + i, currentAmbientSound, soundMediaSource);
                 continue;
             }
@@ -198,21 +223,18 @@ function doTheMuffling() {
                         clearSound(soundMediaSource.container.gainNode);
                     }
                 } else {
-                    WHE.logMessage('Im FAR AWAY! and IS PLAYING');
-                    // clearSound(soundMediaSource.container.gainNode);
-                    // continue;
+                    WHE.logMessage('Sound is too far away!');
                 }
             } else {
                 // Schedule on start to take into consideration the moment
-                // the user hasn-t yet interacted with the browser so sound is unavailable
-                WHE.logMessage('WIll muffle on start');
+                // the user hasn't yet interacted with the browser so sound is unavailable
+                WHE.logMessage('WIll muffle on start if needed');
                 soundMediaSource.on('start', function (soundSource) {
                     // Muffle as needed
                     if (shouldBeMuffled) {
                         injectFilterIfPossible(soundSource.container.gainNode, audioMuffler);
                     } else {
-                        WHE.logMessage('ON START Should not be muffled');
-                        // clearSound(soundSource.container.gainNode);
+                        WHE.logMessage('Sound is starting but should not be muffled');
                     }
                 });
             }
@@ -254,7 +276,15 @@ function clearSound(sourceNode) {
     sourceNode.connect(sourceNode.context.destination);
 }
 
-// Get if ywo points have a wall
+/**
+ * Ray casts the sound and the token and estimate a muffling index
+ *
+ * @param number x1 x of the token
+ * @param number y1 y of the token
+ * @param number x2 x of the sound
+ * @param number y2 y of the sound
+ * @returns number returns the muffling index or -1 if the sound shouldn't be heard
+ */
 function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
     const ray = new Ray({ x: x1, y: y1 }, { x: x2, y: y2 });
 
@@ -263,18 +293,18 @@ function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
         mode: 'any',
     });
     if (hasSoundOccluded) {
-        WHE.logMessage('NO ABLE TO HEAR');
+        WHE.logMessage('This sound should not be heard (sound proof walls)');
         return -1;
     }
 
     // If you dont see it, it's muffled
-    const sensesCollision = canvas.walls.checkCollision(ray, {
+    const sensesCollisions = canvas.walls.checkCollision(ray, {
         type: 'sight',
         mode: 'all',
     });
 
     // Then again if terrain collissions exist, you are in the same room
-    const noTerrainSightCollisions = sensesCollision.filter((impactVertex) => {
+    const noTerrainSenseCollisions = sensesCollisions.filter((impactVertex) => {
         const wall = impactVertex?.edges?.first()?.isLimited;
         return !wall;
     });
@@ -285,13 +315,18 @@ function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
         mode: 'all',
     });
 
+    // Present the results
+    WHE.logMessage('Collision walls (MOVE):', moveCollisions.length);
+    WHE.logMessage('Collision walls (SENSE):', sensesCollisions.length);
+    WHE.logMessage('Collision walls (SENSE excl. terrain ):', noTerrainSenseCollisions.length);
+
     // Estimating how much to muffle
     // See image:
-    const finalMuffling = Math.floor((noTerrainSightCollisions.length + moveCollisions.length) / 2);
+    const finalMuffling = Math.floor((noTerrainSenseCollisions.length + moveCollisions.length) / 2);
 
-    WHE.logMessage('MOVE SENSE Coll', moveCollisions, sensesCollision);
     // Account for ethereal walls
-    if (sensesCollision.length >= 1 && moveCollisions.length === 0) {
+    if (sensesCollisions.length >= 1 && moveCollisions.length === 0) {
+        WHE.logMessage('There is at least an ethereal wall');
         return 0;
     }
 

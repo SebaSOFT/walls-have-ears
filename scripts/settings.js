@@ -14,6 +14,16 @@ Hooks.once('init', async function () {
         default: false
     });
 
+    game.settings.register(WHE.MODULE, WHE.SETTING_DEBUG, {
+        name: WHE.getMessageText(WHE.STR_SETTING_DEBUG_TITLE),
+        hint: WHE.getMessageText(WHE.STR_SETTING_DEBUG_HINT),
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: false
+    });
+
+
     // Register custom sheets (if any)
     // console.log('walls-have-ears | settings registration finished');
 });
