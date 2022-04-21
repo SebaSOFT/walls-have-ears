@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.0.2] 2022-04-22
+
+### CHANGED
+
+-   Corrected a problem for scenes with no walls
+
+### ADDED
+
+-   Added an additional check for ignoring/cleaning sounds that are not constrained by walls (they NEED to be constrained by walls)
+-   Better debugging logs
+
 ## [1.0.1] 2022-04-20
 
 ### CHANGED

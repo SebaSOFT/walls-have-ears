@@ -188,6 +188,11 @@ function doTheMuffling() {
                 console.warn('WHE | No Audio Context, waiting for user interaction');
                 continue;
             }
+            if(!currentAmbientSound.data.walls) {
+                WHE.logMessage('Ignoring this sound, is not constrained by walls');
+                clearSound(soundMediaSource.container.gainNode);
+                continue;
+            }
 
             const currentSoundRadius = currentAmbientSound.data.radius;
             const soundPosition = {
@@ -204,7 +209,7 @@ function doTheMuffling() {
 
             const muffleIndex = getMufflingIndex(soundPosition, tokenPosition);
             if (muffleIndex < 0) {
-                WHE.logMessage('Sound ' + i, currentAmbientSound, soundMediaSource);
+                WHE.logMessage('AmbientSound ' + i, currentAmbientSound, soundMediaSource);
                 continue;
             }
 
@@ -288,6 +293,7 @@ function clearSound(sourceNode) {
 function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
     const ray = new Ray({ x: x1, y: y1 }, { x: x2, y: y2 });
 
+    // First, there should not be any sound interruption
     const hasSoundOccluded = canvas.walls.checkCollision(ray, {
         type: 'sound',
         mode: 'any',
@@ -297,11 +303,16 @@ function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
         return -1;
     }
 
-    // If you dont see it, it's muffled
+    // If you don't see it, it's muffled
     const sensesCollisions = canvas.walls.checkCollision(ray, {
         type: 'sight',
         mode: 'all',
     });
+
+    if (!sensesCollisions) {
+        WHE.logMessage('There are no walls!');
+        return -1;
+    }
 
     // Then again if terrain collissions exist, you are in the same room
     const noTerrainSenseCollisions = sensesCollisions.filter((impactVertex) => {

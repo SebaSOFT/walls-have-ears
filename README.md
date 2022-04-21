@@ -24,8 +24,8 @@ See [CHANGELOG](CHANGELOG.md)
 
 ## How it works
 - Enable Token Vision on the scene (this is a **MUST**)
+- **DO NOT** Disable "Constrained by Walls" on the Sound
 - **EITHER** Set sound occlussion on Walls to limited or none as needed
-- **OR** Disable "Constrained by Walls" on the Sound
 - It works with sound easing (volume changing)
 - It will detect walls and muffle the sound (see table below)
 - Windows are less likely to muffle (see table below)
