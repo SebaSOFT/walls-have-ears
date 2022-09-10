@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.10.0] 2022-09-10
+
+### CHANGED
+
+-   Moved to yarn stable for quicker builds and better dev experience (no zero-install though)
+
+### ADDED
+
+-   ESLint configuration from FoundryVTT, I think it should be stricter though
+-   Compatibility with v10
+
 ## [1.0.2] 2022-04-22
 
 ### CHANGED
