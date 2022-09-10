@@ -11,7 +11,7 @@
   "flags": {},
   "version": "1.10.0",
   "compatibility": {
-    "minimum": "9",
+    "minimum": "10",
     "verified": "10.285",
     "maximum": "10"
   },

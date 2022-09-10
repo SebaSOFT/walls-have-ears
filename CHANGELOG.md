@@ -8,8 +8,9 @@
 
 ### ADDED
 
--   ESLint configuration from FoundryVTT, I think it should be stricter though
--   Compatibility with v10
+- ESLint's configuration from FoundryVTT, I think it should be stricter though
+- Compatibility with v10
+- Implemented a muffling cache to avoid changing the filter nodes if no muffling is needed (preventing ticks)
 
 ## [1.0.2] 2022-04-22
 
@@ -19,7 +20,7 @@
 
 ### ADDED
 
--   Added an additional check for ignoring/cleaning sounds that are not constrained by walls (they NEED to be constrained by walls)
+-   Added a check for ignoring/cleaning sounds that are not constrained by walls (they NEED to be constrained by walls)
 -   Better debugging logs
 
 ## [1.0.1] 2022-04-20

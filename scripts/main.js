@@ -61,10 +61,10 @@ Hooks.once("ready", async function() {
 
   if (!token) return;
   listenerToken = token;
+  WHE.logMessage("Token obtained, id: ", listenerToken.id);
 
   // Muffling at startup
   doTheMuffling();
-  WHE.logMessage("Token obtained", listenerToken);
 });
 
 /* ------------------------------------ */
@@ -117,6 +117,7 @@ Hooks.on("controlToken", async (token, selected) => {
     listenerToken = token;
   }
   if (listenerToken) {
+    WHE.logMessage("Token obtained, id: ", listenerToken.id);
     WHE.logMessage("Got a Token, Doing the Muffling");
     await game.audio.awaitFirstGesture();
     doTheMuffling();
@@ -130,8 +131,8 @@ Hooks.on("controlToken", async (token, selected) => {
  * This could be changes in the future as some sounds or sound listening
  * events may need different parameters depending on the occasion
  *
- * @param context : AudioContext
- * @param muffling : int
+ * @param {AudioContext} context the audio conext
+ * @param {number} muffling the muffling level required
  */
 function getAudioMuffler(context, muffling) {
   const clamped = Math.floor(clamp(muffling, 0, 4));
@@ -166,6 +167,8 @@ function doTheMuffling() {
     y: listenerToken.center.y
   };
 
+  const currentTokenId = listenerToken.id;
+
   /**
    * @type {AmbientSound[]}
    */
@@ -188,13 +191,15 @@ function doTheMuffling() {
         console.warn("WHE | No Audio Context, waiting for user interaction");
         continue;
       }
-      if (!currentAmbientSound.data.walls) {
+      if (!currentAmbientSound.document.walls) {
         WHE.logMessage("Ignoring this sound, is not constrained by walls");
         clearSound(soundMediaSource.container.gainNode);
         continue;
       }
 
-      const currentSoundRadius = currentAmbientSound.data.radius;
+      const currentSoundId = currentAmbientSound.id;
+
+      const currentSoundRadius = currentAmbientSound.document.radius;
       const soundPosition = {
         x: currentAmbientSound.center.x,
         y: currentAmbientSound.center.y
@@ -214,34 +219,45 @@ function doTheMuffling() {
       }
 
       const shouldBeMuffled = muffleIndex >= 1;
-      WHE.logMessage("Muffle index: ", muffleIndex);
-      const audioMuffler = getAudioMuffler(soundMediaSource.context, muffleIndex);
 
-      if (soundMediaSource.playing) {
-        if (currentSoundRadius >= Math.floor(distanceToSound)) {
-          // Muufle as needed
-          if (shouldBeMuffled) {
-            WHE.logMessage("Muffling");
-            injectFilterIfPossible(soundMediaSource.container.gainNode, audioMuffler);
+      let shouldMufflingChange = WHE.hasMufflingChanged(currentTokenId, currentSoundId, muffleIndex);
+
+      // Caching muffling values to avoid changing filters if not needed
+      if (shouldMufflingChange) {
+        WHE.storeMufflingLevel(currentTokenId, currentSoundId, muffleIndex);
+
+        WHE.logMessage("Token and Sound IDs: ", currentTokenId, currentSoundId);
+        WHE.logMessage("Muffle index: ", muffleIndex);
+        const audioMuffler = getAudioMuffler(soundMediaSource.context, muffleIndex);
+
+        if (soundMediaSource.playing) {
+          if (currentSoundRadius >= Math.floor(distanceToSound)) {
+            // Muufle as needed
+            if (shouldBeMuffled) {
+              WHE.logMessage("Muffling");
+              injectFilterIfPossible(soundMediaSource.container.gainNode, audioMuffler);
+            } else {
+              WHE.logMessage("Should not be muffled");
+              clearSound(soundMediaSource.container.gainNode);
+            }
           } else {
-            WHE.logMessage("Should not be muffled");
-            clearSound(soundMediaSource.container.gainNode);
+            WHE.logMessage("Sound is too far away!");
           }
         } else {
-          WHE.logMessage("Sound is too far away!");
+          // Schedule on start to take into consideration the moment
+          // the user hasn't yet interacted with the browser so sound is unavailable
+          WHE.logMessage("WIll muffle on start if needed");
+          soundMediaSource.on("start", function(soundSource) {
+            // Muffle as needed
+            if (shouldBeMuffled) {
+              injectFilterIfPossible(soundSource.container.gainNode, audioMuffler);
+            } else {
+              WHE.logMessage("Sound is starting but should not be muffled");
+            }
+          });
         }
       } else {
-        // Schedule on start to take into consideration the moment
-        // the user hasn't yet interacted with the browser so sound is unavailable
-        WHE.logMessage("WIll muffle on start if needed");
-        soundMediaSource.on("start", function(soundSource) {
-          // Muffle as needed
-          if (shouldBeMuffled) {
-            injectFilterIfPossible(soundSource.container.gainNode, audioMuffler);
-          } else {
-            WHE.logMessage("Sound is starting but should not be muffled");
-          }
-        });
+        WHE.logMessage("Cached muffling level WILL NOT change filter");
       }
     }
   }
@@ -249,13 +265,11 @@ function doTheMuffling() {
 
 /**
  * Inhecta a filterNode (probable any AudioNode) into the fron tof the node's path
- * connects the filter to the context destination, socurrently doesnt allos filter
+ * connects the filter to the context destination, socurrently doesn't allos filter
  * stacking
  *
- * @param sourceNode: AudioNode
- * @param filterNode: AudioNode
- * @param sourceNode
- * @param filterNode
+ * @param {AudioNode} sourceNode the audio node that contains the sound source
+ * @param {AudioNode} filterNode the filter to be applied to the source
  */
 function injectFilterIfPossible(sourceNode, filterNode) {
   if (sourceNode.numberOfOutputs !== 1) {
@@ -273,8 +287,7 @@ function injectFilterIfPossible(sourceNode, filterNode) {
  * Removes any node after the sourceNode so the sound can be heard clearly.
  * This could be done in a loop to clear an entire path
  *
- * @param sourceNode: AudioNode
- * @param sourceNode
+ * @param {AudioNode} sourceNode the audio node that contains the sound source
  */
 function clearSound(sourceNode) {
   if (sourceNode.destination === sourceNode.context.destination) {
@@ -286,16 +299,9 @@ function clearSound(sourceNode) {
 
 /**
  * Ray casts the sound and the token and estimate a muffling index
- *
- * @param number x1 x of the token
- * @param number y1 y of the token
- * @param number x2 x of the sound
- * @param number y2 y of the sound
- * @param number.x
- * @param number.y
- * @param number.x
- * @param number.y
- * @returns number returns the muffling index or -1 if the sound shouldn't be heard
+ * @param {{x:number, y:number}} token The Token position
+ * @param {{x:number, y:number}} sound The Sound position
+ * @returns {number} returns the muffling index or -1 if the sound shouldn't be heard
  */
 function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
   const ray = new Ray({ x: x1, y: y1 }, { x: x2, y: y2 });
@@ -355,7 +361,7 @@ function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
  * This is a "Way too complex" function to get acting token or user-owned token
  *
  * @param {*} options
- * @returns
+ * @returns {object|null} the token object or null
  */
 function getActingToken({
   actor,
