@@ -108,3 +108,12 @@ dist
 .vscode/
 
 walls-have-ears.lock
+
+# Yarn without zero installs
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
