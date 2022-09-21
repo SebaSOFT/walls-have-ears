@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [1.10.1] 2022-09-21
+
+### CHANGED
+
+-   Changed compatibility range to avoid sily warning on minor version change
+
 ## [1.10.0] 2022-09-10
 
 ### CHANGED
