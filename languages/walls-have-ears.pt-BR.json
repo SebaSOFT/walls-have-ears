@@ -2,6 +2,8 @@
   "WHE.walls-have-ears": "As paredes têm orelhas",
   "WHE.settings.title": "As paredes têm orelhas",
   "WHE.save": "Salvar",
+  "WHE.settings_tester.title": "",
+  "WHE.settings_tester.hint": "",
   "WHE.settings_disable.title": "Desativar abafamento de som",
   "WHE.settings_disable.hint": "Este módulo permite que os sons sejam abafados para uma melhor imersão. Mas você pode desativar esse recurso por motivos de desempenho.",
   "WHE.settings_debug.title": "Ativar o modo de depuração",
