@@ -1,9 +1,15 @@
 export default class WHE {
   static MODULE = "walls-have-ears";
 
+  static SETTING_TESTER = "tester-enable";
+
   static SETTING_DISABLE = "client-disable";
 
   static SETTING_DEBUG = "client-debug";
+
+  static STR_SETTING_TESTER_TITLE = "WHE.settings_tester.title";
+
+  static STR_SETTING_TESTER_HINT = "WHE.settings_tester.hint";
 
   static STR_SETTING_DISABLE_TITLE = "WHE.settings_disable.title";
 

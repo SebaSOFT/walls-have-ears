@@ -5,6 +5,16 @@ import WHE from "./WHE.js";
 /* ------------------------------------ */
 Hooks.once("init", async function() {
 
+  game.settings.register(WHE.MODULE, WHE.SETTING_TESTER, {
+    name: WHE.getMessageText(WHE.STR_SETTING_TESTER_TITLE),
+    hint: WHE.getMessageText(WHE.STR_SETTING_TESTER_HINT),
+    scope: "client",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+
+
   game.settings.register(WHE.MODULE, WHE.SETTING_DISABLE, {
     name: WHE.getMessageText(WHE.STR_SETTING_DISABLE_TITLE),
     hint: WHE.getMessageText(WHE.STR_SETTING_DISABLE_HINT),

@@ -57,7 +57,7 @@ Hooks.once("ready", async function() {
   await game.audio.awaitFirstGesture();
 
   // Do anything once the module is ready
-  const token = getActingToken({ warn: false });
+  const token = getActingToken({warn: false});
 
   if (!token) return;
   listenerToken = token;
@@ -299,57 +299,74 @@ function clearSound(sourceNode) {
 
 /**
  * Ray casts the sound and the token and estimate a muffling index
- * @param {{x:number, y:number}} token The Token position
- * @param {{x:number, y:number}} sound The Sound position
+ * @param {{x:number, y:number}} soundPoint The Token position
+ * @param {{x:number, y:number}} tokenPoint The Sound position
  * @returns {number} returns the muffling index or -1 if the sound shouldn't be heard
  */
-function getMufflingIndex({ x: x1, y: y1 }, { x: x2, y: y2 }) {
-  const ray = new Ray({ x: x1, y: y1 }, { x: x2, y: y2 });
+function getMufflingIndex(soundPoint, tokenPoint) {
+  const ray = new Ray(tokenPoint, soundPoint);
+
+  const sightLayer = CONFIG.Canvas.polygonBackends.sight;
+  const soundLayer = CONFIG.Canvas.polygonBackends.sound;
+  const moveLayer = CONFIG.Canvas.polygonBackends.move;
 
   // First, there should not be any sound interruption
-  const hasSoundOccluded = canvas.walls.checkCollision(ray, {
-    type: "sound",
-    mode: "any"
-  });
+  const hasSoundOccluded = soundLayer.testCollision(tokenPoint, soundPoint, {type: "sound", mode: "any"});
+
   if (hasSoundOccluded) {
     WHE.logMessage("This sound should not be heard (sound proof walls)");
     return -1;
   }
 
   // If you don't see it, it's muffled
-  const sensesCollisions = canvas.walls.checkCollision(ray, {
-    type: "sight",
-    mode: "all"
-  });
+  let sightCollisions = sightLayer.testCollision(tokenPoint, soundPoint, {type: "sight", mode: "all"});
 
-  if (!sensesCollisions) {
+  if (!sightCollisions) {
     WHE.logMessage("There are no walls!");
     return -1;
   }
 
-  // Then again if terrain collissions exist, you are in the same room
-  const noTerrainSenseCollisions = sensesCollisions.filter(impactVertex => {
+  // New windows come by default with a distance triggering of the sight,
+  // which we need to filter to keep (available) windows as 0 muffling
+  sightCollisions = sightCollisions.filter(impactVertex => {
+    const wall = impactVertex?.edges?.first()?.wall;
+    const wallCenter = wall.center;
+
+    const sightDistance = wall.document.threshold.sight;
+    if (!sightDistance) {
+      return true;
+    }
+    const tokenDistance = canvas.grid.measureDistance(tokenPoint, wallCenter);
+
+    WHE.logMessage("Maximum sight:", sightDistance);
+    WHE.logMessage("Distance to Wall:", tokenDistance);
+    // If token is close to the window it should be open and not represent a sight collision
+    return tokenDistance >= sightDistance;
+  });
+
+
+  console.log("Sight collisions", sightCollisions);
+
+  // Then again if terrain collisions exist, you are in the same room
+  const noTerrainSenseCollisions = sightCollisions.filter(impactVertex => {
     const wall = impactVertex?.edges?.first()?.isLimited;
     return !wall;
   });
 
   // This already takes into account open doors
-  const moveCollisions = canvas.walls.checkCollision(ray, {
-    type: "move",
-    mode: "all"
-  });
+  const moveCollisions = moveLayer.testCollision(tokenPoint, soundPoint, {type: "move", mode: "all"});
 
   // Present the results
   WHE.logMessage("Collision walls (MOVE):", moveCollisions.length);
-  WHE.logMessage("Collision walls (SENSE):", sensesCollisions.length);
-  WHE.logMessage("Collision walls (SENSE excl. terrain ):", noTerrainSenseCollisions.length);
+  WHE.logMessage("Collision walls (SIGHT):", sightCollisions.length);
+  WHE.logMessage("Collision walls (SIGHT excl. terrain ):", noTerrainSenseCollisions.length);
 
   // Estimating how much to muffle
   // See image:
   const finalMuffling = Math.floor((noTerrainSenseCollisions.length + moveCollisions.length) / 2);
 
   // Account for ethereal walls
-  if (sensesCollisions.length >= 1 && moveCollisions.length === 0) {
+  if (sightCollisions.length >= 1 && moveCollisions.length === 0) {
     WHE.logMessage("There is at least an ethereal wall");
     return 0;
   }
