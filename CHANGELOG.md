@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## [1.11.0] 2023-05-25
+
+### CHANGED
+
+-   Plucked away all compatibility warnings
+-   Added additional position check since now windows have "proximity" restrictions to sight by default (and windows contribute zero muffling as per sight)
+-   Sorted out a bug in Foundry's collision test
+
+### ADDED
+
+- Compatibility with v11
+- Added a setting for enabling muffling during sound preview check (feature is coming when there si enough documentation/javascript types for v11)
+
+
 ## [1.10.1] 2022-09-21
 
 ### CHANGED
