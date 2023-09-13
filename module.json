@@ -48,6 +48,12 @@
       "name": "Português (Portuguese)",
       "path": "languages/walls-have-ears.pt-BR.json",
       "flags": {}
+    },
+    {
+      "lang": "ja",
+      "name": "日本語 (Japanese)",
+      "path": "languages/walls-have-ears.ja.json",
+      "flags": {}
     }
   ],
   "manifest": "https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json",
