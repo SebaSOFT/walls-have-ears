@@ -1,6 +1,6 @@
 {
     "name": "walls-have-ears",
-    "version": "1.11.0",
+    "version": "1.11.1",
     "description": "A simple-as-possible module to muffle sounds that are behind a wall for a player.",
     "main": "scripts/main.js",
     "scripts": {

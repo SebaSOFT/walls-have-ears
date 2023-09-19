@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [1.11.1] 2023-09-19
+
+### CHANGED
+
+N/A
+
+### ADDED
+
+-  Added Japanese translations thanks to the amazing contribution by @doumoku
+
 ## [1.11.0] 2023-05-25
 
 ### CHANGED
