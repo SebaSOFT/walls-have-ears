@@ -8,7 +8,7 @@ N/A
 
 ### ADDED
 
--  Added Japanese translations thanks to the amazing contribution by @doumoku 
+-  Added Japanese translations thanks to the amazing contribution by @doumoku
 
 ## [1.11.0] 2023-05-25
 
