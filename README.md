@@ -12,6 +12,19 @@
 
 In the setup screen, use the URL https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json to install the module.
 
+## A note in v12 plans
+
+Foundry VTT has partially included some of the functionality of WHE into core, but the current implementation is not easy to setup and is already prone to incorrectness. 
+So my idea for v12 is:
+> - Move the project to parcel/TS
+> - Implement if possible the types on the new framework
+> - Update Yarn and automated workflows (autodeploy?)
+> - Add a global or scene setting to "handle muffling intensity by wall estimation"
+> - Prevent showing the Muffling intensity slider
+> - Prevent showing the Muffling selector ( or auto assign it)
+> - Change the intensity slider just for a given user and not be a server setting
+> - Handle new types of walls and the proximity/reverse proximity cases
+> - Create entire new tutorials and test bed
 
 ## Release Notes
 
@@ -51,9 +64,8 @@ alt="Test suite demo" width="240" height="180" border="10" /></a>
 
 ## TO DO
 
-- Estimate L shaped rooms and track sound bouncing, so it doesn't get muffled (possible echo/delay effect)
-- ~~Have three or more muffling densities and assign them to the wall they are listening through~~
-- ~~Have a setting for disable sound muffling, useful for muffled sounds or ambient global sounds you may want to eclude~~
+- **Acoustic Ray Tracing:** Estimate L shaped rooms and track sound bouncing, so it doesn't get muffled (possible echo/delay effect)
+- See v12 improvements above
 
 ## Known Issues
 
