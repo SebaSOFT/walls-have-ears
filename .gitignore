@@ -117,3 +117,5 @@ walls-have-ears.lock
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.parcel-cache/
+parcel-bundle-reports/

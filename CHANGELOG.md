@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [3.13.0] 2025-09-02
+
+### CHANGED
+
+- Removed the "Disable Muffling" setting. You can certainly disable the module. But this may come back a as a world setting, or a map setting
+
+### ADDED
+
+- Support for v13+
+- Now the module is fully TypeScript. Parcel JS, Jest testing and type-checked
+- Auto deployment script
+
 ## [1.11.1] 2023-09-19
 
 ### CHANGED
