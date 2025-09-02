@@ -10,47 +10,24 @@
     "sourceType": "module",
     "requireConfigFile": false
   },
-  "plugins": [
-    "jsdoc"
-  ],
+  "plugins": ["jsdoc"],
   "rules": {
-    "array-bracket-spacing": [
-      "warn",
-      "never"
-    ],
+    "array-bracket-spacing": ["warn", "never"],
     "array-callback-return": "warn",
     "arrow-spacing": "warn",
-    "comma-dangle": [
-      "warn",
-      "never"
-    ],
+    "comma-dangle": ["warn", "never"],
     "comma-style": "warn",
     "computed-property-spacing": "warn",
     "constructor-super": "error",
     "default-param-last": "warn",
-    "dot-location": [
-      "warn",
-      "property"
-    ],
-    "eol-last": [
-      "error",
-      "always"
-    ],
-    "eqeqeq": [
-      "warn",
-      "smart"
-    ],
+    "dot-location": ["warn", "property"],
+    "eol-last": ["error", "always"],
+    "eqeqeq": ["warn", "smart"],
     "func-call-spacing": "warn",
-    "func-names": [
-      "warn",
-      "never"
-    ],
+    "func-names": ["warn", "never"],
     "getter-return": "warn",
     "lines-between-class-members": "warn",
-    "new-parens": [
-      "warn",
-      "always"
-    ],
+    "new-parens": ["warn", "always"],
     "no-alert": "warn",
     "no-array-constructor": "warn",
     "no-class-assign": "warn",
@@ -83,9 +60,7 @@
     "no-implicit-coercion": [
       "warn",
       {
-        "allow": [
-          "!!"
-        ]
+        "allow": ["!!"]
       }
     ],
     "no-implied-eval": "warn",
@@ -156,15 +131,9 @@
     "prefer-object-spread": "warn",
     "prefer-regex-literals": "warn",
     "prefer-spread": "warn",
-    "rest-spread-spacing": [
-      "warn",
-      "never"
-    ],
+    "rest-spread-spacing": ["warn", "never"],
     "semi-spacing": "warn",
-    "semi-style": [
-      "warn",
-      "last"
-    ],
+    "semi-style": ["warn", "last"],
     "space-unary-ops": [
       "warn",
       {
@@ -174,14 +143,8 @@
     ],
     "switch-colon-spacing": "warn",
     "symbol-description": "warn",
-    "template-curly-spacing": [
-      "warn",
-      "never"
-    ],
-    "unicode-bom": [
-      "warn",
-      "never"
-    ],
+    "template-curly-spacing": ["warn", "never"],
+    "unicode-bom": ["warn", "never"],
     "use-isnan": [
       "warn",
       {
@@ -195,10 +158,7 @@
         "requireStringLiterals": true
       }
     ],
-    "wrap-iife": [
-      "warn",
-      "inside"
-    ],
+    "wrap-iife": ["warn", "inside"],
     "arrow-parens": [
       "warn",
       "as-needed",
@@ -262,14 +222,8 @@
     "no-throw-literal": "error",
     "no-trailing-spaces": "warn",
     "no-useless-escape": "warn",
-    "nonblock-statement-body-position": [
-      "warn",
-      "beside"
-    ],
-    "one-var": [
-      "warn",
-      "never"
-    ],
+    "nonblock-statement-body-position": ["warn", "beside"],
+    "one-var": ["warn", "never"],
     "operator-linebreak": [
       "warn",
       "before",
@@ -298,10 +252,7 @@
       }
     ],
     "semi": "warn",
-    "space-before-blocks": [
-      "warn",
-      "always"
-    ],
+    "space-before-blocks": ["warn", "always"],
     "space-before-function-paren": [
       "warn",
       {
@@ -322,9 +273,7 @@
     "jsdoc/check-tag-names": [
       "warn",
       {
-        "definedTags": [
-          "category"
-        ]
+        "definedTags": ["category"]
       }
     ],
     "jsdoc/check-types": "warn",
@@ -341,10 +290,7 @@
     "jsdoc/require-description-complete-sentence": "off",
     "jsdoc/require-example": "off",
     "jsdoc/require-file-overview": "off",
-    "jsdoc/require-hyphen-before-param-description": [
-      "warn",
-      "never"
-    ],
+    "jsdoc/require-hyphen-before-param-description": ["warn", "never"],
     "jsdoc/require-jsdoc": "warn",
     "jsdoc/require-param": "warn",
     "jsdoc/require-param-description": "off",

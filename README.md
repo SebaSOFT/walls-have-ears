@@ -22,6 +22,7 @@ In the setup screen, use the URL `https://github.com/SebaSOFT/walls-have-ears/re
 - Ignores open doors so sound should not be muffled if listened through an open door
 
 ## How it works
+
 - Enable Token Vision on the scene (this is a **MUST**)
 - **DO NOT** Disable "Constrained by Walls" on the Sound
 - **EITHER** Set sound occlussion on Walls to limited or none as needed
@@ -36,11 +37,13 @@ See:
 ![Test cases for Muffling logic](https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/develop/mufflingLogic.jpg)
 
 ### Nightclub demo
+
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=EXkrlQVEeAo
 " target="_blank"><img src="http://img.youtube.com/vi/EXkrlQVEeAo/0.jpg"
 alt="Nightclub demo" width="240" height="180" border="10" /></a>
 
 ### Test suite demo
+
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=hlsi4gw1YIA
 " target="_blank"><img src="http://img.youtube.com/vi/hlsi4gw1YIA/0.jpg"
 alt="Test suite demo" width="240" height="180" border="10" /></a>
@@ -51,8 +54,8 @@ This section outlines the development process for the wallsHaveEars library.
 
 ### Prerequisites
 
--   [Node.js](https://nodejs.org/) (v20 or higher)
--   [Yarn](https://yarnpkg.com/) (v4 or higher)
+- [Node.js](https://nodejs.org/) (v20 or higher)
+- [Yarn](https://yarnpkg.com/) (v4 or higher)
 
 ### Building the Library
 
@@ -118,38 +121,38 @@ Tests are configured to run with TypeScript using `ts-jest` in a `node` environm
 
 The project is organized as follows:
 
--   `src/`: The main source code directory.
-    -   `index.ts`: The main entry point of the library, responsible for module initialization and settings.
-    -   `canvas/`: Contains classes related to canvas objects.
-        -   `WHEBaseObject.ts`: A base class for other canvas objects.
-        -   `WHESoundObject.ts`: Extends `WHEBaseObject`, intended for sound-related logic.
-        -   `WHEWallObject.ts`: Extends `WHEBaseObject`, intended for wall-related logic.
-    -   `hooks/`: (Currently empty) Reserved for FoundryVTT hook implementations.
-    -   `settings/`: Contains settings-related classes.
-        -   `WHESettings.ts`: A singleton class for managing module settings.
-    -   `utils/`: Contains utility functions and constants.
-        -   `WHEConstants.ts`: Defines constants used throughout the module.
-        -   `WHEUtils.ts`: Provides static utility methods for logging, internationalization, number clamping, and caching.
--   `dist/`: The output directory for the built library.
--   `languages/`: Contains localization files for different languages.
--   `module.json`: FoundryVTT module metadata.
--   `package.json`: Defines project metadata, dependencies, and scripts.
--   `tsconfig.json`: Configures the TypeScript compiler options.
--   `yarn.lock`: The Yarn lockfile.
--   `.parcel-cache/`: Parcel's cache directory.
--   `parcel-bundle-reports/`: Contains Parcel bundle analysis reports.
--   `.github/workflows/`: Contains GitHub Actions workflow definitions.
--   `jest.config.cjs`: Jest configuration for testing.
+- `src/`: The main source code directory.
+  - `index.ts`: The main entry point of the library, responsible for module initialization and settings.
+  - `canvas/`: Contains classes related to canvas objects.
+    - `WHEBaseObject.ts`: A base class for other canvas objects.
+    - `WHESoundObject.ts`: Extends `WHEBaseObject`, intended for sound-related logic.
+    - `WHEWallObject.ts`: Extends `WHEBaseObject`, intended for wall-related logic.
+  - `hooks/`: (Currently empty) Reserved for FoundryVTT hook implementations.
+  - `settings/`: Contains settings-related classes.
+    - `WHESettings.ts`: A singleton class for managing module settings.
+  - `utils/`: Contains utility functions and constants.
+    - `WHEConstants.ts`: Defines constants used throughout the module.
+    - `WHEUtils.ts`: Provides static utility methods for logging, internationalization, number clamping, and caching.
+- `dist/`: The output directory for the built library.
+- `languages/`: Contains localization files for different languages.
+- `module.json`: FoundryVTT module metadata.
+- `package.json`: Defines project metadata, dependencies, and scripts.
+- `tsconfig.json`: Configures the TypeScript compiler options.
+- `yarn.lock`: The Yarn lockfile.
+- `.parcel-cache/`: Parcel's cache directory.
+- `parcel-bundle-reports/`: Contains Parcel bundle analysis reports.
+- `.github/workflows/`: Contains GitHub Actions workflow definitions.
+- `jest.config.cjs`: Jest configuration for testing.
 
 ## Class Structure and Relationships
 
--   **`WHEBaseObject`**: The foundational class for canvas-related objects. Currently serves as a placeholder for common properties or methods that might be shared by `WHESoundObject` and `WHEWallObject`.
--   **`WHESoundObject`**: Extends `WHEBaseObject`. This class is designed to encapsulate logic specific to sound objects within the FoundryVTT canvas.
--   **`WHEWallObject`**: Extends `WHEBaseObject`. This class is designed to encapsulate logic specific to wall objects within the FoundryVTT canvas.
--   **`WHESettings`**: A singleton class responsible for registering and retrieving module settings. It interacts with FoundryVTT's settings API and depends on `WHEConstants` for setting keys.
--   **`WHEConstants`**: An enum that defines various constant values used across the module, such as the module ID and setting keys.
--   **`WHEUtils`**: A static utility class providing helper functions for common tasks like logging (conditional on debug settings), internationalization (translating messages), clamping numerical values, and a simple in-memory cache for `WHEBaseObject` instances. It depends on `WHEConstants` and `WHEBaseObject`.
--   **`index.ts`**: The primary entry point of the module. It orchestrates the initialization process, including setting up debug logging via `WHEUtils` and initializing module settings through `WHESettings`.
+- **`WHEBaseObject`**: The foundational class for canvas-related objects. Currently serves as a placeholder for common properties or methods that might be shared by `WHESoundObject` and `WHEWallObject`.
+- **`WHESoundObject`**: Extends `WHEBaseObject`. This class is designed to encapsulate logic specific to sound objects within the FoundryVTT canvas.
+- **`WHEWallObject`**: Extends `WHEBaseObject`. This class is designed to encapsulate logic specific to wall objects within the FoundryVTT canvas.
+- **`WHESettings`**: A singleton class responsible for registering and retrieving module settings. It interacts with FoundryVTT's settings API and depends on `WHEConstants` for setting keys.
+- **`WHEConstants`**: An enum that defines various constant values used across the module, such as the module ID and setting keys.
+- **`WHEUtils`**: A static utility class providing helper functions for common tasks like logging (conditional on debug settings), internationalization (translating messages), clamping numerical values, and a simple in-memory cache for `WHEBaseObject` instances. It depends on `WHEConstants` and `WHEBaseObject`.
+- **`index.ts`**: The primary entry point of the module. It orchestrates the initialization process, including setting up debug logging via `WHEUtils` and initializing module settings through `WHESettings`.
 
 ## Dependencies
 
@@ -157,25 +160,25 @@ The project relies on the following dependencies:
 
 ### Development Dependencies
 
--   `@parcel/packager-ts`: Parcel packager for TypeScript.
--   `@parcel/reporter-bundle-analyzer`: Parcel reporter for bundle analysis.
--   `@parcel/transformer-typescript-tsc`: Parcel transformer for TypeScript compilation.
--   `@parcel/transformer-typescript-types`: Parcel transformer for generating TypeScript declaration files.
--   `@types/jest`: Type definitions for Jest.
--   `eslint`: Pluggable JavaScript linter.
--   `eslint-config-prettier`: Turns off all ESLint rules that are unnecessary or might conflict with Prettier.
--   `eslint-plugin-prettier`: Runs Prettier as an ESLint rule.
--   `fvtt-types`: FoundryVTT type definitions.
--   `globals`: ESLint global variables.
--   `jest`: JavaScript testing framework.
--   `parcel`: The web application bundler.
--   `prettier`: An opinionated code formatter.
--   `ts-jest`: Jest transformer for TypeScript.
--   `typescript`: The TypeScript compiler.
+- `@parcel/packager-ts`: Parcel packager for TypeScript.
+- `@parcel/reporter-bundle-analyzer`: Parcel reporter for bundle analysis.
+- `@parcel/transformer-typescript-tsc`: Parcel transformer for TypeScript compilation.
+- `@parcel/transformer-typescript-types`: Parcel transformer for generating TypeScript declaration files.
+- `@types/jest`: Type definitions for Jest.
+- `eslint`: Pluggable JavaScript linter.
+- `eslint-config-prettier`: Turns off all ESLint rules that are unnecessary or might conflict with Prettier.
+- `eslint-plugin-prettier`: Runs Prettier as an ESLint rule.
+- `fvtt-types`: FoundryVTT type definitions.
+- `globals`: ESLint global variables.
+- `jest`: JavaScript testing framework.
+- `parcel`: The web application bundler.
+- `prettier`: An opinionated code formatter.
+- `ts-jest`: Jest transformer for TypeScript.
+- `typescript`: The TypeScript compiler.
 
 ### Package Manager
 
--   `yarn`: Version 4.9.2 or higher.
+- `yarn`: Version 4.9.2 or higher.
 
 ## TO DO
 
@@ -212,7 +215,6 @@ SebaSOFT
 **Discord:** https://discord.gg/Sebasoft (SebaSOFT#9414)
 
 **Patreon:** https://www.patreon.com/SebaSOFT
-
 
 ## Credits
 

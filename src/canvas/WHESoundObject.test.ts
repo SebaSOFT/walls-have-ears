@@ -7,7 +7,7 @@ describe('WHESoundObject', () => {
     expect(typeof WHESoundObject).toBe('function');
   });
   it('should be able to be instantiated', () => {
-    const wheSoundObject = new WHESoundObject();
+    const wheSoundObject = new WHESoundObject('hello', 0);
     expect(wheSoundObject).toBeInstanceOf(WHESoundObject);
   });
 });

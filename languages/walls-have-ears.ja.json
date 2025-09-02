@@ -1,11 +1,11 @@
 {
-    "WHE.walls-have-ears": "壁に耳あり",
-    "WHE.settings.title": "壁に耳あり",
-    "WHE.save": "保存",
-    "WHE.settings_tester.title": "音声プレビュー時に起動する",
-    "WHE.settings_tester.hint": "音編集時の環境音をプレビューする際「音こもり」を有効化する。",
-    "WHE.settings_disable.title": "「音こもり」を無効化する",
-    "WHE.settings_disable.hint": "このMODは没入感を向上させるために音をこもらせる。だがパフォーマンスを理由にこの機能を無効化できる。",
-    "WHE.settings_debug.title": "デバッグモード有効化",
-    "WHE.settings_debug.hint": "あなたのシーンをトラブルシューティングする際、これを選択・有効化しトークンを動かし「音こもり」のインデックスを閲覧できる。"
+  "WHE.walls-have-ears": "壁に耳あり",
+  "WHE.settings.title": "壁に耳あり",
+  "WHE.save": "保存",
+  "WHE.settings_tester.title": "音声プレビュー時に起動する",
+  "WHE.settings_tester.hint": "音編集時の環境音をプレビューする際「音こもり」を有効化する。",
+  "WHE.settings_disable.title": "「音こもり」を無効化する",
+  "WHE.settings_disable.hint": "このMODは没入感を向上させるために音をこもらせる。だがパフォーマンスを理由にこの機能を無効化できる。",
+  "WHE.settings_debug.title": "デバッグモード有効化",
+  "WHE.settings_debug.hint": "あなたのシーンをトラブルシューティングする際、これを選択・有効化しトークンを動かし「音こもり」のインデックスを閲覧できる。"
 }
