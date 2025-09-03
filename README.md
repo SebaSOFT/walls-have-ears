@@ -15,10 +15,10 @@ In the setup screen, use the URL https://github.com/SebaSOFT/walls-have-ears/rel
 ## A note in v12 plans
 
 Foundry VTT has partially included some of the functionality of WHE into core, but the current implementation is not easy to setup and is already prone to incorrectness. 
-So my idea for v12 is:
-> - Move the project to parcel/TS
-> - Implement if possible the types on the new framework
-> - Update Yarn and automated workflows (autodeploy?)
+So my idea for v13 is:
+> - [X] Move the project to parcel/TS
+> - [X] Implement if possible the types on the new framework
+> - [X] Update Yarn and automated workflows (autodeploy?)
 > - Add a global or scene setting to "handle muffling intensity by wall estimation"
 > - Prevent showing the Muffling intensity slider
 > - Prevent showing the Muffling selector ( or auto assign it)
@@ -82,3 +82,4 @@ This module has been released under the MIT licence, meaning you can do pretty m
 You **can** use it in commercial products.
 
 If the licence terminology in the licence.txt is confusing, check out this: https://www.tldrlegal.com/l/mit
+
