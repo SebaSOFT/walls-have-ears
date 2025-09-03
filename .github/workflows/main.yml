@@ -1,14 +1,23 @@
 name: Release Creation
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Get module version
+        id: get_version
+        run: echo "version=$(jq -r .version module.json)" >> $GITHUB_OUTPUT
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -45,28 +54,34 @@ jobs:
         with:
           files: 'module.json'
         env:
-          version: ${{github.event.release.tag_name}}
+          version: ${{ steps.get_version.outputs.version }}
           url: https://github.com/${{github.repository}}
           manifest: https://github.com/${{github.repository}}/releases/latest/download/module.json
-          download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/module.zip
+          download: https://github.com/${{github.repository}}/releases/download/${{ steps.get_version.outputs.version }}/module.zip
 
-      - run: mkdir -p scripts && mv dist/scripts/* scripts/
+      - run: mkdir -p scripts && mv dist/* scripts/
 
       # Create a zip file with all files required by the module to add to the release
-      - run: zip -r ./module.zip module.json LICENSE styles/ scripts/ templates/ languages/
+      - run: zip -r ./module.zip module.json LICENSE scripts/ languages/
 
       - run: rm -rf scripts
 
       # Create a release for this specific version
-      - name: Update Release with Files
+      - name: Create Release
         id: create_version_release
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true # Set this to false if you want to prevent updating existing releases
-          name: ${{ github.event.release.name }}
+          allowUpdates: true
+          name: Release ${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
+          generateReleaseNotes: true # Automatically generate release notes
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: './module.json, ./module.zip'
-          tag: ${{ github.event.release.tag_name }}
-          body: ${{ github.event.release.body }}
+          tag: ${{ steps.get_version.outputs.version }}
+
+      - name: Publish to Foundry Hub
+        run: npx @ghost-fvtt/foundry-publish
+        env:
+          FVTT_TOKEN: ${{ secrets.FVTT_TOKEN }}
+          FVTT_MANIFEST_URL: ./module.json
