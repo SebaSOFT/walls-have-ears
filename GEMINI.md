@@ -7,13 +7,13 @@ This file provides instructions and guidelines for AI agents interacting with th
 - This project uses yarn stable. PnP or Zero-Installs are not used.
 - This project uses ESLint for linting. Please use `yarn lint` to check for linting errors and `yarn lint:fix` to automatically fix them.
 
-# wallsHaveEars Documentation
+# walls-have-ears Documentation
 
-This document provides a comprehensive overview of the wallsHaveEars project for AI agents and developers.
+This document provides a comprehensive overview of the walls-have-ears project for AI agents and developers. It is intended to be the primary source of information for understanding the project's structure, conventions, and development process.
 
 ## Project Overview
 
-wallsHaveEars is a simple-as-possible module to muffle sounds that are behind a wall for a player in FoundryVTT. It is built and bundled using Parcel, offering a simple and efficient development experience.
+walls-have-ears is a simple-as-possible module to muffle sounds that are behind a wall for a player in FoundryVTT. It is built and bundled using Parcel, offering a simple and efficient development experience.
 
 ## Project Structure
 
@@ -26,7 +26,7 @@ The project is organized as follows:
     - `WHESoundObject.ts`: Extends `WHEBaseObject`, intended for sound-related logic.
     - `WHEWallObject.ts`: Extends `WHEBaseObject`, intended for wall-related logic.
   - `hooks/`: (Currently empty) Reserved for FoundryVTT hook implementations.
-  - `settings/`: Contains settings-related classes.
+  - `game/`: Contains game-related classes.
     - `WHESettings.ts`: A singleton class for managing module settings.
   - `utils/`: Contains utility functions and constants.
     - `WHEConstants.ts`: Defines constants used throughout the module.
@@ -54,78 +54,40 @@ The project is organized as follows:
 
 ## Getting Started
 
-To use wallsHaveEars in your project, you need to have a FoundryVTT instance running.
+To use walls-have-ears in your project, you need to have a FoundryVTT instance running.
 
 1.  **Installation**: Download the module from the FoundryVTT package manager or by downloading the latest release from the GitHub repository.
 
 ## Development
 
-This section outlines the development process for the wallsHaveEars library.
+This section outlines the development process for the walls-have-ears library.
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (v18 or higher)
 - [Yarn](https://yarnpkg.com/) (v4 or higher)
 
-### Building the Library
+### Scripts
 
-To build the library for production, run the following command:
+The following scripts are available in `package.json`:
 
-```bash
-yarn build
-```
+- `build`: Builds the library for production.
+- `build:analyze`: Builds the library and generates a bundle analysis report.
+- `dev`: Watches for file changes and automatically rebuilds the library.
+- `clean`: Removes the `dist` directory.
+- `test`: Runs the tests using Jest.
+- `lint`: Lints the code using ESLint.
+- `lint:fix`: Lints the code and automatically fixes issues.
+- `format`: Checks the code formatting using Prettier.
+- `format:fix`: Formats the code using Prettier.
 
-This command bundles the code and generates the output in the `dist` directory. Test files (`src/**/*.test.ts`) are explicitly excluded from the build process.
+### Coding Style
 
-### Development Mode
-
-For active development, you can use the watch command:
-
-```bash
-yarn dev
-```
-
-This command watches for file changes and automatically rebuilds the library.
-
-### Linting
-
-This project uses ESLint to enforce code quality. To check for linting errors, run:
-
-```bash
-yarn lint
-```
-
-To automatically fix linting errors, run:
-
-```bash
-yarn lint:fix
-```
-
-### Code Formatting
-
-This project uses [Prettier](https://prettier.io/) to format the code. It's recommended to set up your editor to format on save.
-
-To check for formatting errors, run:
-
-```bash
-yarn format
-```
-
-To automatically fix formatting errors, run:
-
-```bash
-yarn format:fix
-```
+This project uses [Prettier](https://prettier.io/) for code formatting and [ESLint](https://eslint.org/) for linting. It's recommended to set up your editor to format on save.
 
 ### Testing
 
-This project uses Jest for unit testing. To run the tests, use:
-
-```bash
-yarn test
-```
-
-Tests are configured to run with TypeScript using `ts-jest` in a `node` environment.
+This project uses [Jest](https://jestjs.io/) for unit testing. Tests are configured to run with TypeScript using `ts-jest` in a `node` environment.
 
 ## Dependencies
 
@@ -148,9 +110,10 @@ The project relies on the following dependencies:
 - `prettier`: An opinionated code formatter.
 - `ts-jest`: Jest transformer for TypeScript.
 - `typescript`: The TypeScript compiler.
+- `typescript-eslint`: An ESLint plugin which provides lint rules for TypeScript codebases.
 
 ### Package Manager
 
-- `yarn`: Version 4.9.2 or higher.
+- `yarn`: Version 4 or higher.
 
-This documentation should provide a clear understanding of the wallsHaveEars project. If you have any questions, please refer to the source code or contact the project maintainers.
+This documentation should provide a clear understanding of the walls-have-ears project. If you have any questions, please refer to the source code or contact the project maintainers.

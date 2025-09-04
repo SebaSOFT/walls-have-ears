@@ -18,7 +18,7 @@ export default class WHESoundObject extends WHEBaseObject {
    * @returns {boolean} TRUE if any muffling is applied
    */
   public isMuffled(): boolean {
-    return this.mufflingLevel === 0;
+    return this.mufflingLevel > 0;
   }
 
   /**
