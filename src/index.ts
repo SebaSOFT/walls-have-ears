@@ -5,8 +5,6 @@ import WHEFramework from './framework/WHEFramework';
 
 const forceDebug = true;
 
-console.log('WHE is being loaded.');
-
 Hooks.once('init', async () => {
   WHEUtils.debug = forceDebug;
   WHESettings.getInstance().initialize();

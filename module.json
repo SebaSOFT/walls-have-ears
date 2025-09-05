@@ -1,7 +1,7 @@
 {
   "id": "walls-have-ears",
-  "title": "Walls Have Ears - Muffled sounds behind walls",
-  "description": "<p>A simple-as-possible module to muffle sounds that are behind a wall for a player.</p>",
+  "title": "Walls Have Ears",
+  "description": "<p>A simple-as-possible module to muffle sounds dynamically based on wall occlusion.</p>",
   "authors": [
     {
       "name": "SebaSOFT",

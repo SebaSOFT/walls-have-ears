@@ -59,42 +59,45 @@ export default class WHEFramework {
       const sound = soundConfig.document;
       console.log('WHE | soundconfig', sound);
     });
-    Hooks.on('renderAmbientSoundConfig', (app, html, data, options) => {
-      console.log('WHE | render parameters', app, html, data, options);
-      const fieldSets = html.getElementsByTagName('fieldset');
-      let foundFields = false;
-      for (let i = 0; i < fieldSets.length; i++) {
-        const fieldset = fieldSets.item(i);
-        if (fieldset) {
-          const fields = fieldset.getElementsByClassName('form-group');
-          for (let j = 0; j < fields.length; j++) {
-            const fieldGroup = fields.item(j);
-            const field = fieldGroup?.getHTML();
-            if (field?.indexOf('"effects.muffled.type"') !== -1) {
-              fieldGroup?.setAttribute('style', 'display:none;');
-              foundFields = true;
-            }
-            if (field?.indexOf('"effects.muffled.intensity"') !== -1) {
-              fieldGroup?.setAttribute('style', 'display:none;');
-              foundFields = true;
-            }
-          }
-          if (foundFields) {
-            const hints = fieldset.getElementsByClassName('hint');
-            const lastHint = hints.item(hints.length - 1);
-            if (lastHint) {
-              const warningText = WHEUtils.getMessageText('WHE.settings_debug.hint');
-              lastHint.innerHTML = `<i>${warningText}</i>`;
-            }
-            break;
-          }
-        }
-      }
+    Hooks.on('renderAmbientSoundConfig', (_app, html, _data, _options) => {
+      WHEFramework.getInstance().modifySoundConfigForm(html);
     });
     // ---------- H O O K S ---------- //
 
     WHEUtils.log('WHEFramework initialized.');
   }
+
+  public modifySoundConfigForm = (html: HTMLElement) => {
+    const fieldSets = html.getElementsByTagName('fieldset');
+    let foundFields = false;
+    for (let i = 0; i < fieldSets.length; i++) {
+      const fieldset = fieldSets.item(i);
+      if (fieldset) {
+        const fields = fieldset.getElementsByClassName('form-group');
+        for (let j = 0; j < fields.length; j++) {
+          const fieldGroup = fields.item(j);
+          const field = fieldGroup?.getHTML();
+          if (field?.indexOf('"effects.muffled.type"') !== -1) {
+            fieldGroup?.setAttribute('style', 'display:none;');
+            foundFields = true;
+          }
+          if (field?.indexOf('"effects.muffled.intensity"') !== -1) {
+            fieldGroup?.setAttribute('style', 'display:none;');
+            foundFields = true;
+          }
+        }
+        if (foundFields) {
+          const hints = fieldset.getElementsByClassName('hint');
+          const lastHint = hints.item(hints.length - 1);
+          if (lastHint) {
+            const warningText = WHEUtils.getMessageText('WHE.config.hint');
+            lastHint.innerHTML = `<i>${warningText}</i>`;
+          }
+          break;
+        }
+      }
+    }
+  };
 
   public checkForChangedSelection = async (token: foundry.canvas.placeables.Token, selected: boolean) => {
     if (!selected) {
