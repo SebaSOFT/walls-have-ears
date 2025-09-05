@@ -1,8 +1,6 @@
-import assert from 'assert';
 import { WHEConstants } from '../utils/WHEConstants';
 import WHEUtils from '../utils/WHEUtils';
 
-assert(game instanceof foundry.Game);
 const g = game as foundry.Game;
 
 export default class WHESettings {
@@ -22,10 +20,8 @@ export default class WHESettings {
           config: true,
           type: Boolean,
           default: false,
-          onChange: (value: unknown, _options?: Omit<ClientSettings.SetOptions, 'document'>) => {
-            console.log('BORRAME', value);
-            assert(value instanceof Boolean);
-            WHEUtils.debug = value.valueOf();
+          onChange: (value: any, _options?: Omit<ClientSettings.SetOptions, 'document'>) => {
+            WHEUtils.debug = value;
           },
           requiresReload: false,
         },
@@ -60,8 +56,7 @@ export default class WHESettings {
     }
 
     this.settings.forEach((setting) => {
-      assert(g.settings instanceof foundry.helpers.ClientSettings);
-      g.settings.register(WHEConstants.MODULE as any, setting[0] as any, setting[1] as any);
+      game!.settings!.register(WHEConstants.MODULE as any, setting[0] as any, setting[1] as any);
     });
 
     this.initialized = true;

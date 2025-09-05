@@ -1,5 +1,4 @@
 import WHEBaseObject from '../canvas/WHEBaseObject';
-import assert from 'assert';
 
 export default class WHEUtils {
   public static debug: boolean = false;
@@ -26,8 +25,7 @@ export default class WHEUtils {
    * @returns {string} the translated key or the key text
    */
   public static getMessageText = (msgKey: string, paramMap: Record<string, any> | null = null): string => {
-    assert(game.i18n instanceof foundry.helpers.Localization);
-    return !paramMap ? game.i18n.localize(msgKey) : game.i18n.format(msgKey, paramMap);
+    return !paramMap ? game.i18n!.localize(msgKey) : game.i18n!.format(msgKey, paramMap);
   };
 
   /**
