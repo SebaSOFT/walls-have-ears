@@ -1,5 +1,9 @@
 import WHEUtils from '../utils/WHEUtils';
-
+import { WHEConstants } from '../utils/WHEConstants';
+import { getGame } from '../foundry/getGame';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-errorß
+import { libWrapper } from '../lib/libWrapper';
 /**
  * Options for the getActingToken method.
  */
@@ -31,10 +35,25 @@ export default class WHEFramework {
     // ---------- H O O K S ---------- //
     // Hook wen the scene is ready
     Hooks.on('ready', async () => {
-      await game.audio!.awaitFirstGesture();
+      await getGame().audio.awaitFirstGesture();
 
       WHEFramework.getInstance().setSelectedToken(this.getActingToken());
       WHEFramework.getInstance().performMuffling();
+
+      libWrapper.register(
+        WHEConstants.MODULE,
+        'foundry.canvas.placeables.Wall.prototype._playDoorSound',
+        function (wrapped: (interaction: string) => void, args: any) {
+          console.log('WHE | executed', args);
+          // Wee need an annonymous function here, to get the THIS
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          const wall = this as foundry.canvas.placeables.Wall;
+          WHEFramework.getInstance().playDoorSound(wrapped, args, wall);
+          return;
+        },
+        'MIXED',
+      );
     });
     // When a token is about to be moved
     Hooks.on('updateToken', (_token, _updateData, _options, _userId) => {
@@ -55,9 +74,9 @@ export default class WHEFramework {
     Hooks.on('controlToken', async (token, selected) => {
       await WHEFramework.getInstance().checkForChangedSelection(token, selected);
     });
-    Hooks.on('closeAmbientSoundConfig', (soundConfig) => {
-      const sound = soundConfig.document;
-      console.log('WHE | soundconfig', sound);
+    Hooks.on('closeAmbientSoundConfig', (_soundConfig) => {
+      WHEUtils.log('WHEFramework Event: closeAmbientSoundConfig');
+      WHEFramework.getInstance().performMuffling();
     });
     Hooks.on('renderAmbientSoundConfig', (_app, html, _data, _options) => {
       WHEFramework.getInstance().modifySoundConfigForm(html);
@@ -66,6 +85,47 @@ export default class WHEFramework {
 
     WHEUtils.log('WHEFramework initialized.');
   }
+
+  public playDoorSound = (
+    wrapped: (intWrapper: string) => void,
+    interaction: 'open' | 'close' | 'lock' | 'unlock' | 'test',
+    wall: Wall,
+  ) => {
+    // If there is no selected token, just execute FVTT function
+    if (!this.selectedToken) {
+      wrapped(interaction);
+      return;
+    }
+
+    // Copy of FVTT code
+    if (!CONST.WALL_DOOR_INTERACTIONS.includes(interaction)) {
+      throw new Error(`"${interaction}" is not a valid door interaction type`);
+    }
+    if (!wall.isDoor) return;
+    // Identify which door sound effect to play
+    const doorSound = CONFIG.Wall.doorSounds[wall.document.doorSound as any];
+    let sounds = doorSound?.[interaction];
+    if (sounds && !Array.isArray(sounds)) sounds = [sounds];
+    else if (!sounds?.length) {
+      if (interaction !== 'test') return;
+      sounds = [CONFIG.sounds.lock];
+    }
+    const src = sounds[Math.floor(Math.random() * sounds.length)];
+
+    // This is the different about WHE, here we dinamically estimate the mufling
+    const muffIntensity = 5;
+
+    // Play the door sound as a localized sound effect
+    getGame()
+      .canvas!.sounds!.playAtPosition(src, wall.center, wall.soundRadius, {
+        volume: 1.0,
+        easing: true,
+        walls: false,
+        gmAlways: true,
+        muffledEffect: { type: 'lowPass', intensity: muffIntensity },
+      })
+      .then();
+  };
 
   public modifySoundConfigForm = (html: HTMLElement) => {
     const fieldSets = html.getElementsByTagName('fieldset');
@@ -103,7 +163,7 @@ export default class WHEFramework {
     if (!selected) {
       WHEUtils.log('No token selected but getting from user');
       this.selectedToken = this.getActingToken({
-        actor: game.user?.character ?? undefined,
+        actor: getGame().user!.character ?? undefined,
       });
     } else {
       WHEUtils.log('Token Selected so it should be yours');
@@ -111,7 +171,7 @@ export default class WHEFramework {
     }
     if (this.selectedToken) {
       WHEUtils.log(`Token obtained, id: ${this.selectedToken.name} (${this.selectedToken.id})`);
-      await game.audio!.awaitFirstGesture();
+      await getGame().audio!.awaitFirstGesture();
       this.performMuffling();
     } else {
       WHEUtils.log('Looks like you are the GM');
@@ -139,8 +199,11 @@ export default class WHEFramework {
     if (!this.selectedToken) {
       return;
     }
-
+    if (getGame().audio.locked) {
+      return;
+    }
     //DO THA MUFFLING
+    getGame().audio.debug('WHE | Dynamically muffled sound to level X');
   }
 
   /**
@@ -155,7 +218,7 @@ export default class WHEFramework {
     warn = false,
     linked = false,
   }: GetActingTokenOptions = {}): foundry.canvas.placeables.Token | null => {
-    const tokenLayer: TokenLayer | null = game.canvas?.tokens ?? null;
+    const tokenLayer: TokenLayer | null = getGame().canvas!.tokens ?? null;
     if (!tokenLayer) {
       return null;
     }
@@ -176,9 +239,9 @@ export default class WHEFramework {
       }
     } else {
       potentialTokens = [...tokenLayer.controlled];
-      if (potentialTokens.length === 0 && game.user?.character) {
+      if (potentialTokens.length === 0 && getGame().user!.character) {
         // getActiveTokens returns an array of Token objects
-        potentialTokens = game.user.character.getActiveTokens();
+        potentialTokens = getGame().user!.character!.getActiveTokens();
       }
     }
 

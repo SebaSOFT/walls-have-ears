@@ -8,5 +8,5 @@
   "WHE.settings_disable.hint": "Mit diesem Modul können Geräusche gedämpft werden, um das Eintauchen zu verbessern. Sie können diese Funktion jedoch aus Leistungsgründen deaktivieren.",
   "WHE.settings_debug.title": "Aktivieren Sie den Debug-Modus",
   "WHE.settings_debug.hint": "Um Fehler in Ihren Szenen zu beheben, aktivieren Sie dies, um den Dämpfungsindex anzuzeigen, wenn Sie Ihre Token auswählen/verschieben.",
-  "WHE.config.hint" : "WÄNDE HABEN OHREN: Der Dämpfungseffekt wurde von diesem Bildschirm entfernt, da er dynamisch vom Modul gehandhabt wird."
+  "WHE.config.hint": "WÄNDE HABEN OHREN: Der Dämpfungseffekt wurde von diesem Bildschirm entfernt, da er dynamisch vom Modul gehandhabt wird."
 }

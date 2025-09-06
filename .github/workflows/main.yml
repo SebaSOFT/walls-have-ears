@@ -64,7 +64,7 @@ jobs:
       # Create a zip file with all files required by the module to add to the release
       - run: zip -r ./module.zip module.json LICENSE dist/ lang/
 
-     #  - run: rm -rf scripts
+      #  - run: rm -rf scripts
 
       # Create a release for this specific version
       - name: Create Release

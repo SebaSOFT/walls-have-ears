@@ -2,6 +2,7 @@ import WHEUtils from './utils/WHEUtils';
 import { WHEConstants } from './utils/WHEConstants';
 import WHESettings from './settings/WHESettings';
 import WHEFramework from './framework/WHEFramework';
+import { getGame } from './foundry/getGame';
 
 const forceDebug = true;
 
@@ -30,7 +31,12 @@ Hooks.on('closeSettings', () => {
 });
 
 Hooks.once('ready', async () => {
-  await game.audio?.awaitFirstGesture();
+  await getGame().audio.awaitFirstGesture();
+
+  // libWrapper warning
+  if (!game!.modules!.get('lib-wrapper')?.active && game!.user!.isGM) {
+    ui!.notifications!.warn("Module XYZ requires the 'libWrapper' module. Please install and activate it.");
+  }
 
   WHEUtils.log('WHE is now ready.');
 });

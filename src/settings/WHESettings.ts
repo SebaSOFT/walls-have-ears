@@ -1,7 +1,6 @@
 import { WHEConstants } from '../utils/WHEConstants';
 import WHEUtils from '../utils/WHEUtils';
-
-const g = game as foundry.Game;
+import { getGame } from '../foundry/getGame';
 
 export default class WHESettings {
   private static instance: WHESettings;
@@ -56,7 +55,7 @@ export default class WHESettings {
     }
 
     this.settings.forEach((setting) => {
-      game!.settings!.register(WHEConstants.MODULE as any, setting[0] as any, setting[1] as any);
+      getGame().settings.register(WHEConstants.MODULE as any, setting[0] as any, setting[1] as any);
     });
 
     this.initialized = true;
@@ -73,7 +72,7 @@ export default class WHESettings {
     if (!this.initialized) {
       return defaultValue;
     }
-    const res: boolean | null = g.settings.get(WHEConstants.MODULE as any, settingKey as any) as boolean | null;
+    const res: boolean | null = getGame().settings.get(WHEConstants.MODULE as any, settingKey as any) as boolean | null;
     if (res === null) {
       return defaultValue;
     }

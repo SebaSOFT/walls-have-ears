@@ -1,5 +1,5 @@
 import WHEUtils from './WHEUtils';
-import WHEBaseObject from '../canvas/WHEBaseObject';
+import WHEBaseObject from '../framework/canvas/WHEBaseObject';
 
 describe('WHEUtils', () => {
   let consoleSpy: jest.SpyInstance;
@@ -16,7 +16,7 @@ describe('WHEUtils', () => {
     it('should log a message when debug is true', () => {
       WHEUtils.debug = true;
       WHEUtils.log('Test message');
-      expect(consoleSpy).toHaveBeenCalledWith('[WHE] Test message');
+      expect(consoleSpy).toHaveBeenCalledWith('[WHE] | Test message');
     });
 
     it('should not log a message when debug is false', () => {

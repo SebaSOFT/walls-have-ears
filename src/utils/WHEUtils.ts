@@ -1,4 +1,5 @@
-import WHEBaseObject from '../canvas/WHEBaseObject';
+import WHEBaseObject from '../framework/canvas/WHEBaseObject';
+import { getGame } from '../foundry/getGame';
 
 export default class WHEUtils {
   public static debug: boolean = false;
@@ -15,7 +16,7 @@ export default class WHEUtils {
     if (!WHEUtils.debug) {
       return;
     }
-    console.log(`[WHE] ${message}`);
+    console.log(`[WHE] | ${message}`);
   };
 
   /**
@@ -25,7 +26,7 @@ export default class WHEUtils {
    * @returns {string} the translated key or the key text
    */
   public static getMessageText = (msgKey: string, paramMap: Record<string, any> | null = null): string => {
-    return !paramMap ? game.i18n!.localize(msgKey) : game.i18n!.format(msgKey, paramMap);
+    return !paramMap ? getGame().i18n!.localize(msgKey) : getGame().i18n!.format(msgKey, paramMap);
   };
 
   /**

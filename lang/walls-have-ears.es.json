@@ -8,5 +8,5 @@
   "WHE.settings_disable.hint": "Este módulo permite amortiguar los sonidos para mejorar la inmersión. Pero puede desactivar esta función por motivos de rendimiento.",
   "WHE.settings_debug.title": "Activar modo de depuración",
   "WHE.settings_debug.hint": "Para resolver problemas en sus escenas, active esto para ver el índice amortiguación de sonidos cuando seleccione o mueva sus tokens.",
-  "WHE.config.hint" : "LAS PAREDES ESCUCHAN: Se eliminó el efecto de amortiguación de esta pantalla ya que el módulo lo manejará de forma dinámica."
+  "WHE.config.hint": "LAS PAREDES ESCUCHAN: Se eliminó el efecto de amortiguación de esta pantalla ya que el módulo lo manejará de forma dinámica."
 }
