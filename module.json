@@ -15,8 +15,8 @@
   "version": "3.13.0",
   "compatibility": {
     "minimum": "13",
-    "verified": "13",
-    "maximum": "14"
+    "verified": "13.348",
+    "maximum": "13"
   },
   "esmodules": ["dist/main.js"],
   "languages": [
