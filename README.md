@@ -1,41 +1,28 @@
-# Foundry VTT - Walls have ears
+# WALLS HAVE EARS
 
-[![GitHub license](https://img.shields.io/github/license/SebaSOFT/walls-have-ears)](https://github.com/SebaSOFT/walls-have-ears/blob/main/LICENSE) 
-[![GitHub release](https://img.shields.io/github/downloads-pre/SebaSOFT/walls-have-ears/latest/module.zip?label=downloads)](https://github.com/SebaSOFT/walls-have-ears/releases/) 
-[![Forge Installs](https://img.shields.io/badge/dynamic/json?color=green&label=Forge%20installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fwalls-have-ears)](https://forge-vtt.com/bazaar#package=walls-have-ears) 
+[![GitHub license](https://img.shields.io/github/license/SebaSOFT/walls-have-ears)](https://github.com/SebaSOFT/walls-have-ears/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/downloads-pre/SebaSOFT/walls-have-ears/latest/module.zip?label=downloads)](https://github.com/SebaSOFT/walls-have-ears/releases/)
+[![Forge Installs](https://img.shields.io/badge/dynamic/json?color=green&label=Forge%20installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fwalls-have-ears)](https://forge-vtt.com/bazaar#package=walls-have-ears)
 [![Foundry HUB Endorsements](https://img.shields.io/badge/dynamic/json?label=FoundryHUB%20Endorsements&query=%24.endorsements&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fwalls-have-ears)](https://www.foundryvtt-hub.com/package/walls-have-ears/)
-[![Maximum Foundry VTT version](https://img.shields.io/badge/dynamic/json?label=Foundry%20VTT%20support&query=%24.compatibility.maximum&url=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json)](https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json)
+[![Minimum Foundry VTT version](https://img.shields.io/badge/dynamic/json?label=Foundry%20VTT%20version&query=%24.minimumCoreVersion&suffix=%20or%20later&url=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json)](https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json)
+
+**Version:** 3.13.0
 
 "A simple-as-possible module to muffle sounds that are behind a wall for a player or token."
 
+walls-have-ears is a simple-as-possible module to muffle sounds that are behind a wall for a player in FoundryVTT. It is built and bundled using Parcel, offering a simple and efficient development experience.
+
 ## Installation
 
-In the setup screen, use the URL https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json to install the module.
-
-## A note in v12 plans
-
-Foundry VTT has partially included some of the functionality of WHE into core, but the current implementation is not easy to setup and is already prone to incorrectness. 
-So my idea for v13 is:
-> - [X] Move the project to parcel/TS
-> - [X] Implement if possible the types on the new framework
-> - [X] Update Yarn and automated workflows (autodeploy?)
-> - Add a global or scene setting to "handle muffling intensity by wall estimation"
-> - Prevent showing the Muffling intensity slider
-> - Prevent showing the Muffling selector ( or auto assign it)
-> - Change the intensity slider just for a given user and not be a server setting
-> - Handle new types of walls and the proximity/reverse proximity cases
-> - Create entire new tutorials and test bed
-
-## Release Notes
-
-See [CHANGELOG](CHANGELOG.md)
+In the setup screen, use the URL `https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json` to install the module.
 
 ## Features
 
 - Detects sound that are in range but through a wall, and muffles them
-- Ignores open doors so sound should not be muffled if listened throughan open door
+- Ignores open doors so sound should not be muffled if listened through an open door
 
 ## How it works
+
 - Enable Token Vision on the scene (this is a **MUST**)
 - **DO NOT** Disable "Constrained by Walls" on the Sound
 - **EITHER** Set sound occlussion on Walls to limited or none as needed
@@ -49,23 +36,25 @@ See:
 
 ![Test cases for Muffling logic](https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/develop/mufflingLogic.jpg)
 
-Demo videos:
-
-
 ### Nightclub demo
+
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=EXkrlQVEeAo
 " target="_blank"><img src="http://img.youtube.com/vi/EXkrlQVEeAo/0.jpg"
 alt="Nightclub demo" width="240" height="180" border="10" /></a>
 
 ### Test suite demo
+
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=hlsi4gw1YIA
 " target="_blank"><img src="http://img.youtube.com/vi/hlsi4gw1YIA/0.jpg"
 alt="Test suite demo" width="240" height="180" border="10" /></a>
 
+## Development
+
+For details on the project structure, development process, and dependencies, please see the [GEMINI.md](GEMINI.md) file.
+
 ## TO DO
 
-- **Acoustic Ray Tracing:** Estimate L shaped rooms and track sound bouncing, so it doesn't get muffled (possible echo/delay effect)
-- See v12 improvements above
+- Estimate L shaped rooms and track sound bouncing, so it doesn't get muffled (possible echo/delay effect)
 
 ## Known Issues
 
@@ -75,7 +64,9 @@ alt="Test suite demo" width="240" height="180" border="10" /></a>
 
 We're always happy for community contributions.
 
-## Licence
+(Guidelines for contributing to the project will go here.)
+
+## License
 
 This module has been released under the MIT licence, meaning you can do pretty much anything you like with it, so long as the original copyright remains in place.
 
@@ -83,3 +74,33 @@ You **can** use it in commercial products.
 
 If the licence terminology in the licence.txt is confusing, check out this: https://www.tldrlegal.com/l/mit
 
+## Author
+
+SebaSOFT
+
+**Project URL:** https://github.com/SebaSOFT/walls-have-ears
+
+**Foundry VTT:** https://foundryvtt.com/packages/walls-have-ears
+
+**Bug Reports:** https://github.com/SebaSOFT/walls-have-ears/issues
+
+**Discord:** https://discord.gg/Sebasoft (SebaSOFT#9414)
+
+**Patreon:** https://www.patreon.com/SebaSOFT
+
+## Credits
+
+- Idea and original implementation by @KayelGee, from the FoundryVTT Discord
+- Spanish translation by @lozalojo
+- German translation by @Fallayn
+- French translation by @JDR-Ninja
+- Japanese translation by @Brother Sharp
+- Portuguese translation by @castanhocorreia
+
+## Buy me a coffee
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W22C3S2)
+
+## Release Notes
+
+See [CHANGELOG](CHANGELOG.md)

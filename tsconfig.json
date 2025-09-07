@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "types": ["fvtt-types", "jest"],
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["es2022", "dom"],
+    "declaration": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
