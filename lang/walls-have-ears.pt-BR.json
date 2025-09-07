@@ -7,5 +7,6 @@
   "WHE.settings_disable.title": "Desativar abafamento de som",
   "WHE.settings_disable.hint": "Este módulo permite que os sons sejam abafados para uma melhor imersão. Mas você pode desativar esse recurso por motivos de desempenho.",
   "WHE.settings_debug.title": "Ativar o modo de depuração",
-  "WHE.settings_debug.hint": "Para solucionar problemas de suas cenas, ative isso para ver o índice de abafamento ao selecionar/mover seus tokens."
+  "WHE.settings_debug.hint": "Para solucionar problemas de suas cenas, ative isso para ver o índice de abafamento ao selecionar/mover seus tokens.",
+  "WHE.config.hint": "AS PAREDES TÊM ORELHAS: O efeito de abafamento foi removido desta tela, pois será manipulado dinamicamente pelo módulo."
 }
