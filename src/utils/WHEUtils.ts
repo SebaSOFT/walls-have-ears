@@ -1,22 +1,22 @@
-import WHEBaseObject from '../framework/canvas/WHEBaseObject';
 import { getGame } from '../foundry/getGame';
 
 export default class WHEUtils {
   public static debug: boolean = false;
   private static cache: {
-    [key: string]: WHEBaseObject;
+    [key: string]: number;
   } = {};
 
   /**
    * Logs a message to the console, but only if debug mode is enabled.
    *
    * @param message
+   * @param args
    */
-  public static log = (message: string): void => {
+  public static log = (message: string, ...args: any[]): void => {
     if (!WHEUtils.debug) {
       return;
     }
-    console.log(`[WHE] | ${message}`);
+    console.log(`[WHE] | ${message}`, ...args);
   };
 
   /**
@@ -45,7 +45,7 @@ export default class WHEUtils {
    *
    * @param cacheKey The key in which the item is cached
    */
-  public static getCachedItem = (cacheKey: string): WHEBaseObject => {
+  public static getCachedItem = (cacheKey: string): number => {
     return WHEUtils.cache[cacheKey];
   };
 
@@ -55,7 +55,7 @@ export default class WHEUtils {
    * @param cacheKey The key to cache the item under
    * @param item The item to cache
    */
-  public static setCachedItem = (cacheKey: string, item: WHEBaseObject): void => {
+  public static setCachedItem = (cacheKey: string, item: number): void => {
     WHEUtils.cache[cacheKey] = item;
   };
 }

@@ -1,5 +1,4 @@
 import WHEUtils from './WHEUtils';
-import WHEBaseObject from '../framework/canvas/WHEBaseObject';
 
 describe('WHEUtils', () => {
   let consoleSpy: jest.SpyInstance;
@@ -46,7 +45,7 @@ describe('WHEUtils', () => {
 
   describe('cache', () => {
     it('should set and get a cached item', () => {
-      const item = new WHEBaseObject();
+      const item = 1;
       WHEUtils.setCachedItem('testKey', item);
       expect(WHEUtils.getCachedItem('testKey')).toBe(item);
     });
@@ -56,8 +55,8 @@ describe('WHEUtils', () => {
     });
 
     it('should overwrite an existing cached item', () => {
-      const item1 = new WHEBaseObject();
-      const item2 = new WHEBaseObject();
+      const item1 = 1;
+      const item2 = 2;
       WHEUtils.setCachedItem('overwriteKey', item1);
       WHEUtils.setCachedItem('overwriteKey', item2);
       expect(WHEUtils.getCachedItem('overwriteKey')).toBe(item2);

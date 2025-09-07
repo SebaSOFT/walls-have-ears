@@ -33,6 +33,20 @@ Hooks.on('closeSettings', () => {
 Hooks.once('ready', async () => {
   await getGame().audio.awaitFirstGesture();
 
+  // Override all ambient sounds muffled effects
+  const ambientSounds = getGame()!.canvas!.sounds!.placeables;
+
+  ambientSounds.forEach((sound: foundry.canvas.placeables.AmbientSound) => {
+    sound.document.effects.muffled.type = 'lowpass';
+    sound.document.effects.muffled.intensity = 0;
+    sound.document.update({
+      effects: {
+        muffled: { type: 'lowpass', intensity: 0 },
+      },
+    });
+    sound.initializeSoundSource();
+  });
+
   // libWrapper warning
   if (!game!.modules!.get('lib-wrapper')?.active && game!.user!.isGM) {
     ui!.notifications!.warn("Module XYZ requires the 'libWrapper' module. Please install and activate it.");
