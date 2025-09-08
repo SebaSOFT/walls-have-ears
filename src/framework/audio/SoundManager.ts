@@ -4,6 +4,25 @@ import PlayerContext from '../player/PlayerContext';
 import { getGame } from '../../foundry/getGame';
 import Effect = AmbientSoundDocument.Effect;
 
+const AWAIT_SOUND_TIMEOUT_MS = 2000;
+const AWAIT_SOUND_POLL_INTERVAL_MS = 50;
+
+const awaitSound = (ambientSound: foundry.canvas.placeables.AmbientSound): Promise<foundry.audio.Sound | null> => {
+  return new Promise((resolve) => {
+    let elapsed = 0;
+    const timer = setInterval(() => {
+      if (ambientSound.sound) {
+        clearInterval(timer);
+        resolve(ambientSound.sound);
+      }
+      elapsed += AWAIT_SOUND_POLL_INTERVAL_MS;
+      if (elapsed >= AWAIT_SOUND_TIMEOUT_MS) {
+        clearInterval(timer);
+        resolve(null);
+      }
+    }, AWAIT_SOUND_POLL_INTERVAL_MS);
+  });
+};
 /**
  * Manages all audio-related functionality, including applying muffling effects and handling special sounds like doors.
  */
@@ -50,43 +69,43 @@ export default class SoundManager {
   /**
    * Applies the muffling effect to a given ambient sound based on the calculated index.
    * It checks the cache to avoid unnecessary updates.
-   * @param {foundry.canvas.placeables.AmbientSound} sound - The ambient sound to modify.
+   * @param {foundry.canvas.placeables.AmbientSound} ambientSound - The ambient sound to modify.
    * @param {number} muffleIndex - The calculated muffling index (0-5).
    * @param {string} currentTokenId - The ID of the listening token, for caching purposes.
    */
-  public applyMuffling = (
-    sound: foundry.canvas.placeables.AmbientSound,
+  public applyMuffling = async (
+    ambientSound: foundry.canvas.placeables.AmbientSound,
     muffleIndex: number,
     currentTokenId: string,
   ) => {
-    const soundMediaSource = sound.sound;
+    const soundMediaSource = ambientSound.sound ?? (await awaitSound(ambientSound));
     if (!soundMediaSource) {
-      WHEUtils.log('Sound is not loaded in the ambient sound, maybe a FVTT bug');
+      WHEUtils.log(`Sound for ambient sound ${ambientSound.id} not loaded after waiting.`);
       return;
     }
 
     const mufflingLevel = MUFFLING_MAPPING[`level${muffleIndex}`];
-    const shouldMufflingChange = this.hasMufflingChanged(currentTokenId, sound.id, mufflingLevel);
+    const shouldMufflingChange = this.hasMufflingChanged(currentTokenId, ambientSound.id, mufflingLevel);
 
     if (muffleIndex < 0 && !shouldMufflingChange) {
-      WHEUtils.log(`AmbientSound `, sound, soundMediaSource);
+      WHEUtils.log(`AmbientSound `, ambientSound, soundMediaSource);
       return;
     }
 
     if (shouldMufflingChange) {
-      this.storeMufflingLevel(currentTokenId, sound.id, mufflingLevel);
+      this.storeMufflingLevel(currentTokenId, ambientSound.id, mufflingLevel);
       const shouldBeMuffled = muffleIndex >= 1;
 
       if (shouldBeMuffled) {
         WHEUtils.log('Muffling to: ', mufflingLevel);
-        sound.document.effects.muffled.type = 'lowpass';
-        sound.document.effects.muffled.intensity = mufflingLevel;
+        ambientSound.document.effects.muffled.type = 'lowpass';
+        ambientSound.document.effects.muffled.intensity = mufflingLevel;
 
         if (soundMediaSource.effects.length == 0) {
-          sound.sync(sound.isAudible, sound.document.volume, {
+          ambientSound.sync(ambientSound.isAudible, ambientSound.document.volume, {
             muffled: true,
           });
-          sound.initializeSoundSource();
+          ambientSound.initializeSoundSource();
         } else {
           const effect = soundMediaSource.effects[0] as foundry.audio.BiquadFilterEffect;
           effect.update({
@@ -97,13 +116,13 @@ export default class SoundManager {
         }
       } else {
         WHEUtils.log('Should not be muffled');
-        sound.document.effects.muffled.type = '';
-        sound.document.effects.muffled.intensity = 0;
+        ambientSound.document.effects.muffled.type = '';
+        ambientSound.document.effects.muffled.intensity = 0;
         if (soundMediaSource.effects.length == 0) {
-          sound.sync(sound.isAudible, sound.document.volume, {
+          ambientSound.sync(ambientSound.isAudible, ambientSound.document.volume, {
             muffled: false,
           });
-          sound.initializeSoundSource();
+          ambientSound.initializeSoundSource();
         } else {
           const effect = soundMediaSource.effects[0] as foundry.audio.BiquadFilterEffect;
           effect.update({

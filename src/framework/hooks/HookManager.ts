@@ -30,7 +30,7 @@ export default class HookManager {
     Hooks.on('ready', async () => {
       await getGame().audio.awaitFirstGesture();
 
-      this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling();
 
       /* eslint-disable @typescript-eslint/ban-ts-comment */
       // IMPORTANT: Do not convert to an arrow function.
@@ -47,19 +47,27 @@ export default class HookManager {
       );
     });
     // When a token is about to be moved
-    Hooks.on('updateToken', (_token, _updateData, _options, _userId) => {
+    Hooks.on('updateToken', async (_token, _updateData, _options, _userId) => {
       WHEUtils.log('WHEFramework Event: updateToken');
-      this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling();
+    });
+    Hooks.on('refreshToken', async () => {
+      WHEUtils.log('WHEFramework Event: refreshToken');
+      await this._wheFramework.performMuffling();
     });
     // When a Door is about to be opened
-    Hooks.on('updateWall', (_token, _updateData, _options, _userId) => {
+    Hooks.on('updateWall', async (_token, _updateData, _options, _userId) => {
       WHEUtils.log('WHEFramework Event: updateWall');
-      this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling();
+    });
+    Hooks.on('refreshWall', async () => {
+      WHEUtils.log('WHEFramework Event: refreshWall');
+      await this._wheFramework.performMuffling();
     });
     // When the user starts controlling a token
     Hooks.on('controlToken', async (token, selected) => {
       await this._wheFramework.getPlayerContext().checkForChangedSelection(token, selected);
-      this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling();
     });
     // When ambient sound is about to be moved
     Hooks.on('preUpdateAmbientSound', (ambientSound, formData, _options, _userId) => {
@@ -76,7 +84,7 @@ export default class HookManager {
       }
     });
     // When ambient sound is about to be moved
-    Hooks.on('updateAmbientSound', (ambientSound, _updateData, _options, _userId) => {
+    Hooks.on('updateAmbientSound', async (ambientSound, _updateData, _options, _userId) => {
       WHEUtils.log('WHEFramework Event: updateAmbientSound', _updateData);
       const aSound = ambientSound as foundry.documents.AmbientSoundDocument;
       aSound.update({
@@ -86,11 +94,11 @@ export default class HookManager {
       });
       aSound.effects.muffled.type = 'lowpass';
       aSound.effects.muffled.intensity = 0;
-      this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling();
     });
-    Hooks.on('closeAmbientSoundConfig', (_soundConfig) => {
+    Hooks.on('closeAmbientSoundConfig', async (_soundConfig) => {
       WHEUtils.log('WHEFramework Event: closeAmbientSoundConfig');
-      this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling();
     });
     Hooks.on('renderAmbientSoundConfig', (_app, html, _data, _options) => {
       this.modifySoundConfigForm(html);

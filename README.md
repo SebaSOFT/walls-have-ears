@@ -38,15 +38,9 @@ See:
 
 ### Nightclub demo
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=EXkrlQVEeAo
-" target="_blank"><img src="http://img.youtube.com/vi/EXkrlQVEeAo/0.jpg"
-alt="Nightclub demo" width="240" height="180" border="10" /></a>
+https://youtu.be/rqj76KYpGQg
 
-### Test suite demo
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=hlsi4gw1YIA
-" target="_blank"><img src="http://img.youtube.com/vi/hlsi4gw1YIA/0.jpg"
-alt="Test suite demo" width="240" height="180" border="10" /></a>
+[http://www.youtube.com/watch?feature=player_embedded&v=rqj76KYpGQg](http://img.youtube.com/vi/rqj76KYpGQg/0.jpg)
 
 ## Development
 
