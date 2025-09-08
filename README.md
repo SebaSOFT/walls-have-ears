@@ -38,9 +38,7 @@ See:
 
 ### Nightclub demo
 
-https://youtu.be/rqj76KYpGQg
-
-[http://img.youtube.com/vi/rqj76KYpGQg/0.jpg](http://www.youtube.com/watch?feature=player_embedded&v=rqj76KYpGQg)
+[![Nightclub demo for Walls Have Ears](https://img.youtube.com/vi/rqj76KYpGQg/0.jpg)](https://www.youtube.com/watch?v=rqj76KYpGQg)
 
 ## Development
 
