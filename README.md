@@ -40,7 +40,7 @@ See:
 
 https://youtu.be/rqj76KYpGQg
 
-[http://www.youtube.com/watch?feature=player_embedded&v=rqj76KYpGQg](http://img.youtube.com/vi/rqj76KYpGQg/0.jpg)
+[http://img.youtube.com/vi/rqj76KYpGQg/0.jpg](http://www.youtube.com/watch?feature=player_embedded&v=rqj76KYpGQg)
 
 ## Development
 
