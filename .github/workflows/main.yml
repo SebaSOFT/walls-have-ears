@@ -84,4 +84,4 @@ jobs:
         run: npx @ghost-fvtt/foundry-publish
         env:
           FVTT_TOKEN: ${{ secrets.FVTT_TOKEN }}
-          FVTT_MANIFEST_URL: ./module.json
+          FVTT_MANIFEST_PATH: ./module.json
