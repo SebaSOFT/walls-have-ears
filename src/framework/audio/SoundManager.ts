@@ -94,43 +94,27 @@ export default class SoundManager {
 
     if (shouldMufflingChange) {
       this.storeMufflingLevel(currentTokenId, ambientSound.id, mufflingLevel);
-      const shouldBeMuffled = muffleIndex >= 1;
+      const shouldBeMuffled = muffleIndex > 0;
 
-      if (shouldBeMuffled) {
-        WHEUtils.log('Muffling to: ', mufflingLevel);
-        ambientSound.document.effects.muffled.type = 'lowpass';
-        ambientSound.document.effects.muffled.intensity = mufflingLevel;
+      const intensity = shouldBeMuffled ? mufflingLevel : 0;
+      const type = shouldBeMuffled ? 'lowpass' : '';
 
-        if (soundMediaSource.effects.length == 0) {
-          ambientSound.sync(ambientSound.isAudible, ambientSound.document.volume, {
-            muffled: true,
-          });
-          ambientSound.initializeSoundSource();
-        } else {
-          const effect = soundMediaSource.effects[0] as foundry.audio.BiquadFilterEffect;
-          effect.update({
-            type: 'lowpass',
-            intensity: mufflingLevel,
-          });
-          WHEUtils.log('*** UPDATED EFFECT***', effect.intensity);
-        }
+      WHEUtils.log(shouldBeMuffled ? `Muffling to: ${intensity}` : 'Should not be muffled');
+      ambientSound.document.effects.muffled.type = type;
+      ambientSound.document.effects.muffled.intensity = intensity;
+
+      if (soundMediaSource.effects.length === 0) {
+        ambientSound.sync(ambientSound.isAudible, ambientSound.document.volume, {
+          muffled: shouldBeMuffled,
+        });
+        ambientSound.initializeSoundSource();
       } else {
-        WHEUtils.log('Should not be muffled');
-        ambientSound.document.effects.muffled.type = '';
-        ambientSound.document.effects.muffled.intensity = 0;
-        if (soundMediaSource.effects.length == 0) {
-          ambientSound.sync(ambientSound.isAudible, ambientSound.document.volume, {
-            muffled: false,
-          });
-          ambientSound.initializeSoundSource();
-        } else {
-          const effect = soundMediaSource.effects[0] as foundry.audio.BiquadFilterEffect;
-          effect.update({
-            type: 'lowpass',
-            intensity: 0,
-          });
-          WHEUtils.log('*** UPDATED EFFECT***', effect.intensity);
-        }
+        const effect = soundMediaSource.effects[0] as foundry.audio.BiquadFilterEffect;
+        effect.update({
+          type: 'lowpass',
+          intensity: intensity,
+        });
+        WHEUtils.log('*** UPDATED EFFECT***', effect.intensity);
       }
     } else {
       WHEUtils.log('Cached muffling level WILL NOT change filter');

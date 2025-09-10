@@ -85,13 +85,13 @@ export default class HookManager {
     Hooks.on('updateAmbientSound', async (ambientSound, _updateData, _options, _userId) => {
       WHEUtils.log('WHEFramework Event: updateAmbientSound', _updateData);
       const aSound = ambientSound as foundry.documents.AmbientSoundDocument;
+      aSound.effects.muffled.type = 'lowpass';
+      aSound.effects.muffled.intensity = 0;
       aSound.update({
         effects: {
           muffled: { type: 'lowpass', intensity: 0 },
         },
       });
-      aSound.effects.muffled.type = 'lowpass';
-      aSound.effects.muffled.intensity = 0;
       await this._wheFramework.performMuffling();
     });
     Hooks.on('closeAmbientSoundConfig', async (_soundConfig) => {
