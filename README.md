@@ -38,15 +38,7 @@ See:
 
 ### Nightclub demo
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=EXkrlQVEeAo
-" target="_blank"><img src="http://img.youtube.com/vi/EXkrlQVEeAo/0.jpg"
-alt="Nightclub demo" width="240" height="180" border="10" /></a>
-
-### Test suite demo
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=hlsi4gw1YIA
-" target="_blank"><img src="http://img.youtube.com/vi/hlsi4gw1YIA/0.jpg"
-alt="Test suite demo" width="240" height="180" border="10" /></a>
+[![Nightclub demo for Walls Have Ears](https://img.youtube.com/vi/rqj76KYpGQg/0.jpg)](https://www.youtube.com/watch?v=rqj76KYpGQg)
 
 ## Development
 

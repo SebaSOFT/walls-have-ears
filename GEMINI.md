@@ -6,6 +6,7 @@ This file provides instructions and guidelines for AI agents interacting with th
 
 - This project uses yarn stable. PnP or Zero-Installs are not used.
 - This project uses ESLint for linting. Please use `yarn lint` to check for linting errors and `yarn lint:fix` to automatically fix them.
+- **libWrapper `this` context**: When using `libWrapper.register` to patch prototype methods (e.g., `Wall.prototype._playDoorSound`), it is crucial to use a standard anonymous `function` and not an arrow function (`=>`). This ensures that the `this` keyword inside the wrapper correctly refers to the instance of the object being patched (e.g., the `Wall`), not the lexical scope of the surrounding class.
 
 # walls-have-ears Documentation
 
@@ -20,13 +21,18 @@ walls-have-ears is a simple-as-possible module to muffle sounds that are behind 
 The project is organized as follows:
 
 - `src/`: The main source code directory.
-  - `index.ts`: The main entry point of the library, responsible for module initialization and settings.
-  - `canvas/`: Contains classes related to canvas objects.
-    - `WHEBaseObject.ts`: A base class for other canvas objects.
-    - `WHESoundObject.ts`: Extends `WHEBaseObject`, intended for sound-related logic.
-    - `WHEWallObject.ts`: Extends `WHEBaseObject`, intended for wall-related logic.
-  - `hooks/`: (Currently empty) Reserved for FoundryVTT hook implementations.
-  - `game/`: Contains game-related classes.
+  - `index.ts`: The main entry point of the module, responsible for module initialization and settings.
+  - `foundry/`: Contains FoundryVTT specific utility functions.
+    - `getGame.ts`: A utility function to get the `game` object.
+  - `framework/`: Contains the core framework of the module.
+    - `WHEFramework.ts`: The main framework class, handling muffling logic and hooks.
+    - `canvas/`: Contains classes related to canvas objects.
+      - `WHEBaseObject.ts`: A base class for other canvas objects.
+      - `WHESoundObject.ts`: Extends `WHEBaseObject`, intended for sound-related logic.
+      - `WHEWallObject.ts`: Extends `WHEBaseObject`, intended for wall-related logic.
+  - `lib/`: Contains third-party libraries.
+    - `libWrapper/`: Contains a shim for the `libWrapper` module.
+  - `settings/`: Contains settings-related classes.
     - `WHESettings.ts`: A singleton class for managing module settings.
   - `utils/`: Contains utility functions and constants.
     - `WHEConstants.ts`: Defines constants used throughout the module.
@@ -44,12 +50,14 @@ The project is organized as follows:
 
 ## Class Structure and Relationships
 
+- **`WHEFramework`**: The core singleton class of the module. It initializes all the hooks and manages the muffling logic for sounds and doors. It depends on `WHEUtils`, `WHEConstants`, and `getGame`.
 - **`WHEBaseObject`**: The foundational class for canvas-related objects. Currently serves as a placeholder for common properties or methods that might be shared by `WHESoundObject` and `WHEWallObject`.
 - **`WHESoundObject`**: Extends `WHEBaseObject`. This class is designed to encapsulate logic specific to sound objects within the FoundryVTT canvas.
 - **`WHEWallObject`**: Extends `WHEBaseObject`. This class is designed to encapsulate logic specific to wall objects within the FoundryVTT canvas.
-- **`WHESettings`**: A singleton class responsible for registering and retrieving module settings. It interacts with FoundryVTT's settings API and depends on `WHEConstants` for setting keys.
+- **`WHESettings`**: A singleton class responsible for registering and retrieving module settings. It interacts with FoundryVTT's settings API and depends on `WHEConstants`.
 - **`WHEConstants`**: An enum that defines various constant values used across the module, such as the module ID and setting keys.
 - **`WHEUtils`**: A static utility class providing helper functions for common tasks like logging (conditional on debug settings), internationalization (translating messages), clamping numerical values, and a simple in-memory cache for `WHEBaseObject` instances. It depends on `WHEConstants` and `WHEBaseObject`.
+-   **`getGame`**: A utility function that returns the FoundryVTT `game` object.
 - **`index.ts`**: The primary entry point of the module. It orchestrates the initialization process, including setting up debug logging via `WHEUtils` and initializing module settings through `WHESettings`.
 
 ## Getting Started
