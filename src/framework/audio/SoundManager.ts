@@ -3,6 +3,7 @@ import { MUFFLING_MAPPING } from '../../utils/WHEConstants';
 import PlayerContext from '../player/PlayerContext';
 import { getGame } from '../../foundry/getGame';
 import Effect = AmbientSoundDocument.Effect;
+import MufflingCalculatorService from '../services/MufflingCalculatorService';
 
 const AWAIT_SOUND_TIMEOUT_MS = 2000;
 const AWAIT_SOUND_POLL_INTERVAL_MS = 50;
@@ -145,25 +146,36 @@ export default class SoundManager {
     if (!CONST.WALL_DOOR_INTERACTIONS.includes(interaction)) {
       throw new Error(`"${interaction}" is not a valid door interaction type`);
     }
-    if (!wall.isDoor) return;
+    if (!wall.isDoor) {
+      return;
+    }
     // Identify which door sound effect to play
     const doorSound = CONFIG.Wall.doorSounds[wall.document.doorSound as any];
     let sounds = doorSound?.[interaction];
     if (sounds && !Array.isArray(sounds)) sounds = [sounds];
     else if (!sounds?.length) {
-      if (interaction !== 'test') return;
+      if (interaction !== 'test') {
+        return;
+      }
       sounds = [CONFIG.sounds.lock];
     }
     const src = sounds[Math.floor(Math.random() * sounds.length)];
 
     // This is the different about WHE, here we dinamically estimate the mufling
-    const muffIntensity = 5;
+    const doorPosition = wall.center;
+    const earPosition = selectedToken.center;
+    const distanceToDoor = MufflingCalculatorService.getDIstanceBetweenPoints(earPosition, doorPosition);
+    if (distanceToDoor > wall.soundRadius) {
+      return;
+    }
+    const muffIntensity = MufflingCalculatorService.getMufflingIndexBetweenPoints(earPosition, doorPosition);
+    const mnufflinglevel = MUFFLING_MAPPING[`level${muffIntensity}`];
 
     // Play the door sound as a localized sound effect
-    const muffledEffect = { type: 'lowpass', intensity: muffIntensity };
+    const muffledEffect = { type: 'lowpass', intensity: mnufflinglevel };
     const soundLayer = getGame().canvas!.sounds!;
     soundLayer
-      .playAtPosition(src, wall.center, wall.soundRadius, {
+      .playAtPosition(src, doorPosition, wall.soundRadius, {
         volume: 1.0,
         easing: true,
         walls: false,
