@@ -1,6 +1,6 @@
 {
   "name": "walls-have-ears",
-  "version": "3.13.0",
+  "version": "3.13.1",
   "description": "A simple-as-possible module to muffle sounds that are behind a wall for a player.",
   "source": [
     "src/index.ts",

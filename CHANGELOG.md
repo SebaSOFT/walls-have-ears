@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [3.13.1] 2025-09-10
+
+### CHANGED
+
+- The module's core logic has been completely overhauled for better performance, stability, and accuracy in sound muffling.
+- The new architecture ensures a more responsive and reliable experience, especially in complex scenes with many walls and sounds.
+
+### ADDED
+
+- Enhanced the precision of wall occlusion detection for more realistic sound muffling effects.
+- Asynchronous detection of sound loading that caused failed detection on big sound files (mp3)
+
 ## [3.13.0] 2025-09-02
 
 ### CHANGED
