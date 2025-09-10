@@ -6,7 +6,7 @@
 [![Foundry HUB Endorsements](https://img.shields.io/badge/dynamic/json?label=FoundryHUB%20Endorsements&query=%24.endorsements&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fwalls-have-ears)](https://www.foundryvtt-hub.com/package/walls-have-ears/)
 [![Minimum Foundry VTT version](https://img.shields.io/badge/dynamic/json?label=Foundry%20VTT%20version&query=%24.minimumCoreVersion&suffix=%20or%20later&url=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json)](https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json)
 
-**Version:** 3.13.0
+**Version:** 3.13.1
 
 "A simple-as-possible module to muffle sounds that are behind a wall for a player or token."
 
@@ -38,7 +38,15 @@ See:
 
 ### Nightclub demo
 
-[![Nightclub demo for Walls Have Ears](https://img.youtube.com/vi/rqj76KYpGQg/0.jpg)](https://www.youtube.com/watch?v=rqj76KYpGQg)
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=EXkrlQVEeAo
+" target="_blank"><img src="http://img.youtube.com/vi/EXkrlQVEeAo/0.jpg"
+alt="Nightclub demo" width="240" height="180" border="10" /></a>
+
+### Test suite demo
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=hlsi4gw1YIA
+" target="_blank"><img src="http://img.youtube.com/vi/hlsi4gw1YIA/0.jpg"
+alt="Test suite demo" width="240" height="180" border="10" /></a>
 
 ## Development
 
