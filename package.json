@@ -48,6 +48,7 @@
     "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
     "globals": "^16.3.0",
     "jest": "^30.1.2",
+    "jest-environment-jsdom": "^30.1.2",
     "parcel": "^2.15.4",
     "prettier": "^3.6.2",
     "ts-jest": "^29.4.1",

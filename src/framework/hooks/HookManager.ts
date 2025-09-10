@@ -1,8 +1,6 @@
 import WHEUtils from '../../utils/WHEUtils';
 import { WHEConstants } from '../../utils/WHEConstants';
 import { getGame } from '../../foundry/getGame';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 import { libWrapper } from '../../lib/libWrapper';
 import WHEFramework from '../WHEFramework';
 import SoundManager from '../audio/SoundManager';
