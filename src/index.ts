@@ -4,7 +4,7 @@ import WHESettings from './settings/WHESettings';
 import WHEFramework from './framework/WHEFramework';
 import { getGame } from './foundry/getGame';
 
-const forceDebug = true;
+const forceDebug = false;
 
 Hooks.once('init', async () => {
   WHEUtils.debug = forceDebug;
