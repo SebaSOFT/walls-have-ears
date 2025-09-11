@@ -33,7 +33,7 @@ In the setup screen, use the URL `https://github.com/SebaSOFT/walls-have-ears/re
 
 See:
 
-![Test cases for Muffling logic](https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/develop/artwork/mufflingLogic.jpg)
+![Test cases for Muffling logic](https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/main/artwork/mufflingLogic.jpg)
 
 ### WHE Showwcase v13+
 
