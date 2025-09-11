@@ -1,7 +1,7 @@
 {
   "id": "walls-have-ears",
   "title": "Walls Have Ears",
-  "description": "<p>A simple-as-possible module to muffle sounds dynamically based on wall occlusion.</p>",
+  "description": "<p>A zero-config module that dynamically muffles sounds based on wall occlusion. Supports door sounds and settings for a tailored audio experience.</p>",
   "authors": [
     {
       "name": "SebaSOFT",
@@ -19,6 +19,14 @@
     "maximum": "13"
   },
   "esmodules": ["dist/main.js"],
+  "media": [
+    {
+      "type": "setup",
+      "url": "modules/walls-have-ears/artwork/cover.webp",
+      "thumbnail": "modules/walls-have-ears/artwork/cover-thumb.webp",
+      "caption": "A zero-config module that dynamically muffles sounds based on wall occlusion. Supports door sounds and settings for a tailored audio experience."
+    }
+  ],
   "languages": [
     {
       "lang": "de",

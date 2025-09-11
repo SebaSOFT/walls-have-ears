@@ -62,7 +62,7 @@ jobs:
       # - run: mkdir -p scripts && mv dist/* scripts/
 
       # Create a zip file with all files required by the module to add to the release
-      - run: zip -r ./module.zip module.json LICENSE dist/ lang/
+      - run: zip -r ./module.zip module.json LICENSE dist/ lang/ artwork/*.webp
 
       #  - run: rm -rf scripts
 

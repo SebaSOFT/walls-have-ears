@@ -9,9 +9,7 @@
 
 **Version:** 3.13.2
 
-"A simple-as-possible module to muffle sounds that are behind a wall for a player or token."
-
-walls-have-ears is a simple-as-possible module to muffle sounds that are behind a wall for a player in FoundryVTT. It is built and bundled using Parcel, offering a simple and efficient development experience.
+"A zero-config module that dynamically muffles sounds based on wall occlusion. Supports door sounds and settings for a tailored audio experience."
 
 ## Installation
 
@@ -35,7 +33,7 @@ In the setup screen, use the URL `https://github.com/SebaSOFT/walls-have-ears/re
 
 See:
 
-![Test cases for Muffling logic](https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/develop/mufflingLogic.jpg)
+![Test cases for Muffling logic](https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/develop/artwork/mufflingLogic.jpg)
 
 ### WHE Showwcase v13+
 
@@ -81,7 +79,7 @@ SebaSOFT
 
 **Bug Reports:** https://github.com/SebaSOFT/walls-have-ears/issues
 
-**Discord:** https://discord.gg/Sebasoft (SebaSOFT#9414)
+**Discord:** https://discordapp.com/users/SebaSOFT#2613 (SebaSOFT#2613)
 
 **Patreon:** https://www.patreon.com/SebaSOFT
 
