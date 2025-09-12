@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Enable Corepack
         run: corepack enable
@@ -59,12 +59,8 @@ jobs:
           manifest: https://github.com/${{github.repository}}/releases/latest/download/module.json
           download: https://github.com/${{github.repository}}/releases/download/${{ steps.get_version.outputs.version }}/module.zip
 
-      # - run: mkdir -p scripts && mv dist/* scripts/
-
       # Create a zip file with all files required by the module to add to the release
       - run: zip -r ./module.zip module.json LICENSE dist/ lang/ artwork/*.webp
-
-      #  - run: rm -rf scripts
 
       # Create a release for this specific version
       - name: Create Release
@@ -77,11 +73,12 @@ jobs:
           prerelease: false
           generateReleaseNotes: true # Automatically generate release notes
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: './module.json, ./module.zip'
+          artifacts: "./module.json, ./module.zip"
           tag: ${{ steps.get_version.outputs.version }}
 
-      - name: Publish to Foundry Hub
-        run: npx @ghost-fvtt/foundry-publish
-        env:
-          FVTT_TOKEN: ${{ secrets.FVTT_TOKEN }}
-          FVTT_MANIFEST_PATH: ./module.json
+      - name: Publish Module to FoundryVTT Website
+        id: publish-to-foundry-website
+        uses: cs96and/FoundryVTT-release-package@v1
+        with:
+          package-token: ${{ secrets.FVTT_TOKEN }}
+          manifest-url: https://github.com/${{github.repository}}/releases/download/${{ steps.get_version.outputs.version }}/module.json
