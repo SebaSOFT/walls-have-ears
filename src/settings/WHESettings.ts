@@ -39,6 +39,20 @@ export default class WHESettings {
           requiresReload: false,
         },
       ],
+      [
+        WHEConstants.SETTING_DOOR_MUFFLING,
+        {
+          name: WHEUtils.getMessageText('WHE.settings_door_muffling.title'),
+          hint: WHEUtils.getMessageText('WHE.settings_door_muffling.hint'),
+          key: WHEConstants.SETTING_DOOR_MUFFLING,
+          namespace: WHEConstants.MODULE,
+          scope: 'client',
+          config: true,
+          type: Boolean,
+          default: true,
+          requiresReload: false,
+        },
+      ],
     ];
   }
 

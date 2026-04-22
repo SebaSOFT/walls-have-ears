@@ -1,9 +1,10 @@
 import WHEUtils from '../../utils/WHEUtils';
-import { MUFFLING_MAPPING } from '../../utils/WHEConstants';
+import { MUFFLING_MAPPING, WHEConstants } from '../../utils/WHEConstants';
 import PlayerContext from '../player/PlayerContext';
 import { getGame } from '../../foundry/getGame';
 import Effect = AmbientSoundDocument.Effect;
 import MufflingCalculatorService from '../services/MufflingCalculatorService';
+import WHESettings from '../../settings/WHESettings';
 
 const AWAIT_SOUND_TIMEOUT_MS = 2000;
 const AWAIT_SOUND_POLL_INTERVAL_MS = 50;
@@ -134,8 +135,10 @@ export default class SoundManager {
     wall: Wall,
   ) => {
     const selectedToken = PlayerContext.getInstance().getSelectedToken();
-    // If there is no selected token, just execute FVTT function
-    if (!selectedToken) {
+    const doorMufflingEnabled = WHESettings.getInstance().getBoolean(WHEConstants.SETTING_DOOR_MUFFLING, true);
+
+    // If there is no selected token or door muffling is disabled, just execute FVTT function
+    if (!selectedToken || !doorMufflingEnabled) {
       WHEUtils.log('Executing regular playDoorSound');
       wrapped(interaction);
       return;
