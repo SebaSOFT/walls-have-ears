@@ -4,6 +4,8 @@
   "WHE.save": "Enregistrer",
   "WHE.settings_tester.title": "Activer pendant la prévisualisation des sons",
   "WHE.settings_tester.hint": "Assourdir les sons lorsque l'aperçu du son ambiant est activé pendant l'édition du son ambiant.",
+  "WHE.settings_door_muffling.title": "Activer l'étouffement des sons de porte",
+  "WHE.settings_door_muffling.hint": "Active l'étouffement dynamique des sons de porte lors de l'ouverture ou de la fermeture des portes en fonction de l'occlusion des murs.",
   "WHE.settings_disable.title": "Désactiver le silencieux",
   "WHE.settings_disable.hint": "Ce module permet d'étouffer les sons pour une meilleure intégration. Mais vous pouvez désactiver cette fonctionnalité pour des raisons de performances.",
   "WHE.settings_debug.title": "Activer le mode débogage",
