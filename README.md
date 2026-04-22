@@ -2,15 +2,14 @@
 
 [![GitHub license](https://img.shields.io/github/license/SebaSOFT/walls-have-ears)](https://github.com/SebaSOFT/walls-have-ears/blob/main/LICENSE)
 [![GitHub release](https://img.shields.io/github/downloads-pre/SebaSOFT/walls-have-ears/latest/module.zip?label=downloads)](https://github.com/SebaSOFT/walls-have-ears/releases/)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SebaSOFT/walls-have-ears/main.yml?branch=main&label=Test%20Build%20Release)
 [![Forge Installs](https://img.shields.io/badge/dynamic/json?color=green&label=Forge%20installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fwalls-have-ears)](https://forge-vtt.com/bazaar#package=walls-have-ears)
 [![Foundry HUB Endorsements](https://img.shields.io/badge/dynamic/json?label=FoundryHUB%20Endorsements&query=%24.endorsements&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fwalls-have-ears)](https://www.foundryvtt-hub.com/package/walls-have-ears/)
-[![Minimum Foundry VTT version](https://img.shields.io/badge/dynamic/json?label=Foundry%20VTT%20version&query=%24.minimumCoreVersion&suffix=%20or%20later&url=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json)](https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json)
+[![Minimum Foundry VTT version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json&query=%24.compatibility.minimum&suffix=%2B&label=FoundryVTT%20compat&link=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json)](https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json)
 
-**Version:** 3.13.1
+**Version:** 3.13.2
 
-"A simple-as-possible module to muffle sounds that are behind a wall for a player or token."
-
-walls-have-ears is a simple-as-possible module to muffle sounds that are behind a wall for a player in FoundryVTT. It is built and bundled using Parcel, offering a simple and efficient development experience.
+"A zero-config module that dynamically muffles sounds based on wall occlusion. Supports door sounds and settings for a tailored audio experience."
 
 ## Installation
 
@@ -24,29 +23,25 @@ In the setup screen, use the URL `https://github.com/SebaSOFT/walls-have-ears/re
 ## How it works
 
 - Enable Token Vision on the scene (this is a **MUST**)
-- **DO NOT** Disable "Constrained by Walls" on the Sound
-- **EITHER** Set sound occlussion on Walls to limited or none as needed
+- Disable "Constrained by Walls" on the Sound
 - It works with sound easing (volume changing)
 - It will detect walls and muffle the sound (see table below)
 - Windows are less likely to muffle (see table below)
 - Terrain walls don't contribute to muffling (see table below)
 - Ethereal Walls don't contribute to muffling (see table below)
+- Secret Walls work like regular doors
 
 See:
 
-![Test cases for Muffling logic](https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/develop/mufflingLogic.jpg)
+![Test cases for Muffling logic](https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/main/artwork/mufflingLogic.jpg)
 
-### Nightclub demo
+### WHE Showwcase v13+
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=EXkrlQVEeAo
-" target="_blank"><img src="http://img.youtube.com/vi/EXkrlQVEeAo/0.jpg"
-alt="Nightclub demo" width="240" height="180" border="10" /></a>
+[![WHE Showwcase v13+](https://img.youtube.com/vi/rqj76KYpGQg/0.jpg)](https://www.youtube.com/watch?v=rqj76KYpGQg)
 
-### Test suite demo
+### Door Sounds demo
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=hlsi4gw1YIA
-" target="_blank"><img src="http://img.youtube.com/vi/hlsi4gw1YIA/0.jpg"
-alt="Test suite demo" width="240" height="180" border="10" /></a>
+[![Door Sounds demo](https://img.youtube.com/vi/f7Ti98hel5s/0.jpg)](https://www.youtube.com/watch?v=f7Ti98hel5s)
 
 ## Development
 
@@ -84,7 +79,7 @@ SebaSOFT
 
 **Bug Reports:** https://github.com/SebaSOFT/walls-have-ears/issues
 
-**Discord:** https://discord.gg/Sebasoft (SebaSOFT#9414)
+**Discord:** https://discordapp.com/users/SebaSOFT#2613 (SebaSOFT#2613)
 
 **Patreon:** https://www.patreon.com/SebaSOFT
 
