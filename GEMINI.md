@@ -26,10 +26,14 @@ The project is organized as follows:
     - `getGame.ts`: A utility function to get the `game` object.
   - `framework/`: Contains the core framework of the module.
     - `WHEFramework.ts`: The main framework class, handling muffling logic and hooks.
-    - `canvas/`: Contains classes related to canvas objects.
-      - `WHEBaseObject.ts`: A base class for other canvas objects.
-      - `WHESoundObject.ts`: Extends `WHEBaseObject`, intended for sound-related logic.
-      - `WHEWallObject.ts`: Extends `WHEBaseObject`, intended for wall-related logic.
+    - `audio/`: Contains classes related to audio management.
+      - `SoundManager.ts`: Manages all audio-related functionality.
+    - `hooks/`: Contains classes related to FoundryVTT hooks.
+      - `HookManager.ts`: Manages all FoundryVTT hooks and libWrapper patches.
+    - `player/`: Contains classes related to the player context.
+      - `PlayerContext.ts`: Manages the player's token context.
+    - `services/`: Contains services used by the framework.
+      - `MufflingCalculatorService.ts`: Calculates the muffling index between two points.
   - `lib/`: Contains third-party libraries.
     - `libWrapper/`: Contains a shim for the `libWrapper` module.
   - `settings/`: Contains settings-related classes.
@@ -50,14 +54,15 @@ The project is organized as follows:
 
 ## Class Structure and Relationships
 
-- **`WHEFramework`**: The core singleton class of the module. It initializes all the hooks and manages the muffling logic for sounds and doors. It depends on `WHEUtils`, `WHEConstants`, and `getGame`.
-- **`WHEBaseObject`**: The foundational class for canvas-related objects. Currently serves as a placeholder for common properties or methods that might be shared by `WHESoundObject` and `WHEWallObject`.
-- **`WHESoundObject`**: Extends `WHEBaseObject`. This class is designed to encapsulate logic specific to sound objects within the FoundryVTT canvas.
-- **`WHEWallObject`**: Extends `WHEBaseObject`. This class is designed to encapsulate logic specific to wall objects within the FoundryVTT canvas.
-- **`WHESettings`**: A singleton class responsible for registering and retrieving module settings. It interacts with FoundryVTT's settings API and depends on `WHEConstants`.
+- **`WHEFramework`**: The core singleton class of the module. It initializes and coordinates the different services and managers. It depends on `PlayerContext`, `SoundManager`, `HookManager`, `MufflingCalculatorService`, and `WHEUtils`.
+- **`SoundManager`**: A singleton class that manages all audio-related functionality, including applying muffling effects and handling special sounds like doors. It depends on `WHEUtils`, `WHEConstants`, `PlayerContext`, `MufflingCalculatorService` and `getGame`.
+- **`HookManager`**: Manages all FoundryVTT hooks and libWrapper patches for the module. It depends on `WHEFramework`, `SoundManager`, `WHEUtils`, `WHEConstants` and `getGame`.
+- **`PlayerContext`**: A singleton class that manages the player's token context, primarily tracking the selected token for muffling calculations. It depends on `WHEUtils` and `getGame`.
+- **`MufflingCalculatorService`**: A static utility class that calculates the muffling index between two points by testing for collisions. It depends on `WHEUtils` and `getGame`.
+- **`WHESettings`**: A singleton class responsible for registering and retrieving module settings. It interacts with FoundryVTT's settings API and depends on `WHEConstants` and `WHEUtils`.
 - **`WHEConstants`**: An enum that defines various constant values used across the module, such as the module ID and setting keys.
-- **`WHEUtils`**: A static utility class providing helper functions for common tasks like logging (conditional on debug settings), internationalization (translating messages), clamping numerical values, and a simple in-memory cache for `WHEBaseObject` instances. It depends on `WHEConstants` and `WHEBaseObject`.
--   **`getGame`**: A utility function that returns the FoundryVTT `game` object.
+- **`WHEUtils`**: A static utility class providing helper functions for common tasks like logging (conditional on debug settings), internationalization (translating messages), clamping numerical values, and a simple in-memory cache. It depends on `getGame`.
+- **`getGame`**: A utility function that returns the FoundryVTT `game` object.
 - **`index.ts`**: The primary entry point of the module. It orchestrates the initialization process, including setting up debug logging via `WHEUtils` and initializing module settings through `WHESettings`.
 
 ## Getting Started
@@ -95,7 +100,7 @@ This project uses [Prettier](https://prettier.io/) for code formatting and [ESLi
 
 ### Testing
 
-This project uses [Jest](https://jestjs.io/) for unit testing. Tests are configured to run with TypeScript using `ts-jest` in a `node` environment.
+This project uses [Jest](https://jestjs.io/) for unit testing. Tests are configured to run with TypeScript using `ts-jest` in a `jsdom` environment.
 
 ## Dependencies
 
@@ -114,6 +119,7 @@ The project relies on the following dependencies:
 - `fvtt-types`: FoundryVTT type definitions.
 - `globals`: ESLint global variables.
 - `jest`: JavaScript testing framework.
+- `jest-environment-jsdom`: JSDOM environment for Jest.
 - `parcel`: The web application bundler.
 - `prettier`: An opinionated code formatter.
 - `ts-jest`: Jest transformer for TypeScript.

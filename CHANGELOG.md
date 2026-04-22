@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [3.13.2] 2025-09-11
+
+### CHANGED
+
+- Revised functionality of preview setting
+
+### ADDED
+
+- Settings to disable the muffling functionality for door sounds
+
 ## [3.13.1] 2025-09-10
 
 ### CHANGED
