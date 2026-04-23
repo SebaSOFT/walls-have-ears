@@ -165,17 +165,25 @@ export default class SoundManager {
     const src = sounds[Math.floor(Math.random() * sounds.length)];
 
     // This is the different about WHE, here we dinamically estimate the mufling
-    const doorPosition = wall.center;
-    const earPosition = selectedToken.center;
-    const distanceToDoor = MufflingCalculatorService.getDIstanceBetweenPoints(earPosition, doorPosition);
+    const doorPosition = {
+      x: wall.center.x,
+      y: wall.center.y,
+      z: (wall.document as any).elevation ?? 0,
+    } as any;
+    const earPosition = {
+      x: selectedToken.center.x,
+      y: selectedToken.center.y,
+      z: (selectedToken.document.elevation ?? 0) + 6,
+    } as any;
+    const distanceToDoor = MufflingCalculatorService.getDistanceBetweenPoints(earPosition, doorPosition);
     if (distanceToDoor > wall.soundRadius) {
       return;
     }
     const muffIntensity = MufflingCalculatorService.getMufflingIndexBetweenPoints(earPosition, doorPosition);
-    const mnufflinglevel = MUFFLING_MAPPING[`level${muffIntensity}`];
+    const mufflingLevel = MUFFLING_MAPPING[`level${muffIntensity}`];
 
     // Play the door sound as a localized sound effect
-    const muffledEffect = { type: 'lowpass', intensity: mnufflinglevel };
+    const muffledEffect = { type: 'lowpass', intensity: mufflingLevel };
     const soundLayer = getGame().canvas!.sounds!;
     soundLayer
       .playAtPosition(src, doorPosition, wall.soundRadius, {

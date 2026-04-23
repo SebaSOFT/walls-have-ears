@@ -53,6 +53,20 @@ export default class WHESettings {
           requiresReload: false,
         },
       ],
+      [
+        WHEConstants.SETTING_FLOOR_THICKNESS,
+        {
+          name: WHEUtils.getMessageText('WHE.settings_floor_thickness.title'),
+          hint: WHEUtils.getMessageText('WHE.settings_floor_thickness.hint'),
+          key: WHEConstants.SETTING_FLOOR_THICKNESS,
+          namespace: WHEConstants.MODULE,
+          scope: 'world',
+          config: true,
+          type: Number,
+          default: 10,
+          requiresReload: false,
+        },
+      ],
     ];
   }
 
@@ -87,6 +101,24 @@ export default class WHESettings {
       return defaultValue;
     }
     const res: boolean | null = getGame().settings.get(WHEConstants.MODULE as any, settingKey as any) as boolean | null;
+    if (res === null) {
+      return defaultValue;
+    }
+    return res;
+  };
+
+  /**
+   * Get a Number setting for the module
+   * Note: you can call this after the Init Hook has finished
+   *
+   * @param settingKey The Settings Key. See WHEconstants
+   * @param defaultValue  The default value to return if the setting is not found
+   */
+  public getNumber = (settingKey: string, defaultValue: number = 0): number => {
+    if (!this.initialized) {
+      return defaultValue;
+    }
+    const res: number | null = getGame().settings.get(WHEConstants.MODULE as any, settingKey as any) as number | null;
     if (res === null) {
       return defaultValue;
     }

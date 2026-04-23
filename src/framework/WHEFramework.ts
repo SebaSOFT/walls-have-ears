@@ -67,7 +67,8 @@ export default class WHEFramework {
     const earPosition = {
       x: selectedToken.center.x,
       y: selectedToken.center.y,
-    } as foundry.canvas.Canvas.Point;
+      z: (selectedToken.document.elevation ?? 0) + 6, // 6ft token height offset
+    } as any;
 
     const ambientSounds = getGame()!.canvas!.sounds!.placeables;
     if (ambientSounds && ambientSounds.length > 0) {
@@ -86,9 +87,10 @@ export default class WHEFramework {
         const soundPosition = {
           x: currentAmbientSound.center.x,
           y: currentAmbientSound.center.y,
-        } as foundry.canvas.Canvas.Point;
+          z: currentAmbientSound.document.elevation ?? 0,
+        } as any;
 
-        const distanceToSound = MufflingCalculatorService.getDIstanceBetweenPoints(earPosition, soundPosition);
+        const distanceToSound = MufflingCalculatorService.getDistanceBetweenPoints(earPosition, soundPosition);
 
         if (currentAmbientSound.document.radius < Math.floor(distanceToSound)) {
           continue;

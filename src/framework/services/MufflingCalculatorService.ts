@@ -1,17 +1,22 @@
 import WHEUtils from '../../utils/WHEUtils';
 import { getGame } from '../../foundry/getGame';
+import WHESettings from '../../settings/WHESettings';
+
+export interface Point3D extends foundry.canvas.Canvas.Point {
+  z: number;
+}
 
 export default class MufflingCalculatorService {
   /**
    * Calculates the muffling index between two points by testing for collisions.
    * It uses sight, sound, and move collision layers to determine the level of obstruction.
-   * @param {foundry.canvas.Canvas.Point} earPosition - The point representing the listener (e.g., token center).
-   * @param {foundry.canvas.Canvas.Point} soundPosition - The point representing the sound source.
+   * @param {Point3D | foundry.canvas.Canvas.Point} earPosition - The point representing the listener (e.g., token center).
+   * @param {Point3D | foundry.canvas.Canvas.Point} soundPosition - The point representing the sound source.
    * @returns {number} A muffling index from -1 to 5, where -1 is no obstruction and 5 is maximum obstruction.
    */
   public static getMufflingIndexBetweenPoints = (
-    earPosition: foundry.canvas.Canvas.Point,
-    soundPosition: foundry.canvas.Canvas.Point,
+    earPosition: Point3D | foundry.canvas.Canvas.Point,
+    soundPosition: Point3D | foundry.canvas.Canvas.Point,
   ): number => {
     const sightLayer = CONFIG.Canvas.polygonBackends.sight;
     const soundLayer = CONFIG.Canvas.polygonBackends.sound;
@@ -30,15 +35,19 @@ export default class MufflingCalculatorService {
 
     if (!sightCollisions) {
       WHEUtils.log('There are no walls!');
-      return -1;
+      // Even if no sight walls, there might be move walls or floors
+      sightCollisions = [];
     }
 
     // New windows come by default with a distance triggering of the sight,
     // which we need to filter to keep (available) windows as 0 muffling
     sightCollisions = sightCollisions.filter((impactVertex) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      const wall = impactVertex.edges.first().object as Wall;
+      const edge = Array.from(impactVertex.edges)[0] as any;
+      const wall = edge?.object as Wall;
+
+      if (!wall) {
+        return false;
+      }
 
       const wallCenter = wall.center;
 
@@ -46,7 +55,7 @@ export default class MufflingCalculatorService {
       if (!sightDistance) {
         return true;
       }
-      const tokenDistance = MufflingCalculatorService.getDIstanceBetweenPoints(earPosition, wallCenter);
+      const tokenDistance = MufflingCalculatorService.getDistanceBetweenPoints(earPosition, wallCenter);
 
       WHEUtils.log(`Maximum sight: ${sightDistance}`);
       WHEUtils.log(`Distance to Wall: ${tokenDistance}`);
@@ -54,51 +63,75 @@ export default class MufflingCalculatorService {
       return tokenDistance >= sightDistance;
     });
 
-    // Then again if terrain collisions exist, you are in the same room
-    const noTerrainSenseCollisions = sightCollisions.filter((impactVertex) => {
-      const wall = impactVertex?.edges?.first()?.isLimited('sight');
-      return !wall;
-    });
-
     // This already takes into account open doors
-    const moveCollisions = moveLayer.testCollision(earPosition, soundPosition, { type: 'move', mode: 'all' });
+    const moveCollisions = moveLayer.testCollision(earPosition, soundPosition, { type: 'move', mode: 'all' }) || [];
 
-    // Present the results
-    WHEUtils.log(`Collision walls (MOVE): ${moveCollisions.length}`);
-    WHEUtils.log(`Collision walls (SIGHT): ${sightCollisions.length}`);
-    WHEUtils.log(`Collision walls (SIGHT excl. terrain ): ${noTerrainSenseCollisions.length}`);
+    // Accumulate muffling: 0.5 for each sight or move collision
+    let wallMufflingSum = (sightCollisions.length + moveCollisions.length) * 0.5;
+
+    WHEUtils.log(`Sight collisions: ${sightCollisions.length}`);
+    WHEUtils.log(`Move collisions: ${moveCollisions.length}`);
+
+    // 3D Surface Logic
+    if ('z' in earPosition && 'z' in soundPosition) {
+      const zMin = Math.min(earPosition.z, soundPosition.z);
+      const zMax = Math.max(earPosition.z, soundPosition.z);
+
+      const surfaces = (getGame()?.canvas?.scene as any)?.getSurfaces() || [];
+      WHEUtils.log(`Surfaces found: ${surfaces.length}`);
+      const elevationsBetween = surfaces
+        .map((s: any) => s.elevation ?? s.document?.elevation)
+        .filter((e: number | undefined) => e !== undefined && e > zMin && e < zMax)
+        .sort((a: number, b: number) => a - b);
+
+      WHEUtils.log(`Elevations between: ${elevationsBetween.join(', ')}`);
+
+      if (elevationsBetween.length > 0) {
+        const floorThickness = WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
+        let mergedFloors = 0;
+        let lastElevation = -Infinity;
+
+        for (const elevation of elevationsBetween) {
+          if (elevation > lastElevation + floorThickness) {
+            mergedFloors++;
+            lastElevation = elevation;
+          }
+        }
+        wallMufflingSum += mergedFloors;
+      }
+    }
 
     // Estimating how much to muffle
-    // See image:
-    const finalMuffling = Math.floor((noTerrainSenseCollisions.length + moveCollisions.length) / 2);
+    const finalMuffling = Math.floor(wallMufflingSum);
 
-    // Account for ethereal walls
-    if (sightCollisions.length >= 1 && moveCollisions.length === 0) {
-      WHEUtils.log('There is at least an ethereal wall');
-      return 0;
-    }
+    WHEUtils.log(`Collision walls (MOVE): ${moveCollisions.length}`);
+    WHEUtils.log(`Collision walls (SIGHT): ${sightCollisions.length}`);
+    WHEUtils.log(`Wall Muffling Sum: ${wallMufflingSum}`);
 
     return WHEUtils.clamp(finalMuffling, 0, 5) ?? 0;
   };
 
   /**
    * Measures the distance between two points using the canvas grid.
-   * @param {foundry.canvas.Canvas.Point} poinA - The first point.
-   * @param {foundry.canvas.Canvas.Point} pointB - The second point.
+   * @param {Point3D | foundry.canvas.Canvas.Point} pointA - The first point.
+   * @param {Point3D | foundry.canvas.Canvas.Point} pointB - The second point.
    * @returns {number} The calculated distance.
    */
-  public static getDIstanceBetweenPoints = (
-    poinA: foundry.canvas.Canvas.Point,
-    pointB: foundry.canvas.Canvas.Point,
+  public static getDistanceBetweenPoints = (
+    pointA: Point3D | foundry.canvas.Canvas.Point,
+    pointB: Point3D | foundry.canvas.Canvas.Point,
   ): number => {
-    const horizontalDistance = getGame()!.canvas!.grid!.measurePath([poinA, pointB], {}).distance;
+    const horizontalDistance = getGame()!.canvas!.grid!.measurePath([pointA, pointB], {}).distance;
 
-    // TODO meassure elevation
-    //const elevationDiff = Math.abs(token.document.elevation - target.document.elevation);
-    //const trueDistance = Math.round(Math.hypot(horizontalDistance, elevationDiff));
+    let elevationDiff = 0;
+    if ('z' in pointA && 'z' in pointB) {
+      elevationDiff = Math.abs((pointA as Point3D).z - (pointB as Point3D).z);
+    }
 
-    WHEUtils.log('Horizontal Distance: ', horizontalDistance);
+    const trueDistance = Math.round(Math.hypot(horizontalDistance, elevationDiff));
 
-    return horizontalDistance;
+    WHEUtils.log('True Distance: ', trueDistance);
+
+    return trueDistance;
   };
 }

@@ -39,9 +39,9 @@ describe('WHESettings', () => {
   describe('initialize', () => {
     it('should register settings only once', () => {
       const instance = WHESettings.getInstance();
-      
+
       instance.initialize();
-      expect(mockGame.settings.register).toHaveBeenCalledTimes(3);
+      expect(mockGame.settings.register).toHaveBeenCalledTimes(4);
 
       // Call again, should not register again
       jest.clearAllMocks();
@@ -60,6 +60,21 @@ describe('WHESettings', () => {
           key: WHEConstants.SETTING_DOOR_MUFFLING,
           type: Boolean,
           default: true,
+        }),
+      );
+    });
+
+    it('should register the floor thickness setting with correct default', () => {
+      const instance = WHESettings.getInstance();
+      instance.initialize();
+
+      expect(mockGame.settings.register).toHaveBeenCalledWith(
+        WHEConstants.MODULE,
+        WHEConstants.SETTING_FLOOR_THICKNESS,
+        expect.objectContaining({
+          key: WHEConstants.SETTING_FLOOR_THICKNESS,
+          type: Number,
+          default: 10,
         }),
       );
     });
@@ -87,6 +102,30 @@ describe('WHESettings', () => {
 
       expect(instance.getBoolean(WHEConstants.SETTING_DOOR_MUFFLING, false)).toBe(true);
       expect(mockGame.settings.get).toHaveBeenCalledWith(WHEConstants.MODULE, WHEConstants.SETTING_DOOR_MUFFLING);
+    });
+  });
+
+  describe('getNumber', () => {
+    it('should return the default value if not initialized', () => {
+      const instance = WHESettings.getInstance();
+      expect(instance.getNumber('some-key', 5)).toBe(5);
+    });
+
+    it('should return the default value if setting is not found', () => {
+      const instance = WHESettings.getInstance();
+      instance.initialize();
+      mockGame.settings.get.mockReturnValue(null);
+
+      expect(instance.getNumber('missing-key', 15)).toBe(15);
+    });
+
+    it('should return the setting value if found', () => {
+      const instance = WHESettings.getInstance();
+      instance.initialize();
+      mockGame.settings.get.mockReturnValue(42);
+
+      expect(instance.getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10)).toBe(42);
+      expect(mockGame.settings.get).toHaveBeenCalledWith(WHEConstants.MODULE, WHEConstants.SETTING_FLOOR_THICKNESS);
     });
   });
 });

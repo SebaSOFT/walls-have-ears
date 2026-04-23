@@ -6,6 +6,8 @@
   "WHE.settings_tester.hint": "Enable muffling sounds when ambient sound preview is enabled during sound editing.",
   "WHE.settings_door_muffling.title": "Enable door sound muffling",
   "WHE.settings_door_muffling.hint": "Enable dynamic muffling for door sounds when opening or closing doors based on wall occlusion.",
+  "WHE.settings_floor_thickness.title": "Floor Thickness",
+  "WHE.settings_floor_thickness.hint": "The maximum thickness (in grid units) to consider multiple floors as a single structural element for muffling purposes.",
   "WHE.settings_disable.title": "Disable sound muffling",
   "WHE.settings_disable.hint": "This module allows for sounds to be muffled for improved inmersion. But you can disable this feature for performance reasons.",
   "WHE.settings_debug.title": "Enable Debug mode",
