@@ -20,17 +20,23 @@
 - **Technical Table Compliance:** Verified via unit tests that every combination of walls (Solid, Window, Terrain, Ethereal) exactly matches the defined muffling matrix (e.g., 3 Windows = 1 Muffling Level).
 
 #### 👤 Token Anatomy (Ear Height)
-- **Hearing Offset:** For increased realism, the token's hearing point is no longer on the floor. A **6ft** offset has been applied above the token's base elevation, simulating the actual height of a humanoid's ears.
+- **Hearing Height Offset:** For increased realism, the token's hearing point is no longer fixed on the floor. A new configurable setting allows adjusting the vertical offset (Default: 6 units) above the token's base elevation, simulating the actual height of a creature's ears.
 
 #### ⚙️ New Settings
 - **Floor Thickness:** New configurable setting defining the maximum distance to merge nearby surfaces into a single muffling layer (Default: 10 ft).
+- **Hearing Height Offset:** Configurable vertical offset for token "ears" to support different scales (Metric/Imperial) and creature sizes.
 - **V14 Feature Toggle:** Level and portal functions activate only in V14, maintaining full stability in V13.
 
 ### FIXED
 - **Performance Optimization:** 
-    - Implemented pre-fetching for Scene Surfaces and Portal Regions to minimize V14 API overhead during muffling passes.
-    - Eliminated redundant memory allocations in wall collision filtering.
-- **Elevation Accuracy:** Fixed mapping of V14 elevation objects and ensured unit awareness (ft/m) in logs.
+    - **Pre-calculated Data:** Implemented pre-fetching and pre-calculation for Scene Elevations and Portal Regions to minimize V14 API overhead and redundant object mapping during muffling passes.
+    - **Audible Radius Filtering:** Optimized Acoustic Portal evaluation by skipping regions outside the sound's effective radius using high-speed Euclidean distance checks.
+    - **Memory Management:** Eliminated redundant memory allocations (e.g., `Array.from` calls) in high-frequency wall collision filtering.
+    - **Settings Lookup:** Optimized settings API access by fetching configuration values once per muffling pass.
+- **Elevation Accuracy:** 
+    - Fixed mapping of V14 elevation objects (`bottom`/`top` logic).
+    - Ensured unit awareness (ft/m) in logs and calculations.
+    - Improved normalization of Foundry Collections and Sets for cross-version compatibility.
 - **Distance Accuracy:** Calculated distance now includes the vertical hypotenuse (True 3D distance), improving volume falloff calculations.
 - **Memory Optimization:** Improved caching system for calculated muffling levels, reducing performance impact during token movement.
 - **Bug Fixes:**
