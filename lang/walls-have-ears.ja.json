@@ -8,6 +8,8 @@
   "WHE.settings_door_muffling.hint": "壁の遮蔽に基づいて、ドアの開閉時にドア音をダイナミックに消音するようにします。",
   "WHE.settings_floor_thickness.title": "床の厚さ",
   "WHE.settings_floor_thickness.hint": "複数の階層を消音のための単一の構造要素として考慮する最大厚さ（グリッド単位）。",
+  "WHE.settings_hearing_height.title": "聴取高度のオフセット",
+  "WHE.settings_hearing_height.hint": "トークンのベース高度からの垂直方向のオフセット（グリッド単位）です。ここに「耳」があるものとして扱われます。これにより、クリーチャーの頭の高さをシミュレートします（例：人間の場合は6フィート）。",
   "WHE.settings_disable.title": "「音こもり」を無効化する",
   "WHE.settings_disable.hint": "このMODは没入感を向上させるために音をこもらせる。だがパフォーマンスを理由にこの機能を無効化できる。",
   "WHE.settings_debug.title": "デバッグモード有効化",

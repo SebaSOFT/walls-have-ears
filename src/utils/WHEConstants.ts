@@ -4,6 +4,7 @@ export enum WHEConstants {
   SETTING_TESTER = 'tester-enable',
   SETTING_DOOR_MUFFLING = 'door-muffling-enable',
   SETTING_FLOOR_THICKNESS = 'floor-thickness',
+  SETTING_HEARING_HEIGHT = 'hearing-height',
 }
 
 export type Arrayish = { [n: string]: number };

@@ -8,6 +8,8 @@
   "WHE.settings_door_muffling.hint": "Habilita la amortiguación dinámica para los sonidos de las puertas al abrir o cerrar puertas según la oclusión de la pared.",
   "WHE.settings_floor_thickness.title": "Grosor del suelo",
   "WHE.settings_floor_thickness.hint": "El grosor máximo (en unidades de cuadrícula) para considerar varios niveles como un único elemento estructural a efectos de amortiguación.",
+  "WHE.settings_hearing_height.title": "Desplazamiento de altura de audición",
+  "WHE.settings_hearing_height.hint": "El desplazamiento vertical (en unidades de cuadrícula) por encima de la elevación base del token donde se encuentran los 'oídos'. Esto simula la altura de la cabeza de una criatura (por ejemplo, 6 pies para los humanos).",
   "WHE.settings_disable.title": "Desactivar la amortiguación del sonido",
   "WHE.settings_disable.hint": "Este módulo permite amortiguar los sonidos para mejorar la inmersión. Pero puede desactivar esta función por motivos de rendimiento.",
   "WHE.settings_debug.title": "Activar modo de depuración",

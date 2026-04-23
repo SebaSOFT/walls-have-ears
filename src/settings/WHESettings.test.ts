@@ -41,7 +41,7 @@ describe('WHESettings', () => {
       const instance = WHESettings.getInstance();
 
       instance.initialize();
-      expect(mockGame.settings.register).toHaveBeenCalledTimes(4);
+      expect(mockGame.settings.register).toHaveBeenCalledTimes(5);
 
       // Call again, should not register again
       jest.clearAllMocks();
@@ -75,6 +75,21 @@ describe('WHESettings', () => {
           key: WHEConstants.SETTING_FLOOR_THICKNESS,
           type: Number,
           default: 10,
+        }),
+      );
+    });
+
+    it('should register the hearing height setting with correct default', () => {
+      const instance = WHESettings.getInstance();
+      instance.initialize();
+
+      expect(mockGame.settings.register).toHaveBeenCalledWith(
+        WHEConstants.MODULE,
+        WHEConstants.SETTING_HEARING_HEIGHT,
+        expect.objectContaining({
+          key: WHEConstants.SETTING_HEARING_HEIGHT,
+          type: Number,
+          default: 6,
         }),
       );
     });

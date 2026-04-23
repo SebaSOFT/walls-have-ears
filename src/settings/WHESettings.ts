@@ -67,6 +67,20 @@ export default class WHESettings {
           requiresReload: false,
         },
       ],
+      [
+        WHEConstants.SETTING_HEARING_HEIGHT,
+        {
+          name: 'WHE.settings_hearing_height.title',
+          hint: 'WHE.settings_hearing_height.hint',
+          key: WHEConstants.SETTING_HEARING_HEIGHT,
+          namespace: WHEConstants.MODULE,
+          scope: 'world',
+          config: true,
+          type: Number,
+          default: 6,
+          requiresReload: false,
+        },
+      ],
     ];
   }
 

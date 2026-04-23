@@ -4,6 +4,8 @@ import SoundManager from './audio/SoundManager';
 import HookManager from './hooks/HookManager';
 import { getGame } from '../foundry/getGame';
 import MufflingCalculatorService, { Point3D } from './services/MufflingCalculatorService';
+import WHESettings from '../settings/WHESettings';
+import { WHEConstants } from '../utils/WHEConstants';
 
 /**
  * The main class that orchestrates the Walls Have Ears module.
@@ -66,10 +68,11 @@ export default class WHEFramework {
     }
 
     const tokenDoc = selectedToken.document as any;
+    const hearingHeight = WHESettings.getInstance().getNumber(WHEConstants.SETTING_HEARING_HEIGHT, 6);
     const earPosition: Point3D = {
       x: selectedToken.center.x,
       y: selectedToken.center.y,
-      z: (tokenDoc.elevation?.bottom ?? tokenDoc.elevation ?? 0) + 6, // 6ft token height offset
+      z: (tokenDoc.elevation?.bottom ?? tokenDoc.elevation ?? 0) + hearingHeight, // Configurable token hearing height offset
     };
 
     // Performance Optimization: Fetch surfaces and portals once per pass
