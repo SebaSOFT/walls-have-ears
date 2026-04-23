@@ -3,7 +3,7 @@ import PlayerContext from './player/PlayerContext';
 import SoundManager from './audio/SoundManager';
 import HookManager from './hooks/HookManager';
 import { getGame } from '../foundry/getGame';
-import MufflingCalculatorService from './services/MufflingCalculatorService';
+import MufflingCalculatorService, { Point3D } from './services/MufflingCalculatorService';
 
 /**
  * The main class that orchestrates the Walls Have Ears module.
@@ -64,11 +64,13 @@ export default class WHEFramework {
     if (getGame().audio.locked) {
       return;
     }
-    const earPosition = {
+
+    const tokenDoc = selectedToken.document as any;
+    const earPosition: Point3D = {
       x: selectedToken.center.x,
       y: selectedToken.center.y,
-      z: ((selectedToken.document.elevation as any)?.bottom ?? selectedToken.document.elevation ?? 0) + 6, // 6ft token height offset
-    } as import('./services/MufflingCalculatorService').Point3D;
+      z: (tokenDoc.elevation?.bottom ?? tokenDoc.elevation ?? 0) + 6, // 6ft token height offset
+    };
 
     // Performance Optimization: Fetch surfaces and portals once per pass
     const surfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
@@ -96,11 +98,12 @@ export default class WHEFramework {
           continue;
         }
 
-        const soundPosition = {
+        const soundDoc = currentAmbientSound.document as any;
+        const soundPosition: Point3D = {
           x: currentAmbientSound.center.x,
           y: currentAmbientSound.center.y,
-          z: (currentAmbientSound.document.elevation as any)?.bottom ?? currentAmbientSound.document.elevation ?? 0,
-        } as import('./services/MufflingCalculatorService').Point3D;
+          z: soundDoc.elevation?.bottom ?? soundDoc.elevation ?? 0,
+        };
 
         const distanceToSound = MufflingCalculatorService.getDistanceBetweenPoints(earPosition, soundPosition);
 
