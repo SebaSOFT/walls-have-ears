@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Enable Corepack
         run: corepack enable
@@ -73,7 +73,7 @@ jobs:
           prerelease: false
           generateReleaseNotes: true # Automatically generate release notes
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "./module.json, ./module.zip"
+          artifacts: './module.json, ./module.zip'
           tag: ${{ steps.get_version.outputs.version }}
 
       - name: Publish Module to FoundryVTT Website

@@ -1,5 +1,51 @@
 # CHANGELOG
 
+## [3.14.1] 2026-04-23
+
+### ADDED
+
+#### 🚀 Native Scene Levels Support (V14)
+- **Vertical Occlusion Calculation:** The module now automatically detects when sound passes through a "Floor" or "Ceiling" defined in the new V14 Scene Levels system.
+- **Native V14 Levels Fallback:** Implemented support for Foundry's native Level system if the "Levels" module is not present.
+- **Floor Merging Logic (Structure Thickness):** Implemented an intelligent logic to prevent "double muffling". If two surfaces (e.g., a ceiling and the floor above) are within 10 units of distance, they are treated as a single solid structural element.
+- **3D Raycast Physics:** Migrated all calculation logic from 2D straight lines to a real 3D vector (`Point3D`). This allows sound to be dynamically muffled based on the relative height between the source and the listener.
+
+#### 🚪 Acoustic Portals (Stairs and Holes)
+- **Region-Based Propagation:** Implementation of alternative "Acoustic Paths". If a direct path is blocked by a floor but a Region of type `teleport` or `changeLevel` (native V14 stairs) exists, the sound will "travel" through the portal if it offers a clearer path.
+- **"Air" Detection:** Holes in levels (areas without a defined surface) are now correctly treated as air, allowing sound to pass without penalty even between different elevations.
+
+#### 🌿 Material and Wall Refinement
+- **Natural Walls (0.5 Rule):** Introduced an occlusion value of 0.5 for "natural" or limited obstacles (Terrain walls, Ethereal walls).
+    - *Logic:* A single natural obstacle is "acoustically transparent". Only when sound passes through a second natural obstacle (summing to 1.0) is the first level of muffling applied.
+- **Technical Table Compliance:** Verified via unit tests that every combination of walls (Solid, Window, Terrain, Ethereal) exactly matches the defined muffling matrix (e.g., 3 Windows = 1 Muffling Level).
+
+#### 👤 Token Anatomy (Ear Height)
+- **Hearing Height Offset:** For increased realism, the token's hearing point is no longer fixed on the floor. A new configurable setting allows adjusting the vertical offset (Default: 6 units) above the token's base elevation, simulating the actual height of a creature's ears.
+
+#### ⚙️ New Settings
+- **Floor Thickness:** New configurable setting defining the maximum distance to merge nearby surfaces into a single muffling layer (Default: 10 ft).
+- **Hearing Height Offset:** Configurable vertical offset for token "ears" to support different scales (Metric/Imperial) and creature sizes.
+- **V14 Feature Toggle:** Level and portal functions activate only in V14, maintaining full stability in V13.
+
+### FIXED
+- **Performance Optimization:** 
+    - **Pre-calculated Data:** Implemented pre-fetching and pre-calculation for Scene Elevations and Portal Regions to minimize V14 API overhead and redundant object mapping during muffling passes.
+    - **Audible Radius Filtering:** Optimized Acoustic Portal evaluation by skipping regions outside the sound's effective radius using high-speed Euclidean distance checks.
+    - **Memory Management:** Eliminated redundant memory allocations (e.g., `Array.from` calls) in high-frequency wall collision filtering.
+    - **Settings Lookup:** Optimized settings API access by fetching configuration values once per muffling pass.
+- **Elevation Accuracy:** 
+    - Fixed mapping of V14 elevation objects (`bottom`/`top` logic).
+    - Ensured unit awareness (ft/m) in logs and calculations.
+    - Improved normalization of Foundry Collections and Sets for cross-version compatibility.
+- **Distance Accuracy:** Calculated distance now includes the vertical hypotenuse (True 3D distance), improving volume falloff calculations.
+- **Memory Optimization:** Improved caching system for calculated muffling levels, reducing performance impact during token movement.
+- **Bug Fixes:**
+    - Resolved `TypeError` in `MufflingCalculatorService` during asynchronous wall loading.
+    - Fixed a typo in the distance calculation function.
+    - Corrected handling of infinite elevations (`Infinity`) in portal regions.
+    - Added null safety checks for movement collision layers.
+    - Fixed visibility of settings in the menu by using raw translation keys.
+
 ## [3.13.2] 2025-09-11
 
 ### CHANGED

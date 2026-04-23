@@ -3,7 +3,9 @@ import PlayerContext from './player/PlayerContext';
 import SoundManager from './audio/SoundManager';
 import HookManager from './hooks/HookManager';
 import { getGame } from '../foundry/getGame';
-import MufflingCalculatorService from './services/MufflingCalculatorService';
+import MufflingCalculatorService, { Point3D } from './services/MufflingCalculatorService';
+import WHESettings from '../settings/WHESettings';
+import { WHEConstants } from '../utils/WHEConstants';
 
 /**
  * The main class that orchestrates the Walls Have Ears module.
@@ -64,10 +66,28 @@ export default class WHEFramework {
     if (getGame().audio.locked) {
       return;
     }
-    const earPosition = {
+
+    const tokenDoc = selectedToken.document as any;
+    const hearingHeight = WHESettings.getInstance().getNumber(WHEConstants.SETTING_HEARING_HEIGHT, 6);
+    const earPosition: Point3D = {
       x: selectedToken.center.x,
       y: selectedToken.center.y,
-    } as foundry.canvas.Canvas.Point;
+      z: (tokenDoc.elevation?.bottom ?? tokenDoc.elevation ?? 0) + hearingHeight, // Configurable token hearing height offset
+    };
+
+    // Performance Optimization: Fetch surfaces and portals once per pass
+    const rawSurfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
+    const surfaceElevations = MufflingCalculatorService.getSurfaceElevations(rawSurfaces);
+    const floorThickness = WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
+    const portals = ((getGame()?.canvas?.regions as any)?.placeables || []).filter((r: any) =>
+      r.document?.behaviors?.some(
+        (b: any) =>
+          b.type === 'teleport' ||
+          b.type === 'changeLevel' ||
+          b.type === 'core.teleport' ||
+          b.type === 'core.changeLevel',
+      ),
+    );
 
     const ambientSounds = getGame()!.canvas!.sounds!.placeables;
     if (ambientSounds && ambientSounds.length > 0) {
@@ -83,22 +103,33 @@ export default class WHEFramework {
           continue;
         }
 
-        const soundPosition = {
+        const soundDoc = currentAmbientSound.document as any;
+        const soundPosition: Point3D = {
           x: currentAmbientSound.center.x,
           y: currentAmbientSound.center.y,
-        } as foundry.canvas.Canvas.Point;
+          z: soundDoc.elevation?.bottom ?? soundDoc.elevation ?? 0,
+        };
 
-        const distanceToSound = MufflingCalculatorService.getDIstanceBetweenPoints(earPosition, soundPosition);
+        const distanceToSound = MufflingCalculatorService.getDistanceBetweenPoints(earPosition, soundPosition);
 
         if (currentAmbientSound.document.radius < Math.floor(distanceToSound)) {
           continue;
         }
 
-        const muffleIndex = MufflingCalculatorService.getMufflingIndexBetweenPoints(earPosition, soundPosition);
+        const muffleIndex = MufflingCalculatorService.getMufflingIndexBetweenPoints(
+          earPosition,
+          soundPosition,
+          false,
+          surfaceElevations,
+          portals,
+          currentAmbientSound.document.radius,
+          floorThickness,
+        );
 
         await this._soundManager.applyMuffling(currentAmbientSound, muffleIndex, selectedToken.id);
         getGame().audio.debug(`WHE | Dynamically muffled sound to level ${muffleIndex}.`);
       }
     }
+
   };
 }
