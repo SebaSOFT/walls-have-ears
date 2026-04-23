@@ -1,11 +1,12 @@
 # CHANGELOG
 
-## [3.14.1] 2026-04-22
+## [3.14.1] 2026-04-23
 
 ### ADDED
 
 #### 🚀 Native Scene Levels Support (V14)
 - **Vertical Occlusion Calculation:** The module now automatically detects when sound passes through a "Floor" or "Ceiling" defined in the new V14 Scene Levels system.
+- **Native V14 Levels Fallback:** Implemented support for Foundry's native Level system if the "Levels" module is not present.
 - **Floor Merging Logic (Structure Thickness):** Implemented an intelligent logic to prevent "double muffling". If two surfaces (e.g., a ceiling and the floor above) are within 10 units of distance, they are treated as a single solid structural element.
 - **3D Raycast Physics:** Migrated all calculation logic from 2D straight lines to a real 3D vector (`Point3D`). This allows sound to be dynamically muffled based on the relative height between the source and the listener.
 
@@ -26,12 +27,18 @@
 - **V14 Feature Toggle:** Level and portal functions activate only in V14, maintaining full stability in V13.
 
 ### FIXED
+- **Performance Optimization:** 
+    - Implemented pre-fetching for Scene Surfaces and Portal Regions to minimize V14 API overhead during muffling passes.
+    - Eliminated redundant memory allocations in wall collision filtering.
+- **Elevation Accuracy:** Fixed mapping of V14 elevation objects and ensured unit awareness (ft/m) in logs.
 - **Distance Accuracy:** Calculated distance now includes the vertical hypotenuse (True 3D distance), improving volume falloff calculations.
 - **Memory Optimization:** Improved caching system for calculated muffling levels, reducing performance impact during token movement.
 - **Bug Fixes:**
+    - Resolved `TypeError` in `MufflingCalculatorService` during asynchronous wall loading.
     - Fixed a typo in the distance calculation function.
     - Corrected handling of infinite elevations (`Infinity`) in portal regions.
     - Added null safety checks for movement collision layers.
+    - Fixed visibility of settings in the menu by using raw translation keys.
 
 ## [3.13.2] 2025-09-11
 
