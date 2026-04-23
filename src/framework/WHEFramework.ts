@@ -67,8 +67,8 @@ export default class WHEFramework {
     const earPosition = {
       x: selectedToken.center.x,
       y: selectedToken.center.y,
-      z: (selectedToken.document.elevation ?? 0) + 6, // 6ft token height offset
-    } as any;
+      z: ((selectedToken.document.elevation as any)?.bottom ?? selectedToken.document.elevation ?? 0) + 6, // 6ft token height offset
+    } as import('./services/MufflingCalculatorService').Point3D;
 
     const ambientSounds = getGame()!.canvas!.sounds!.placeables;
     if (ambientSounds && ambientSounds.length > 0) {
@@ -87,8 +87,8 @@ export default class WHEFramework {
         const soundPosition = {
           x: currentAmbientSound.center.x,
           y: currentAmbientSound.center.y,
-          z: currentAmbientSound.document.elevation ?? 0,
-        } as any;
+          z: (currentAmbientSound.document.elevation as any)?.bottom ?? currentAmbientSound.document.elevation ?? 0,
+        } as import('./services/MufflingCalculatorService').Point3D;
 
         const distanceToSound = MufflingCalculatorService.getDistanceBetweenPoints(earPosition, soundPosition);
 

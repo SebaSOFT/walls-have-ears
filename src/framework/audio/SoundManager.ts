@@ -168,12 +168,12 @@ export default class SoundManager {
     const doorPosition = {
       x: wall.center.x,
       y: wall.center.y,
-      z: (wall.document as any).elevation ?? 0,
+      z: (wall.document as any).elevation?.bottom ?? (wall.document as any).elevation ?? 0,
     } as any;
     const earPosition = {
       x: selectedToken.center.x,
       y: selectedToken.center.y,
-      z: (selectedToken.document.elevation ?? 0) + 6,
+      z: ((selectedToken.document.elevation as any)?.bottom ?? selectedToken.document.elevation ?? 0) + 6,
     } as any;
     const distanceToDoor = MufflingCalculatorService.getDistanceBetweenPoints(earPosition, doorPosition);
     if (distanceToDoor > wall.soundRadius) {
