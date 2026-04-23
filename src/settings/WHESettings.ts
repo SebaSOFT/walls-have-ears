@@ -11,8 +11,8 @@ export default class WHESettings {
       [
         WHEConstants.SETTING_DEBUG,
         {
-          name: WHEUtils.getMessageText('WHE.settings_debug.title'),
-          hint: WHEUtils.getMessageText('WHE.settings_debug.hint'),
+          name: 'WHE.settings_debug.title',
+          hint: 'WHE.settings_debug.hint',
           key: WHEConstants.SETTING_DEBUG,
           namespace: WHEConstants.MODULE,
           scope: 'client',
@@ -28,8 +28,8 @@ export default class WHESettings {
       [
         WHEConstants.SETTING_TESTER,
         {
-          name: WHEUtils.getMessageText('WHE.settings_tester.title'),
-          hint: WHEUtils.getMessageText('WHE.settings_tester.hint'),
+          name: 'WHE.settings_tester.title',
+          hint: 'WHE.settings_tester.hint',
           key: WHEConstants.SETTING_TESTER,
           namespace: WHEConstants.MODULE,
           scope: 'client',
@@ -42,8 +42,8 @@ export default class WHESettings {
       [
         WHEConstants.SETTING_DOOR_MUFFLING,
         {
-          name: WHEUtils.getMessageText('WHE.settings_door_muffling.title'),
-          hint: WHEUtils.getMessageText('WHE.settings_door_muffling.hint'),
+          name: 'WHE.settings_door_muffling.title',
+          hint: 'WHE.settings_door_muffling.hint',
           key: WHEConstants.SETTING_DOOR_MUFFLING,
           namespace: WHEConstants.MODULE,
           scope: 'client',
@@ -56,8 +56,8 @@ export default class WHESettings {
       [
         WHEConstants.SETTING_FLOOR_THICKNESS,
         {
-          name: WHEUtils.getMessageText('WHE.settings_floor_thickness.title'),
-          hint: WHEUtils.getMessageText('WHE.settings_floor_thickness.hint'),
+          name: 'WHE.settings_floor_thickness.title',
+          hint: 'WHE.settings_floor_thickness.hint',
           key: WHEConstants.SETTING_FLOOR_THICKNESS,
           namespace: WHEConstants.MODULE,
           scope: 'world',

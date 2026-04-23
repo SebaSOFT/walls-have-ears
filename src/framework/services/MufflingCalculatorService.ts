@@ -53,7 +53,7 @@ export default class MufflingCalculatorService {
 
       const wallCenter = wall.center;
 
-      const sightDistance = wall.document.threshold.sight;
+      const sightDistance = (wall.document as any)?.threshold?.sight;
       if (!sightDistance) {
         return true;
       }
