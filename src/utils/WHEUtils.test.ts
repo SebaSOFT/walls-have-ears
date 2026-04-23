@@ -4,7 +4,7 @@ describe('WHEUtils', () => {
   let consoleSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    consoleSpy = jest.spyOn(console, 'log').mockImplementation(function () {});
   });
 
   afterEach(() => {

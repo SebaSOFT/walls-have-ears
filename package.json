@@ -1,6 +1,6 @@
 {
   "name": "walls-have-ears",
-  "version": "3.14.1",
+  "version": "3.14.2",
   "description": "A simple-as-possible module to muffle sounds that are behind a wall for a player.",
   "source": [
     "src/index.ts",
@@ -37,23 +37,23 @@
   },
   "homepage": "https://github.com/SebaSOFT/walls-have-ears#readme",
   "devDependencies": {
-    "@parcel/packager-ts": "2.15.4",
-    "@parcel/reporter-bundle-analyzer": "^2.15.4",
-    "@parcel/transformer-typescript-tsc": "^2.15.4",
-    "@parcel/transformer-typescript-types": "2.15.4",
+    "@parcel/packager-ts": "2.16.4",
+    "@parcel/reporter-bundle-analyzer": "^2.16.4",
+    "@parcel/transformer-typescript-tsc": "^2.16.4",
+    "@parcel/transformer-typescript-types": "2.16.4",
     "@types/jest": "^30.0.0",
-    "eslint": "^9.34.0",
+    "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
-    "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
-    "globals": "^16.3.0",
-    "jest": "^30.1.2",
-    "jest-environment-jsdom": "^30.1.2",
-    "parcel": "^2.15.4",
-    "prettier": "^3.6.2",
-    "ts-jest": "^29.4.1",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.41.0"
+    "eslint-plugin-prettier": "^5.5.5",
+    "fvtt-types": "npm:@league-of-foundry-developers/foundry-vtt-types@latest",
+    "globals": "^17.5.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "parcel": "^2.16.4",
+    "prettier": "^3.8.3",
+    "ts-jest": "^29.4.9",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0"
   },
   "packageManager": "yarn@4.9.2"
 }

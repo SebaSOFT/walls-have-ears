@@ -2,12 +2,12 @@
 
 [![GitHub license](https://img.shields.io/github/license/SebaSOFT/walls-have-ears)](https://github.com/SebaSOFT/walls-have-ears/blob/main/LICENSE)
 [![GitHub release](https://img.shields.io/github/downloads-pre/SebaSOFT/walls-have-ears/latest/module.zip?label=downloads)](https://github.com/SebaSOFT/walls-have-ears/releases/)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SebaSOFT/walls-have-ears/main.yml?branch=main&label=Test%20Build%20Release)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SebaSOFT/walls-have-ears/ci-release.yml?branch=main&label=Test%20Build%20Release)
 [![Forge Installs](https://img.shields.io/badge/dynamic/json?color=green&label=Forge%20installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fwalls-have-ears)](https://forge-vtt.com/bazaar#package=walls-have-ears)
 [![Foundry HUB Endorsements](https://img.shields.io/badge/dynamic/json?label=FoundryHUB%20Endorsements&query=%24.endorsements&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fwalls-have-ears)](https://www.foundryvtt-hub.com/package/walls-have-ears/)
 [![Minimum Foundry VTT version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json&query=%24.compatibility.minimum&suffix=%2B&label=FoundryVTT%20compat&link=https%3A%2F%2Fgithub.com%2FSebaSOFT%2Fwalls-have-ears%2Freleases%2Flatest%2Fdownload%2Fmodule.json)](https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json)
 
-**Version:** 3.13.2
+**Version:** 3.14.2
 
 "A zero-config module that dynamically muffles sounds based on wall occlusion. Supports door sounds and settings for a tailored audio experience."
 

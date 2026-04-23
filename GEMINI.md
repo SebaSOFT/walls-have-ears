@@ -77,7 +77,7 @@ This section outlines the development process for the walls-have-ears library.
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Node.js](https://nodejs.org/) (v24 or higher)
 - [Yarn](https://yarnpkg.com/) (v4 or higher)
 
 ### Scripts

@@ -13,7 +13,8 @@ export default [
       },
     },
   },
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.strict,
+  ...tseslint.configs.stylistic,
   {
     plugins: {
       prettier,
@@ -26,10 +27,24 @@ export default [
         },
       ],
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-empty-function': [
+        'error',
+        {
+          allow: ['private-constructors'],
+        },
+      ],
+      '@typescript-eslint/no-extraneous-class': 'off',
       'prettier/prettier': 'error',
       curly: ['error', 'all'],
       'max-len': ['error', { code: 120 }],
     },
   },
   prettierConfig,
+  {
+    files: ['**/*.test.ts', '**/tests/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-empty-function': 'off',
+    },
+  },
 ];

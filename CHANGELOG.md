@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## [3.14.2] 2026-04-23
+
+### CHANGED
+- **Tooling Modernization:** 
+    - Upgraded to **TypeScript 6.0.3**.
+    - Upgraded to **ESLint 10.2.1** with stricter and stylistic rules for better code quality.
+    - Upgraded to **Prettier 3.8.3** for consistent formatting.
+    - Upgraded to **Parcel 2.16.4** for optimized builds.
+- **Node.js Update:** Migrated development environment and CI/CD to **Node 24**.
+- **Security & Stability:**
+    - Switched `fvtt-types` to the official npm package (`@league-of-foundry-developers/foundry-vtt-types`) for better build reliability.
+    - Patched **33 security vulnerabilities** in transitive dependencies.
+    - Updated `browserslist` database to target modern browser versions.
+- **CI/CD Improvements:**
+    - Refactored GitHub Actions into a unified `ci-release.yml` workflow.
+    - Separated Build/Validation from Release/Deployment jobs.
+    - Added automated version consistency checks between `package.json` and `module.json`.
+
 ## [3.14.1] 2026-04-23
 
 ### ADDED
