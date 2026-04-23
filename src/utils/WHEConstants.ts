@@ -7,7 +7,7 @@ export enum WHEConstants {
   SETTING_HEARING_HEIGHT = 'hearing-height',
 }
 
-export type Arrayish = { [n: string]: number };
+export type Arrayish = Record<string, number>;
 
 export const MUFFLING_MAPPING: Arrayish = {
   'level-1': 0,

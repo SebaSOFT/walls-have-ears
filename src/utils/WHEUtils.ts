@@ -1,10 +1,8 @@
 import { getGame } from '../foundry/getGame';
 
 export default class WHEUtils {
-  public static debug: boolean = false;
-  private static cache: {
-    [key: string]: number;
-  } = {};
+  public static debug = false;
+  private static cache: Record<string, number> = {};
 
   /**
    * Logs a message to the console, but only if debug mode is enabled.
