@@ -84,11 +84,14 @@ export default class MufflingCalculatorService {
       const zMin = Math.min(earPosition.z, soundPosition.z);
       const zMax = Math.max(earPosition.z, soundPosition.z);
 
-      const activeSurfaces = surfaces ?? ((getGame()?.canvas?.scene as any)?.getSurfaces() || []);
+      const activeSurfaces = surfaces ?? ((getGame()?.canvas?.scene as any)?.getSurfaces?.() || []);
       WHEUtils.log(`Surfaces found: ${activeSurfaces.length}`);
       const elevationsBetween = activeSurfaces
-        .map((s: any) => s.elevation ?? s.document?.elevation)
-        .filter((e: number | undefined) => e !== undefined && e > zMin && e < zMax)
+        .map((s: any) => {
+          const e = s.elevation ?? s.document?.elevation;
+          return e?.bottom ?? e;
+        })
+        .filter((e: any) => e !== undefined && typeof e === 'number' && e > zMin && e < zMax)
         .sort((a: number, b: number) => a - b);
 
       WHEUtils.log(`Elevations between: ${elevationsBetween.join(', ')}`);
