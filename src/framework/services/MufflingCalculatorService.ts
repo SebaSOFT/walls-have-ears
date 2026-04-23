@@ -16,6 +16,7 @@ export default class MufflingCalculatorService {
    * @param {boolean} ignorePortals - If true, acoustic portals will not be checked (prevents recursion).
    * @param {number[]} surfaceElevations - Optional pre-calculated elevations for performance optimization.
    * @param {any[]} portals - Optional pre-fetched V14 regions for performance optimization.
+   * @param {number} maxDistance - Optional maximum distance (sound radius) to filter relevant portals.
    * @returns {number} A muffling index from -1 to 5, where -1 is no obstruction and 5 is maximum obstruction.
    */
   public static getMufflingIndexBetweenPoints = (
@@ -24,6 +25,7 @@ export default class MufflingCalculatorService {
     ignorePortals: boolean = false,
     surfaceElevations?: number[],
     portals?: any[],
+    maxDistance?: number,
   ): number => {
     const sightLayer = CONFIG.Canvas.polygonBackends.sight;
     const soundLayer = CONFIG.Canvas.polygonBackends.sound;
@@ -146,8 +148,18 @@ export default class MufflingCalculatorService {
 
       if (activePortals.length > 0) {
         let bestMuffling = finalMuffling;
+        const grid = getGame()?.canvas?.grid;
+        const pixelsPerUnit = grid ? grid.size / grid.distance : 1;
+        const maxPixelsSq = maxDistance ? Math.pow(maxDistance * pixelsPerUnit, 2) : Infinity;
 
         for (const portal of activePortals) {
+          // Performance Optimization: Skip portals outside the sound's effective radius
+          if (maxDistance) {
+            const dx = soundPosition.x - portal.center.x;
+            const dy = soundPosition.y - portal.center.y;
+            if (dx * dx + dy * dy > maxPixelsSq) continue;
+          }
+
           const portalBottom = portal.document?.elevation?.bottom ?? 0;
           let portalTop = portal.document?.elevation?.top ?? portalBottom;
 

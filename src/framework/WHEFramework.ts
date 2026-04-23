@@ -118,6 +118,7 @@ export default class WHEFramework {
           false,
           surfaceElevations,
           portals,
+          currentAmbientSound.document.radius,
         );
 
         await this._soundManager.applyMuffling(currentAmbientSound, muffleIndex, selectedToken.id);
