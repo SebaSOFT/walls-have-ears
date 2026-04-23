@@ -70,6 +70,18 @@ export default class WHEFramework {
       z: ((selectedToken.document.elevation as any)?.bottom ?? selectedToken.document.elevation ?? 0) + 6, // 6ft token height offset
     } as import('./services/MufflingCalculatorService').Point3D;
 
+    // Performance Optimization: Fetch surfaces and portals once per pass
+    const surfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
+    const portals = ((getGame()?.canvas?.regions as any)?.placeables || []).filter((r: any) =>
+      r.document?.behaviors?.some(
+        (b: any) =>
+          b.type === 'teleport' ||
+          b.type === 'changeLevel' ||
+          b.type === 'core.teleport' ||
+          b.type === 'core.changeLevel',
+      ),
+    );
+
     const ambientSounds = getGame()!.canvas!.sounds!.placeables;
     if (ambientSounds && ambientSounds.length > 0) {
       for (let i = 0; i < ambientSounds.length; i++) {
@@ -96,11 +108,18 @@ export default class WHEFramework {
           continue;
         }
 
-        const muffleIndex = MufflingCalculatorService.getMufflingIndexBetweenPoints(earPosition, soundPosition);
+        const muffleIndex = MufflingCalculatorService.getMufflingIndexBetweenPoints(
+          earPosition,
+          soundPosition,
+          false,
+          surfaces,
+          portals,
+        );
 
         await this._soundManager.applyMuffling(currentAmbientSound, muffleIndex, selectedToken.id);
         getGame().audio.debug(`WHE | Dynamically muffled sound to level ${muffleIndex}.`);
       }
     }
+
   };
 }

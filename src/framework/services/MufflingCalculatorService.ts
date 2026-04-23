@@ -13,12 +13,17 @@ export default class MufflingCalculatorService {
    * It uses sight, sound, and move collision layers to determine the level of obstruction.
    * @param {Point3D | foundry.canvas.Canvas.Point} earPosition - The point representing the listener (e.g., token center).
    * @param {Point3D | foundry.canvas.Canvas.Point} soundPosition - The point representing the sound source.
+   * @param {boolean} ignorePortals - If true, acoustic portals will not be checked (prevents recursion).
+   * @param {any[]} surfaces - Optional pre-fetched V14 surfaces for performance optimization.
+   * @param {any[]} portals - Optional pre-fetched V14 regions for performance optimization.
    * @returns {number} A muffling index from -1 to 5, where -1 is no obstruction and 5 is maximum obstruction.
    */
   public static getMufflingIndexBetweenPoints = (
     earPosition: Point3D | foundry.canvas.Canvas.Point,
     soundPosition: Point3D | foundry.canvas.Canvas.Point,
     ignorePortals: boolean = false,
+    surfaces?: any[],
+    portals?: any[],
   ): number => {
     const sightLayer = CONFIG.Canvas.polygonBackends.sight;
     const soundLayer = CONFIG.Canvas.polygonBackends.sound;
@@ -44,7 +49,7 @@ export default class MufflingCalculatorService {
     // New windows come by default with a distance triggering of the sight,
     // which we need to filter to keep (available) windows as 0 muffling
     sightCollisions = sightCollisions.filter((impactVertex) => {
-      const edge = Array.from(impactVertex.edges)[0] as any;
+      const edge = (impactVertex.edges as any).first?.() ?? impactVertex.edges.values().next().value;
       const wall = edge?.object as Wall;
 
       if (!wall) {
@@ -79,9 +84,9 @@ export default class MufflingCalculatorService {
       const zMin = Math.min(earPosition.z, soundPosition.z);
       const zMax = Math.max(earPosition.z, soundPosition.z);
 
-      const surfaces = (getGame()?.canvas?.scene as any)?.getSurfaces() || [];
-      WHEUtils.log(`Surfaces found: ${surfaces.length}`);
-      const elevationsBetween = surfaces
+      const activeSurfaces = surfaces ?? ((getGame()?.canvas?.scene as any)?.getSurfaces() || []);
+      WHEUtils.log(`Surfaces found: ${activeSurfaces.length}`);
+      const elevationsBetween = activeSurfaces
         .map((s: any) => s.elevation ?? s.document?.elevation)
         .filter((e: number | undefined) => e !== undefined && e > zMin && e < zMax)
         .sort((a: number, b: number) => a - b);
@@ -124,38 +129,51 @@ export default class MufflingCalculatorService {
 
     // Acoustic Portal Logic
     if (finalMuffling > 0 && 'z' in earPosition && 'z' in soundPosition && !ignorePortals) {
-      const regions = (getGame()?.canvas?.regions as any)?.placeables || [];
-      const portals = regions.filter((r: any) =>
-        r.document?.behaviors?.some(
-          (b: any) =>
-            b.type === 'teleport' ||
-            b.type === 'changeLevel' ||
-            b.type === 'core.teleport' ||
-            b.type === 'core.changeLevel',
-        ),
-      );
+      const activePortals =
+        portals ??
+        ((getGame()?.canvas?.regions as any)?.placeables || []).filter((r: any) =>
+          r.document?.behaviors?.some(
+            (b: any) =>
+              b.type === 'teleport' ||
+              b.type === 'changeLevel' ||
+              b.type === 'core.teleport' ||
+              b.type === 'core.changeLevel',
+          ),
+        );
 
-      if (portals.length > 0) {
+      if (activePortals.length > 0) {
         let bestMuffling = finalMuffling;
 
-        for (const portal of portals) {
+        for (const portal of activePortals) {
           const portalBottom = portal.document?.elevation?.bottom ?? 0;
           let portalTop = portal.document?.elevation?.top ?? portalBottom;
 
           if (!Number.isFinite(portalTop)) {
-            portalTop = portalBottom + 10;
+            portalTop = portalBottom;
           }
 
           const portalZ = (portalBottom + portalTop) / 2;
 
           const portalPoint: Point3D = { x: portal.center.x, y: portal.center.y, z: portalZ };
 
-          const muffling1 = MufflingCalculatorService.getMufflingIndexBetweenPoints(earPosition, portalPoint, true);
+          const muffling1 = MufflingCalculatorService.getMufflingIndexBetweenPoints(
+            earPosition,
+            portalPoint,
+            true,
+            surfaces,
+            portals,
+          );
 
           // Optimization: skip second raycast if the first leg is already equal or worse
           if (muffling1 >= bestMuffling) continue;
 
-          const muffling2 = MufflingCalculatorService.getMufflingIndexBetweenPoints(portalPoint, soundPosition, true);
+          const muffling2 = MufflingCalculatorService.getMufflingIndexBetweenPoints(
+            portalPoint,
+            soundPosition,
+            true,
+            surfaces,
+            portals,
+          );
 
           const totalPortalMuffling = muffling1 + muffling2;
           if (totalPortalMuffling < bestMuffling) {
@@ -170,6 +188,7 @@ export default class MufflingCalculatorService {
 
     return WHEUtils.clamp(finalMuffling, 0, 5) ?? 0;
   };
+
 
   /**
    * Measures the distance between two points using the canvas grid.

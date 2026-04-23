@@ -123,3 +123,4 @@ parcel-bundle-reports/
 # macOS System Files
 .DS_Store
 **/.DS_Store
+docs/superpowers/
