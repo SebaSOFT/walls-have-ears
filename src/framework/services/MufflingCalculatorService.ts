@@ -14,7 +14,7 @@ export default class MufflingCalculatorService {
    * @param {Point3D | foundry.canvas.Canvas.Point} earPosition - The point representing the listener (e.g., token center).
    * @param {Point3D | foundry.canvas.Canvas.Point} soundPosition - The point representing the sound source.
    * @param {boolean} ignorePortals - If true, acoustic portals will not be checked (prevents recursion).
-   * @param {any[]} surfaces - Optional pre-fetched V14 surfaces for performance optimization.
+   * @param {number[]} surfaceElevations - Optional pre-calculated elevations for performance optimization.
    * @param {any[]} portals - Optional pre-fetched V14 regions for performance optimization.
    * @returns {number} A muffling index from -1 to 5, where -1 is no obstruction and 5 is maximum obstruction.
    */
@@ -22,7 +22,7 @@ export default class MufflingCalculatorService {
     earPosition: Point3D | foundry.canvas.Canvas.Point,
     soundPosition: Point3D | foundry.canvas.Canvas.Point,
     ignorePortals: boolean = false,
-    surfaces?: any[],
+    surfaceElevations?: number[],
     portals?: any[],
   ): number => {
     const sightLayer = CONFIG.Canvas.polygonBackends.sight;
@@ -84,38 +84,17 @@ export default class MufflingCalculatorService {
       const zMin = Math.min(earPosition.z, soundPosition.z);
       const zMax = Math.max(earPosition.z, soundPosition.z);
 
-      let activeSurfaces: any = surfaces ?? [];
-      
-      if (!Array.isArray(activeSurfaces) || activeSurfaces.length === 0) {
-        activeSurfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
-      }
-      
-      // Fallback for native V14 levels if no surfaces found (e.g. not using Levels module)
-      if ((activeSurfaces.length ?? activeSurfaces.size ?? 0) === 0) {
-        activeSurfaces = (getGame()?.canvas?.scene as any)?.levels ?? [];
-      }
-
-      // Normalize to array of documents/objects (handle Collections and Sets)
-      const surfaceArray: any[] = Array.isArray(activeSurfaces) 
-        ? activeSurfaces 
-        : (activeSurfaces.contents ?? Array.from(activeSurfaces.values?.() ?? activeSurfaces));
+      const activeElevations = surfaceElevations ?? MufflingCalculatorService.getSurfaceElevations();
 
       const units = getGame()?.canvas?.scene?.grid?.units || 'ft';
-      WHEUtils.log(`Surfaces/Levels found: ${surfaceArray.length} in range [${zMin}${units}, ${zMax}${units}]`);
-      
-      const elevationsBetween = surfaceArray
-        .map((s: any) => {
-          const doc = s.document ?? s;
-          const e = s.elevation ?? doc.elevation;
-          // In V14 elevation can be an object {bottom, top}
-          const val = typeof e === 'object' ? (e?.bottom ?? e?.top ?? 0) : (e ?? 0);
-          return Number(val);
-        })
-        .filter((e: number) => !isNaN(e) && e > zMin && e < zMax)
+      WHEUtils.log(`Total active elevations found: ${activeElevations.length} in range [${zMin}${units}, ${zMax}${units}]`);
+
+      const elevationsBetween = activeElevations
+        .filter((e: number) => e > zMin && e < zMax)
         .sort((a: number, b: number) => a - b);
 
       if (elevationsBetween.length > 0) {
-        WHEUtils.log(`Elevations between: ${elevationsBetween.map(e => `${e}${units}`).join(', ')}`);
+        WHEUtils.log(`Elevations between: ${elevationsBetween.map((e) => `${e}${units}`).join(', ')}`);
         const floorThickness = WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
         let mergedFloors = 0;
         let lastElevation = -Infinity;
@@ -127,7 +106,7 @@ export default class MufflingCalculatorService {
           }
         }
         wallMufflingSum += mergedFloors;
-      } else if (surfaceArray.length > 0) {
+      } else if (activeElevations.length > 0) {
         WHEUtils.log('No elevations found between the points range.');
       }
     }
@@ -184,7 +163,7 @@ export default class MufflingCalculatorService {
             earPosition,
             portalPoint,
             true,
-            surfaces,
+            surfaceElevations,
             portals,
           );
 
@@ -195,7 +174,7 @@ export default class MufflingCalculatorService {
             portalPoint,
             soundPosition,
             true,
-            surfaces,
+            surfaceElevations,
             portals,
           );
 
@@ -211,6 +190,38 @@ export default class MufflingCalculatorService {
     }
 
     return WHEUtils.clamp(finalMuffling, 0, 5) ?? 0;
+  };
+
+  /**
+   * Retrieves all surface elevations from the current scene (supporting Levels and V14 native levels).
+   * @returns {number[]} An array of sorted elevation values.
+   */
+  public static getSurfaceElevations = (surfaces?: any): number[] => {
+    let activeSurfaces: any = surfaces ?? [];
+
+    if (!Array.isArray(activeSurfaces) || activeSurfaces.length === 0) {
+      activeSurfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
+    }
+
+    // Fallback for native V14 levels if no surfaces found (e.g. not using Levels module)
+    if ((activeSurfaces.length ?? activeSurfaces.size ?? 0) === 0) {
+      activeSurfaces = (getGame()?.canvas?.scene as any)?.levels ?? [];
+    }
+
+    // Normalize to array of documents/objects (handle Collections and Sets)
+    const surfaceArray: any[] = Array.isArray(activeSurfaces)
+      ? activeSurfaces
+      : activeSurfaces.contents ?? Array.from(activeSurfaces.values?.() ?? activeSurfaces);
+
+    return surfaceArray
+      .map((s: any) => {
+        const doc = s.document ?? s;
+        const e = s.elevation ?? doc.elevation;
+        // In V14 elevation can be an object {bottom, top}
+        const val = typeof e === 'object' ? (e?.bottom ?? e?.top ?? 0) : (e ?? 0);
+        return Number(val);
+      })
+      .filter((e: number) => !isNaN(e));
   };
 
 

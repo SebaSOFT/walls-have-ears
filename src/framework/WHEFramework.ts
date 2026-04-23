@@ -73,7 +73,8 @@ export default class WHEFramework {
     };
 
     // Performance Optimization: Fetch surfaces and portals once per pass
-    const surfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
+    const rawSurfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
+    const surfaceElevations = MufflingCalculatorService.getSurfaceElevations(rawSurfaces);
     const portals = ((getGame()?.canvas?.regions as any)?.placeables || []).filter((r: any) =>
       r.document?.behaviors?.some(
         (b: any) =>
@@ -115,7 +116,7 @@ export default class WHEFramework {
           earPosition,
           soundPosition,
           false,
-          surfaces,
+          surfaceElevations,
           portals,
         );
 
