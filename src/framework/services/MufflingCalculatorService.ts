@@ -18,6 +18,7 @@ export default class MufflingCalculatorService {
   public static getMufflingIndexBetweenPoints = (
     earPosition: Point3D | foundry.canvas.Canvas.Point,
     soundPosition: Point3D | foundry.canvas.Canvas.Point,
+    ignorePortals: boolean = false,
   ): number => {
     const sightLayer = CONFIG.Canvas.polygonBackends.sight;
     const soundLayer = CONFIG.Canvas.polygonBackends.sound;
@@ -107,8 +108,11 @@ export default class MufflingCalculatorService {
 
     // Special case: Ethereal path (no move-blocking walls or floors)
     const hasMoveBlockingWalls = moveCollisions.length > 0;
-    const hasFloors = ('z' in earPosition && 'z' in soundPosition) && wallMufflingSum > (sightCollisions.length + moveCollisions.length) * 0.5;
-    
+    const hasFloors =
+      'z' in earPosition &&
+      'z' in soundPosition &&
+      wallMufflingSum > (sightCollisions.length + moveCollisions.length) * 0.5;
+
     if (!hasMoveBlockingWalls && !hasFloors && sightCollisions.length > 0) {
       WHEUtils.log('Ethereal path detected, forcing 0 muffling');
       finalMuffling = 0;
@@ -117,6 +121,52 @@ export default class MufflingCalculatorService {
     WHEUtils.log(`Collision walls (MOVE): ${moveCollisions.length}`);
     WHEUtils.log(`Collision walls (SIGHT): ${sightCollisions.length}`);
     WHEUtils.log(`Wall Muffling Sum: ${wallMufflingSum}`);
+
+    // Acoustic Portal Logic
+    if (finalMuffling > 0 && 'z' in earPosition && 'z' in soundPosition && !ignorePortals) {
+      const regions = (getGame()?.canvas?.regions as any)?.placeables || [];
+      const portals = regions.filter((r: any) =>
+        r.document?.behaviors?.some(
+          (b: any) =>
+            b.type === 'teleport' ||
+            b.type === 'changeLevel' ||
+            b.type === 'core.teleport' ||
+            b.type === 'core.changeLevel',
+        ),
+      );
+
+      if (portals.length > 0) {
+        let bestMuffling = finalMuffling;
+
+        for (const portal of portals) {
+          const portalBottom = portal.document?.elevation?.bottom ?? 0;
+          let portalTop = portal.document?.elevation?.top ?? portalBottom;
+
+          if (!Number.isFinite(portalTop)) {
+            portalTop = portalBottom + 10;
+          }
+
+          const portalZ = (portalBottom + portalTop) / 2;
+
+          const portalPoint: Point3D = { x: portal.center.x, y: portal.center.y, z: portalZ };
+
+          const muffling1 = MufflingCalculatorService.getMufflingIndexBetweenPoints(earPosition, portalPoint, true);
+
+          // Optimization: skip second raycast if the first leg is already equal or worse
+          if (muffling1 >= bestMuffling) continue;
+
+          const muffling2 = MufflingCalculatorService.getMufflingIndexBetweenPoints(portalPoint, soundPosition, true);
+
+          const totalPortalMuffling = muffling1 + muffling2;
+          if (totalPortalMuffling < bestMuffling) {
+            WHEUtils.log('Acoustic Portal found a better path via Region', portal.id);
+            bestMuffling = totalPortalMuffling;
+          }
+        }
+
+        finalMuffling = bestMuffling;
+      }
+    }
 
     return WHEUtils.clamp(finalMuffling, 0, 5) ?? 0;
   };

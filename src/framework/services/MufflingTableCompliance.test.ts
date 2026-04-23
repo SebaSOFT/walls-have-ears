@@ -43,14 +43,14 @@ describe('Muffling Table Compliance Tests', () => {
 
   const mockScenario = (sightCount: number, moveCount: number) => {
     (CONFIG.Canvas.polygonBackends.sound.testCollision as jest.Mock).mockReturnValue(sightCount > 0 || moveCount > 0);
-    
+
     const sightResults = Array(sightCount).fill({
-      edges: new Set([{ object: { center: { x: 50, y: 50 }, document: { threshold: { sight: 0 } } } }])
+      edges: new Set([{ object: { center: { x: 50, y: 50 }, document: { threshold: { sight: 0 } } } }]),
     });
     (CONFIG.Canvas.polygonBackends.sight.testCollision as jest.Mock).mockReturnValue(sightResults);
 
     const moveResults = Array(moveCount).fill({
-      edges: new Set([{}])
+      edges: new Set([{}]),
     });
     (CONFIG.Canvas.polygonBackends.move.testCollision as jest.Mock).mockReturnValue(moveResults);
   };
