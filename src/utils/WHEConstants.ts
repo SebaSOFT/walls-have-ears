@@ -2,6 +2,9 @@ export enum WHEConstants {
   MODULE = 'walls-have-ears',
   SETTING_DEBUG = 'client-debug',
   SETTING_TESTER = 'tester-enable',
+  SETTING_DOOR_MUFFLING = 'door-muffling-enable',
+  SETTING_FLOOR_THICKNESS = 'floor-thickness',
+  SETTING_HEARING_HEIGHT = 'hearing-height',
 }
 
 export type Arrayish = { [n: string]: number };
