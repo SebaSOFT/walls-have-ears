@@ -84,19 +84,30 @@ export default class MufflingCalculatorService {
       const zMin = Math.min(earPosition.z, soundPosition.z);
       const zMax = Math.max(earPosition.z, soundPosition.z);
 
-      const activeSurfaces = surfaces ?? ((getGame()?.canvas?.scene as any)?.getSurfaces?.() || []);
-      WHEUtils.log(`Surfaces found: ${activeSurfaces.length}`);
+      let activeSurfaces: any[] = surfaces ?? [];
+      
+      if (activeSurfaces.length === 0) {
+        activeSurfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
+      }
+      
+      // Fallback for native V14 levels if no surfaces found (e.g. not using Levels module)
+      if (activeSurfaces.length === 0) {
+        activeSurfaces = (getGame()?.canvas?.scene as any)?.levels ?? [];
+      }
+
+      WHEUtils.log(`Surfaces/Levels found: ${activeSurfaces.length} in range [${zMin}, ${zMax}]`);
+      
       const elevationsBetween = activeSurfaces
         .map((s: any) => {
           const e = s.elevation ?? s.document?.elevation;
-          return e?.bottom ?? e;
+          // In V14 elevation can be an object {bottom, top}
+          return typeof e === 'object' ? (e?.bottom ?? e?.top ?? 0) : (e ?? 0);
         })
-        .filter((e: any) => e !== undefined && typeof e === 'number' && e > zMin && e < zMax)
+        .filter((e: any) => typeof e === 'number' && e > zMin && e < zMax)
         .sort((a: number, b: number) => a - b);
 
-      WHEUtils.log(`Elevations between: ${elevationsBetween.join(', ')}`);
-
       if (elevationsBetween.length > 0) {
+        WHEUtils.log(`Elevations between: ${elevationsBetween.join(', ')}`);
         const floorThickness = WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
         let mergedFloors = 0;
         let lastElevation = -Infinity;
@@ -108,6 +119,8 @@ export default class MufflingCalculatorService {
           }
         }
         wallMufflingSum += mergedFloors;
+      } else if (activeSurfaces.length > 0) {
+        WHEUtils.log('No elevations found between the points range.');
       }
     }
 
