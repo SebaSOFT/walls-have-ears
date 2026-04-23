@@ -23,7 +23,7 @@ export default class MufflingCalculatorService {
   public static getMufflingIndexBetweenPoints = (
     earPosition: Point3D | foundry.canvas.Canvas.Point,
     soundPosition: Point3D | foundry.canvas.Canvas.Point,
-    ignorePortals: boolean = false,
+    ignorePortals = false,
     surfaceElevations?: number[],
     portals?: any[],
     maxDistance?: number,
@@ -91,7 +91,9 @@ export default class MufflingCalculatorService {
       const activeElevations = surfaceElevations ?? MufflingCalculatorService.getSurfaceElevations();
 
       const units = getGame()?.canvas?.scene?.grid?.units || 'ft';
-      WHEUtils.log(`Total active elevations found: ${activeElevations.length} in range [${zMin}${units}, ${zMax}${units}]`);
+      WHEUtils.log(
+        `Total active elevations found: ${activeElevations.length} in range [${zMin}${units}, ${zMax}${units}]`,
+      );
 
       const elevationsBetween = activeElevations
         .filter((e: number) => e > zMin && e < zMax)
@@ -99,7 +101,8 @@ export default class MufflingCalculatorService {
 
       if (elevationsBetween.length > 0) {
         WHEUtils.log(`Elevations between: ${elevationsBetween.map((e) => `${e}${units}`).join(', ')}`);
-        const activeFloorThickness = floorThickness ?? WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
+        const activeFloorThickness =
+          floorThickness ?? WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
         let mergedFloors = 0;
         let lastElevation = -Infinity;
 
@@ -229,7 +232,7 @@ export default class MufflingCalculatorService {
     // Normalize to array of documents/objects (handle Collections and Sets)
     const surfaceArray: any[] = Array.isArray(activeSurfaces)
       ? activeSurfaces
-      : activeSurfaces.contents ?? Array.from(activeSurfaces.values?.() ?? activeSurfaces);
+      : (activeSurfaces.contents ?? Array.from(activeSurfaces.values?.() ?? activeSurfaces));
 
     return surfaceArray
       .map((s: any) => {
@@ -241,7 +244,6 @@ export default class MufflingCalculatorService {
       })
       .filter((e: number) => !isNaN(e));
   };
-
 
   /**
    * Measures the distance between two points using the canvas grid.

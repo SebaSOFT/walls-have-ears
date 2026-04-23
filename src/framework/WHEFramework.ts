@@ -91,9 +91,7 @@ export default class WHEFramework {
 
     const ambientSounds = getGame()!.canvas!.sounds!.placeables;
     if (ambientSounds && ambientSounds.length > 0) {
-      for (let i = 0; i < ambientSounds.length; i++) {
-        const currentAmbientSound: foundry.canvas.placeables.AmbientSound = ambientSounds[i];
-
+      for (const currentAmbientSound of ambientSounds) {
         if (!currentAmbientSound.isAudible) {
           WHEUtils.log('Sound not Audible for (probably is just turned off)');
           continue;
@@ -130,6 +128,5 @@ export default class WHEFramework {
         getGame().audio.debug(`WHE | Dynamically muffled sound to level ${muffleIndex}.`);
       }
     }
-
   };
 }

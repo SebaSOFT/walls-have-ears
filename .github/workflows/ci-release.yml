@@ -1,28 +1,24 @@
-name: Release Creation
+name: CI and Release
 
 on:
   push:
     branches:
       - main
+  pull_request:
   workflow_dispatch:
 
 jobs:
-  build:
+  validate:
+    name: Validate (Lint, Test, Build)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Get module version
-        id: get_version
-        run: echo "version=$(jq -r .version module.json)" >> $GITHUB_OUTPUT
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
@@ -38,14 +34,58 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable --inline-builds
 
-      - name: Build project
-        run: yarn build
-
-      - name: Run ESLint
+      - name: Run linter
         run: yarn lint
 
       - name: Run tests
         run: yarn test
+
+      - name: Verify Version Consistency
+        run: |
+          PACKAGE_VERSION=$(jq -r .version package.json)
+          MODULE_VERSION=$(jq -r .version module.json)
+          echo "Package version: $PACKAGE_VERSION"
+          echo "Module version: $MODULE_VERSION"
+          if [ "$PACKAGE_VERSION" != "$MODULE_VERSION" ]; then
+            echo "Error: Version mismatch between package.json ($PACKAGE_VERSION) and module.json ($MODULE_VERSION)"
+            exit 1
+          fi
+
+      - name: Build project
+        run: yarn build
+
+      - name: Upload Build Artifacts
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            dist/
+            module.json
+            LICENSE
+            lang/
+            artwork/*.webp
+
+  release:
+    name: Create Release and Publish
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Get module version
+        id: get_version
+        run: echo "version=$(jq -r .version module.json)" >> $GITHUB_OUTPUT
 
       # Substitute the Manifest and Download URLs in the module.json
       - name: Substitute Manifest and Download Links For Versioned Ones

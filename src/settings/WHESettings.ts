@@ -4,8 +4,8 @@ import { getGame } from '../foundry/getGame';
 
 export default class WHESettings {
   private static instance: WHESettings;
-  private initialized: boolean = false;
-  private readonly settings: ReadonlyArray<[string, Partial<ClientSettings.SettingConfig>]>;
+  private initialized = false;
+  private readonly settings: readonly [string, Partial<ClientSettings.SettingConfig>][];
   private constructor() {
     this.settings = [
       [
@@ -110,7 +110,7 @@ export default class WHESettings {
    * @param settingKey The Settings Key. See WHEconstants
    * @param defaultValue  The default value to return if the setting is not found
    */
-  public getBoolean = (settingKey: string, defaultValue: boolean = false): boolean => {
+  public getBoolean = (settingKey: string, defaultValue = false): boolean => {
     if (!this.initialized) {
       return defaultValue;
     }
@@ -128,7 +128,7 @@ export default class WHESettings {
    * @param settingKey The Settings Key. See WHEconstants
    * @param defaultValue  The default value to return if the setting is not found
    */
-  public getNumber = (settingKey: string, defaultValue: number = 0): number => {
+  public getNumber = (settingKey: string, defaultValue = 0): number => {
     if (!this.initialized) {
       return defaultValue;
     }
