@@ -84,30 +84,38 @@ export default class MufflingCalculatorService {
       const zMin = Math.min(earPosition.z, soundPosition.z);
       const zMax = Math.max(earPosition.z, soundPosition.z);
 
-      let activeSurfaces: any[] = surfaces ?? [];
+      let activeSurfaces: any = surfaces ?? [];
       
-      if (activeSurfaces.length === 0) {
+      if (!Array.isArray(activeSurfaces) || activeSurfaces.length === 0) {
         activeSurfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
       }
       
       // Fallback for native V14 levels if no surfaces found (e.g. not using Levels module)
-      if (activeSurfaces.length === 0) {
+      if ((activeSurfaces.length ?? activeSurfaces.size ?? 0) === 0) {
         activeSurfaces = (getGame()?.canvas?.scene as any)?.levels ?? [];
       }
 
-      WHEUtils.log(`Surfaces/Levels found: ${activeSurfaces.length} in range [${zMin}, ${zMax}]`);
+      // Normalize to array of documents/objects (handle Collections and Sets)
+      const surfaceArray: any[] = Array.isArray(activeSurfaces) 
+        ? activeSurfaces 
+        : (activeSurfaces.contents ?? Array.from(activeSurfaces.values?.() ?? activeSurfaces));
+
+      const units = getGame()?.canvas?.scene?.grid?.units || 'ft';
+      WHEUtils.log(`Surfaces/Levels found: ${surfaceArray.length} in range [${zMin}${units}, ${zMax}${units}]`);
       
-      const elevationsBetween = activeSurfaces
+      const elevationsBetween = surfaceArray
         .map((s: any) => {
-          const e = s.elevation ?? s.document?.elevation;
+          const doc = s.document ?? s;
+          const e = s.elevation ?? doc.elevation;
           // In V14 elevation can be an object {bottom, top}
-          return typeof e === 'object' ? (e?.bottom ?? e?.top ?? 0) : (e ?? 0);
+          const val = typeof e === 'object' ? (e?.bottom ?? e?.top ?? 0) : (e ?? 0);
+          return Number(val);
         })
-        .filter((e: any) => typeof e === 'number' && e > zMin && e < zMax)
+        .filter((e: number) => !isNaN(e) && e > zMin && e < zMax)
         .sort((a: number, b: number) => a - b);
 
       if (elevationsBetween.length > 0) {
-        WHEUtils.log(`Elevations between: ${elevationsBetween.join(', ')}`);
+        WHEUtils.log(`Elevations between: ${elevationsBetween.map(e => `${e}${units}`).join(', ')}`);
         const floorThickness = WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
         let mergedFloors = 0;
         let lastElevation = -Infinity;
@@ -119,7 +127,7 @@ export default class MufflingCalculatorService {
           }
         }
         wallMufflingSum += mergedFloors;
-      } else if (activeSurfaces.length > 0) {
+      } else if (surfaceArray.length > 0) {
         WHEUtils.log('No elevations found between the points range.');
       }
     }
