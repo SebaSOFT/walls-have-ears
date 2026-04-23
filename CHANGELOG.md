@@ -1,5 +1,38 @@
 # CHANGELOG
 
+## [3.14.1] 2026-04-22
+
+### ADDED
+
+#### 🚀 Native Scene Levels Support (V14)
+- **Vertical Occlusion Calculation:** The module now automatically detects when sound passes through a "Floor" or "Ceiling" defined in the new V14 Scene Levels system.
+- **Floor Merging Logic (Structure Thickness):** Implemented an intelligent logic to prevent "double muffling". If two surfaces (e.g., a ceiling and the floor above) are within 10 units of distance, they are treated as a single solid structural element.
+- **3D Raycast Physics:** Migrated all calculation logic from 2D straight lines to a real 3D vector (`Point3D`). This allows sound to be dynamically muffled based on the relative height between the source and the listener.
+
+#### 🚪 Acoustic Portals (Stairs and Holes)
+- **Region-Based Propagation:** Implementation of alternative "Acoustic Paths". If a direct path is blocked by a floor but a Region of type `teleport` or `changeLevel` (native V14 stairs) exists, the sound will "travel" through the portal if it offers a clearer path.
+- **"Air" Detection:** Holes in levels (areas without a defined surface) are now correctly treated as air, allowing sound to pass without penalty even between different elevations.
+
+#### 🌿 Material and Wall Refinement
+- **Natural Walls (0.5 Rule):** Introduced an occlusion value of 0.5 for "natural" or limited obstacles (Terrain walls, Ethereal walls).
+    - *Logic:* A single natural obstacle is "acoustically transparent". Only when sound passes through a second natural obstacle (summing to 1.0) is the first level of muffling applied.
+- **Technical Table Compliance:** Verified via unit tests that every combination of walls (Solid, Window, Terrain, Ethereal) exactly matches the defined muffling matrix (e.g., 3 Windows = 1 Muffling Level).
+
+#### 👤 Token Anatomy (Ear Height)
+- **Hearing Offset:** For increased realism, the token's hearing point is no longer on the floor. A **6ft** offset has been applied above the token's base elevation, simulating the actual height of a humanoid's ears.
+
+#### ⚙️ New Settings
+- **Floor Thickness:** New configurable setting defining the maximum distance to merge nearby surfaces into a single muffling layer (Default: 10 ft).
+- **V14 Feature Toggle:** Level and portal functions activate only in V14, maintaining full stability in V13.
+
+### FIXED
+- **Distance Accuracy:** Calculated distance now includes the vertical hypotenuse (True 3D distance), improving volume falloff calculations.
+- **Memory Optimization:** Improved caching system for calculated muffling levels, reducing performance impact during token movement.
+- **Bug Fixes:**
+    - Fixed a typo in the distance calculation function.
+    - Corrected handling of infinite elevations (`Infinity`) in portal regions.
+    - Added null safety checks for movement collision layers.
+
 ## [3.13.2] 2025-09-11
 
 ### CHANGED
