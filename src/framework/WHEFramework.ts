@@ -78,6 +78,7 @@ export default class WHEFramework {
     // Performance Optimization: Fetch surfaces and portals once per pass
     const rawSurfaces = (getGame()?.canvas?.scene as any)?.getSurfaces?.() || [];
     const surfaceElevations = MufflingCalculatorService.getSurfaceElevations(rawSurfaces);
+    const floorThickness = WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
     const portals = ((getGame()?.canvas?.regions as any)?.placeables || []).filter((r: any) =>
       r.document?.behaviors?.some(
         (b: any) =>
@@ -122,6 +123,7 @@ export default class WHEFramework {
           surfaceElevations,
           portals,
           currentAmbientSound.document.radius,
+          floorThickness,
         );
 
         await this._soundManager.applyMuffling(currentAmbientSound, muffleIndex, selectedToken.id);

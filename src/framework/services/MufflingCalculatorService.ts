@@ -17,6 +17,7 @@ export default class MufflingCalculatorService {
    * @param {number[]} surfaceElevations - Optional pre-calculated elevations for performance optimization.
    * @param {any[]} portals - Optional pre-fetched V14 regions for performance optimization.
    * @param {number} maxDistance - Optional maximum distance (sound radius) to filter relevant portals.
+   * @param {number} floorThickness - Optional thickness to merge multiple floors.
    * @returns {number} A muffling index from -1 to 5, where -1 is no obstruction and 5 is maximum obstruction.
    */
   public static getMufflingIndexBetweenPoints = (
@@ -26,6 +27,7 @@ export default class MufflingCalculatorService {
     surfaceElevations?: number[],
     portals?: any[],
     maxDistance?: number,
+    floorThickness?: number,
   ): number => {
     const sightLayer = CONFIG.Canvas.polygonBackends.sight;
     const soundLayer = CONFIG.Canvas.polygonBackends.sound;
@@ -97,12 +99,12 @@ export default class MufflingCalculatorService {
 
       if (elevationsBetween.length > 0) {
         WHEUtils.log(`Elevations between: ${elevationsBetween.map((e) => `${e}${units}`).join(', ')}`);
-        const floorThickness = WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
+        const activeFloorThickness = floorThickness ?? WHESettings.getInstance().getNumber(WHEConstants.SETTING_FLOOR_THICKNESS, 10);
         let mergedFloors = 0;
         let lastElevation = -Infinity;
 
         for (const elevation of elevationsBetween) {
-          if (elevation > lastElevation + floorThickness) {
+          if (elevation > lastElevation + activeFloorThickness) {
             mergedFloors++;
             lastElevation = elevation;
           }
@@ -177,6 +179,8 @@ export default class MufflingCalculatorService {
             true,
             surfaceElevations,
             portals,
+            maxDistance,
+            floorThickness,
           );
 
           // Optimization: skip second raycast if the first leg is already equal or worse
@@ -188,6 +192,8 @@ export default class MufflingCalculatorService {
             true,
             surfaceElevations,
             portals,
+            maxDistance,
+            floorThickness,
           );
 
           const totalPortalMuffling = muffling1 + muffling2;
