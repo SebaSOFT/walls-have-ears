@@ -1,6 +1,7 @@
 import WHEUtils from '../../utils/WHEUtils';
 import { getGame } from '../../foundry/getGame';
 import WHESettings from '../../settings/WHESettings';
+import { WHEConstants } from '../../utils/WHEConstants';
 
 export interface Point3D extends foundry.canvas.Canvas.Point {
   z: number;
@@ -102,7 +103,16 @@ export default class MufflingCalculatorService {
     }
 
     // Estimating how much to muffle
-    const finalMuffling = Math.floor(wallMufflingSum);
+    let finalMuffling = Math.floor(wallMufflingSum);
+
+    // Special case: Ethereal path (no move-blocking walls or floors)
+    const hasMoveBlockingWalls = moveCollisions.length > 0;
+    const hasFloors = ('z' in earPosition && 'z' in soundPosition) && wallMufflingSum > (sightCollisions.length + moveCollisions.length) * 0.5;
+    
+    if (!hasMoveBlockingWalls && !hasFloors && sightCollisions.length > 0) {
+      WHEUtils.log('Ethereal path detected, forcing 0 muffling');
+      finalMuffling = 0;
+    }
 
     WHEUtils.log(`Collision walls (MOVE): ${moveCollisions.length}`);
     WHEUtils.log(`Collision walls (SIGHT): ${sightCollisions.length}`);
