@@ -103,7 +103,8 @@ describe('HookManager', () => {
       expect(registeredHooks).toContain('updateAmbientSound');
       expect(registeredHooks).toContain('closeAmbientSoundConfig');
       expect(registeredHooks).toContain('renderAmbientSoundConfig');
-      expect(mockHooksOn).toHaveBeenCalledTimes(10);
+      expect(registeredHooks).toContain('refreshAmbientSound');
+      expect(mockHooksOn).toHaveBeenCalledTimes(11);
     });
 
     it('should register libWrapper on "ready" hook', async () => {

@@ -99,6 +99,11 @@ export default class HookManager {
       });
       await this._wheFramework.performMuffling();
     });
+    Hooks.on('refreshAmbientSound', async () => {
+      WHEUtils.log('WHEFramework Event: refreshAmbientSound');
+      RoomAcousticService.clearCache();
+      await this._wheFramework.performMuffling();
+    });
     Hooks.on('closeAmbientSoundConfig', async (_soundConfig) => {
       WHEUtils.log('WHEFramework Event: closeAmbientSoundConfig');
       await this._wheFramework.performMuffling();
