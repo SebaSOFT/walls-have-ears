@@ -1,6 +1,8 @@
 import WHEUtils from '../../utils/WHEUtils';
 import { getGame } from '../../foundry/getGame';
 import { Point3D } from './MufflingCalculatorService';
+import WHESettings from '../../settings/WHESettings';
+import { WHEConstants } from '../../utils/WHEConstants';
 
 /**
  * Service responsible for calculating environmental acoustics, room sizes,
@@ -17,6 +19,49 @@ export default class RoomAcousticService {
     RoomAcousticService.roomSizeCache.clear();
     RoomAcousticService.reboundCache.clear();
     WHEUtils.log('[RoomAcousticService] Acoustic cache cleared.');
+  };
+
+  /**
+   * Draw temporary debug lines in the Foundry canvas if debug mode is active.
+   */
+  public static drawDebugLine = (
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+    color = 0x00ffff,
+    thickness = 2,
+    alpha = 0.8,
+  ): void => {
+    if (typeof PIXI === 'undefined') return;
+
+    const isDebug = WHESettings.getInstance().getBoolean(WHEConstants.SETTING_DEBUG, false);
+    if (!isDebug) return;
+
+    const canvas = getGame()?.canvas;
+    if (!canvas || !canvas.ready || !canvas.stage) return;
+
+    try {
+      const g = new PIXI.Graphics();
+      g.lineStyle(thickness, color, alpha);
+      g.moveTo(start.x, start.y);
+      g.lineTo(end.x, end.y);
+
+      const stage = canvas.stage;
+      stage.addChild(g);
+
+      // Remove the graphics element after 500ms
+      setTimeout(() => {
+        try {
+          if (!g.destroyed) {
+            stage.removeChild(g);
+            g.destroy();
+          }
+        } catch {
+          // ignore
+        }
+      }, 500);
+    } catch (e) {
+      console.error('WHE | Error drawing debug ray:', e);
+    }
   };
 
   /**
@@ -69,9 +114,19 @@ export default class RoomAcousticService {
         const minDistancePixels = Math.sqrt(minDistanceSq);
         const minDistanceUnits = minDistancePixels / pixelsPerUnit;
         sumDistances += minDistanceUnits;
+
+        // Draw debug ray to collision point
+        const collisionPoint = {
+          x: position.x + minDistancePixels * Math.cos(angle),
+          y: position.y + minDistancePixels * Math.sin(angle),
+        };
+        RoomAcousticService.drawDebugLine(position, collisionPoint, 0x00ffff, 2, 0.6);
       } else {
         // No collision, ray travelled maximum distance
         sumDistances += maxDistance;
+
+        // Draw faint debug ray to max limit
+        RoomAcousticService.drawDebugLine(position, endPoint, 0x00ffff, 1, 0.2);
       }
     }
 
@@ -114,6 +169,7 @@ export default class RoomAcousticService {
     const maxPixels = maxDistance * pixelsPerUnit;
 
     let shortestReboundDistance = Infinity;
+    let bestReflectionPoint: { x: number; y: number } | null = null;
 
     for (let i = 0; i < rayCount; i++) {
       const angle = (i * 2 * Math.PI) / rayCount;
@@ -163,6 +219,7 @@ export default class RoomAcousticService {
 
             if (total3DUnits < shortestReboundDistance) {
               shortestReboundDistance = total3DUnits;
+              bestReflectionPoint = closestCollision;
             }
           }
         }
@@ -173,6 +230,12 @@ export default class RoomAcousticService {
     if (shortestReboundDistance !== Infinity) {
       WHEUtils.log(`[RoomAcousticService] Found rebound path with distance: ${shortestReboundDistance} units`);
       result = shortestReboundDistance;
+
+      // Draw the best connecting rebound path: Magenta for sound->wall, Yellow for wall->listener
+      if (bestReflectionPoint) {
+        RoomAcousticService.drawDebugLine(source, bestReflectionPoint, 0xff00ff, 3, 0.8);
+        RoomAcousticService.drawDebugLine(bestReflectionPoint, listener, 0xffff00, 3, 0.8);
+      }
     }
 
     RoomAcousticService.reboundCache.set(cacheKey, result);
