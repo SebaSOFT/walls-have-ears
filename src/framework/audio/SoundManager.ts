@@ -170,8 +170,8 @@ export default class SoundManager {
 
         const soundRadius = (ambientSound as any).soundRadius || (ambientSound as any).radius || 100;
 
-        const sRoom = RoomAcousticService.calculateRoomSize(sourcePos, soundRadius, rayCount);
-        const lRoom = RoomAcousticService.calculateRoomSize(listenerPos, soundRadius, rayCount);
+        const sRoom = RoomAcousticService.calculateRoomSize(sourcePos, soundRadius, rayCount, true);
+        const lRoom = RoomAcousticService.calculateRoomSize(listenerPos, soundRadius, rayCount, false);
         const effectiveRoomSize = RoomAcousticService.getEffectiveRoomSize(sRoom, lRoom, threshold);
 
         if (effectiveRoomSize !== null) {
@@ -290,8 +290,8 @@ export default class SoundManager {
 
           const soundRadius = wall.soundRadius || 100;
 
-          const sRoom = RoomAcousticService.calculateRoomSize(doorPosition, soundRadius, rayCount);
-          const lRoom = RoomAcousticService.calculateRoomSize(earPosition, soundRadius, rayCount);
+          const sRoom = RoomAcousticService.calculateRoomSize(doorPosition, soundRadius, rayCount, true);
+          const lRoom = RoomAcousticService.calculateRoomSize(earPosition, soundRadius, rayCount, false);
           const effectiveRoomSize = RoomAcousticService.getEffectiveRoomSize(sRoom, lRoom, threshold);
 
           if (effectiveRoomSize !== null) {

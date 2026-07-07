@@ -76,6 +76,7 @@ export default class RoomAcousticService {
     position: Point3D | foundry.canvas.Canvas.Point,
     maxDistance: number,
     rayCount = 8,
+    drawDebug = true,
   ): number => {
     const posZ = 'z' in position ? (position as Point3D).z : 0;
     const cacheKey = `${position.x.toFixed(1)},${position.y.toFixed(1)},${posZ.toFixed(1)},${maxDistance.toFixed(1)},${rayCount}`;
@@ -116,17 +117,21 @@ export default class RoomAcousticService {
         sumDistances += minDistanceUnits;
 
         // Draw debug ray to collision point
-        const collisionPoint = {
-          x: position.x + minDistancePixels * Math.cos(angle),
-          y: position.y + minDistancePixels * Math.sin(angle),
-        };
-        RoomAcousticService.drawDebugLine(position, collisionPoint, 0x00ffff, 2, 0.6);
+        if (drawDebug) {
+          const collisionPoint = {
+            x: position.x + minDistancePixels * Math.cos(angle),
+            y: position.y + minDistancePixels * Math.sin(angle),
+          };
+          RoomAcousticService.drawDebugLine(position, collisionPoint, 0x00ffff, 2, 0.6);
+        }
       } else {
         // No collision, ray travelled maximum distance
         sumDistances += maxDistance;
 
         // Draw faint debug ray to max limit
-        RoomAcousticService.drawDebugLine(position, endPoint, 0x00ffff, 1, 0.2);
+        if (drawDebug) {
+          RoomAcousticService.drawDebugLine(position, endPoint, 0x00ffff, 1, 0.2);
+        }
       }
     }
 

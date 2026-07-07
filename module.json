@@ -12,19 +12,23 @@
     }
   ],
   "url": "https://github.com/SebaSOFT/walls-have-ears",
-  "version": "3.14.36",
+  "version": "3.14.2",
   "compatibility": {
-    "minimum": "14",
-    "verified": "14.364",
+    "minimum": "13",
+    "verified": "14.360",
     "maximum": "14"
   },
-  "esmodules": ["dist/main.js"],
+  "esmodules": [
+    "dist/main.js"
+  ],
   "media": [
     {
       "type": "setup",
       "url": "modules/walls-have-ears/artwork/cover.webp",
       "thumbnail": "modules/walls-have-ears/artwork/cover-thumb.webp",
-      "caption": "A zero-config module that dynamically muffles sounds based on wall occlusion. Supports door sounds and settings for a tailored audio experience."
+      "caption": "A zero-config module that dynamically muffles sounds based on wall occlusion. Supports door sounds and settings for a tailored audio experience.",
+      "loop": false,
+      "flags": {}
     }
   ],
   "languages": [
@@ -68,7 +72,7 @@
   "readme": "https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/refs/heads/main/README.md",
   "changelog": "https://raw.githubusercontent.com/SebaSOFT/walls-have-ears/refs/heads/main/CHANGELOG.md",
   "manifest": "https://github.com/SebaSOFT/walls-have-ears/releases/latest/download/module.json",
-  "download": "https://github.com/SebaSOFT/walls-have-ears/releases/download/3.13.2/module.zip",
+  "download": "https://github.com/SebaSOFT/walls-have-ears/releases/download/3.14.2/module.zip",
   "relationships": {
     "recommends": [
       {
