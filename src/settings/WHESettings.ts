@@ -5,7 +5,7 @@ import { getGame } from '../foundry/getGame';
 export default class WHESettings {
   private static instance: WHESettings;
   private initialized = false;
-  private readonly settings: readonly [string, Partial<ClientSettings.SettingConfig>][];
+  private readonly settings: readonly [string, Partial<ClientSettings.SettingConfig<any>>][];
   private constructor() {
     this.settings = [
       [
@@ -81,6 +81,82 @@ export default class WHESettings {
           requiresReload: false,
         },
       ],
+      [
+        WHEConstants.SETTING_ECHO_ENABLE,
+        {
+          name: 'WHE.settings_echo_enable.title',
+          hint: 'WHE.settings_echo_enable.hint',
+          key: WHEConstants.SETTING_ECHO_ENABLE,
+          namespace: WHEConstants.MODULE,
+          scope: 'world',
+          config: true,
+          type: Boolean,
+          default: false,
+          requiresReload: false,
+        },
+      ],
+      [
+        WHEConstants.SETTING_ECHO_RAYS,
+        {
+          name: 'WHE.settings_echo_rays.title',
+          hint: 'WHE.settings_echo_rays.hint',
+          key: WHEConstants.SETTING_ECHO_RAYS,
+          namespace: WHEConstants.MODULE,
+          scope: 'world',
+          config: true,
+          type: String,
+          choices: {
+            '8': '8',
+            '12': '12',
+            '16': '16',
+            '20': '20',
+          },
+          default: '8',
+          requiresReload: false,
+        },
+      ],
+      [
+        WHEConstants.SETTING_ECHO_EXTERIOR_THRESHOLD,
+        {
+          name: 'WHE.settings_echo_exterior_threshold.title',
+          hint: 'WHE.settings_echo_exterior_threshold.hint',
+          key: WHEConstants.SETTING_ECHO_EXTERIOR_THRESHOLD,
+          namespace: WHEConstants.MODULE,
+          scope: 'world',
+          config: true,
+          type: Number,
+          default: 120,
+          requiresReload: false,
+        },
+      ],
+      [
+        WHEConstants.SETTING_ECHO_FEEDBACK,
+        {
+          name: 'WHE.settings_echo_feedback.title',
+          hint: 'WHE.settings_echo_feedback.hint',
+          key: WHEConstants.SETTING_ECHO_FEEDBACK,
+          namespace: WHEConstants.MODULE,
+          scope: 'world',
+          config: true,
+          type: Number,
+          default: 0.5,
+          requiresReload: false,
+        },
+      ],
+      [
+        WHEConstants.SETTING_ECHO_DAMPENING,
+        {
+          name: 'WHE.settings_echo_dampening.title',
+          hint: 'WHE.settings_echo_dampening.hint',
+          key: WHEConstants.SETTING_ECHO_DAMPENING,
+          namespace: WHEConstants.MODULE,
+          scope: 'world',
+          config: true,
+          type: Number,
+          default: 3000,
+          requiresReload: false,
+        },
+      ],
     ];
   }
 
@@ -132,10 +208,10 @@ export default class WHESettings {
     if (!this.initialized) {
       return defaultValue;
     }
-    const res: number | null = getGame().settings.get(WHEConstants.MODULE as any, settingKey as any) as number | null;
-    if (res === null) {
+    const res = getGame().settings.get(WHEConstants.MODULE as any, settingKey as any);
+    if (res === null || res === undefined) {
       return defaultValue;
     }
-    return res;
+    return Number(res);
   };
 }

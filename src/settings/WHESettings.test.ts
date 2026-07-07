@@ -41,7 +41,7 @@ describe('WHESettings', () => {
       const instance = WHESettings.getInstance();
 
       instance.initialize();
-      expect(mockGame.settings.register).toHaveBeenCalledTimes(5);
+      expect(mockGame.settings.register).toHaveBeenCalledTimes(10);
 
       // Call again, should not register again
       jest.clearAllMocks();

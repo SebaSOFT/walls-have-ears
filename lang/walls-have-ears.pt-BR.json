@@ -14,5 +14,15 @@
   "WHE.settings_disable.hint": "Este módulo permite que os sons sejam abafados para uma melhor imersão. Mas você pode desativar esse recurso por motivos de desempenho.",
   "WHE.settings_debug.title": "Ativar o modo de depuração",
   "WHE.settings_debug.hint": "Para solucionar problemas de suas cenas, ative isso para ver o índice de abafamento ao selecionar/mover seus tokens.",
-  "WHE.config.hint": "AS PAREDES TÊM ORELHAS: O efeito de abafamento foi removido desta tela, pois será manipulado dinamicamente pelo módulo."
+  "WHE.config.hint": "AS PAREDES TÊM ORELHAS: O efeito de abafamento foi removido desta tela, pois será de forma dinâmica pelo módulo.",
+  "WHE.settings_echo_enable.title": "Enable Echoes and Reverb",
+  "WHE.settings_echo_enable.hint": "Enable dynamic algorithmic echo and reverberation based on room size and reflections.",
+  "WHE.settings_echo_rays.title": "Number of Echo Raycasts",
+  "WHE.settings_echo_rays.hint": "The number of rays to cast radially to estimate the room size and reflections. More rays increase precision but use more CPU.",
+  "WHE.settings_echo_exterior_threshold.title": "Exterior Space Threshold",
+  "WHE.settings_echo_exterior_threshold.hint": "The average distance (in grid units) beyond which a space is considered an open exterior (disabling reverberation). Default is 120.",
+  "WHE.settings_echo_feedback.title": "Echo Feedback Gain",
+  "WHE.settings_echo_feedback.hint": "The feedback multiplier for the algorithmic echo loop (between 0.0 and 0.95). Larger values produce longer reverb tail.",
+  "WHE.settings_echo_dampening.title": "Echo Dampening Frequency",
+  "WHE.settings_echo_dampening.hint": "The cutoff frequency (in Hz) for the lowpass filter in the echo feedback loop. Lower values produce warmer/darker reverb."
 }

@@ -14,5 +14,15 @@
   "WHE.settings_disable.hint": "このMODは没入感を向上させるために音をこもらせる。だがパフォーマンスを理由にこの機能を無効化できる。",
   "WHE.settings_debug.title": "デバッグモード有効化",
   "WHE.settings_debug.hint": "あなたのシーンをトラブルシューティングする際、これを選択・有効化しトークンを動かし「音こもり」のインデックスを閲覧できる。",
-  "WHE.config.hint": "壁に耳あり: 消音効果はモジュールによって動的に処理されるため、この画面から削除されました。"
+  "WHE.config.hint": "壁に耳あり: 消音効果はモジュールによって動的に処理されるため、この画面から削除されました。",
+  "WHE.settings_echo_enable.title": "Enable Echoes and Reverb",
+  "WHE.settings_echo_enable.hint": "Enable dynamic algorithmic echo and reverberation based on room size and reflections.",
+  "WHE.settings_echo_rays.title": "Number of Echo Raycasts",
+  "WHE.settings_echo_rays.hint": "The number of rays to cast radially to estimate the room size and reflections. More rays increase precision but use more CPU.",
+  "WHE.settings_echo_exterior_threshold.title": "Exterior Space Threshold",
+  "WHE.settings_echo_exterior_threshold.hint": "The average distance (in grid units) beyond which a space is considered an open exterior (disabling reverberation). Default is 120.",
+  "WHE.settings_echo_feedback.title": "Echo Feedback Gain",
+  "WHE.settings_echo_feedback.hint": "The feedback multiplier for the algorithmic echo loop (between 0.0 and 0.95). Larger values produce longer reverb tail.",
+  "WHE.settings_echo_dampening.title": "Echo Dampening Frequency",
+  "WHE.settings_echo_dampening.hint": "The cutoff frequency (in Hz) for the lowpass filter in the echo feedback loop. Lower values produce warmer/darker reverb."
 }

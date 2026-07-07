@@ -4,6 +4,7 @@ import { getGame } from '../../foundry/getGame';
 import { libWrapper } from '../../lib/libWrapper';
 import WHEFramework from '../WHEFramework';
 import SoundManager from '../audio/SoundManager';
+import RoomAcousticService from '../services/RoomAcousticService';
 
 /**
  * Manages all FoundryVTT hooks and libWrapper patches for the module.
@@ -27,7 +28,7 @@ export default class HookManager {
     // Hook wen the scene is ready
     Hooks.on('ready', async () => {
       await getGame().audio.awaitFirstGesture();
-
+      RoomAcousticService.clearCache();
       await this._wheFramework.performMuffling();
 
       /* eslint-disable @typescript-eslint/ban-ts-comment */
@@ -47,19 +48,23 @@ export default class HookManager {
     // When a token is about to be moved
     Hooks.on('updateToken', async (_token, _updateData, _options, _userId) => {
       WHEUtils.log('WHEFramework Event: updateToken');
+      RoomAcousticService.clearCache();
       await this._wheFramework.performMuffling();
     });
     Hooks.on('refreshToken', async () => {
       WHEUtils.log('WHEFramework Event: refreshToken');
+      RoomAcousticService.clearCache();
       await this._wheFramework.performMuffling();
     });
     // When a Door is about to be opened
     Hooks.on('updateWall', async (_token, _updateData, _options, _userId) => {
       WHEUtils.log('WHEFramework Event: updateWall');
+      RoomAcousticService.clearCache();
       await this._wheFramework.performMuffling();
     });
     Hooks.on('refreshWall', async () => {
       WHEUtils.log('WHEFramework Event: refreshWall');
+      RoomAcousticService.clearCache();
       await this._wheFramework.performMuffling();
     });
     // When the user starts controlling a token
