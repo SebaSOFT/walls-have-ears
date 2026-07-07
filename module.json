@@ -12,10 +12,10 @@
     }
   ],
   "url": "https://github.com/SebaSOFT/walls-have-ears",
-  "version": "3.14.2",
+  "version": "3.14.36",
   "compatibility": {
-    "minimum": "13",
-    "verified": "14.360",
+    "minimum": "14",
+    "verified": "14.364",
     "maximum": "14"
   },
   "esmodules": ["dist/main.js"],
