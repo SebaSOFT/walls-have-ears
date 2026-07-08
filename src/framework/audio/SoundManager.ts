@@ -88,22 +88,82 @@ export default class SoundManager {
       return;
     }
 
-    const mufflingLevel = MUFFLING_MAPPING[`level${muffleIndex}`];
-    const shouldMufflingChange = this.hasMufflingChanged(currentTokenId, ambientSound.id, mufflingLevel);
+    let finalMuffleIndex = muffleIndex;
+    let delayTimeSeconds = 0;
+    let feedbackGain = 0;
+    let dampeningCutoff = 3000;
+    let wetGain = 0;
+    let dryGain = 1.0;
 
-    if (muffleIndex < 0 && !shouldMufflingChange) {
-      WHEUtils.log(`AmbientSound `, ambientSound, soundMediaSource);
-      return;
+    const isEchoEnabled = WHESettings.getInstance().getBoolean(WHEConstants.SETTING_ECHO_ENABLE, false);
+    const selectedToken = PlayerContext.getInstance().getSelectedToken();
+
+    if (isEchoEnabled && selectedToken) {
+      const rayCount = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_RAYS, 8);
+      const threshold = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_EXTERIOR_THRESHOLD, 120);
+      const maxFeedback = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_FEEDBACK, 0.5);
+      dampeningCutoff = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_DAMPENING, 3000);
+
+      const sourcePos = {
+        x: ambientSound.x,
+        y: ambientSound.y,
+        z: (ambientSound.document as any).elevation?.bottom ?? (ambientSound.document as any).elevation ?? 0,
+      };
+
+      const listenerPos = {
+        x: selectedToken.center.x,
+        y: selectedToken.center.y,
+        z: ((selectedToken.document.elevation as any)?.bottom ?? selectedToken.document.elevation ?? 0) + 6,
+      };
+
+      const soundRadius = (ambientSound as any).soundRadius || (ambientSound as any).radius || 100;
+
+      const sRoom = RoomAcousticService.calculateRoomSize(sourcePos, soundRadius, rayCount, true);
+      const lRoom = RoomAcousticService.calculateRoomSize(listenerPos, soundRadius, rayCount, false);
+      const effectiveRoomSize = RoomAcousticService.getEffectiveRoomSize(sRoom, lRoom, threshold);
+
+      if (effectiveRoomSize !== null) {
+        feedbackGain = WHEUtils.clamp((effectiveRoomSize / threshold) * maxFeedback, 0.1, 0.95) ?? 0.5;
+
+        let pathDistanceUnits: number | null = null;
+        if (muffleIndex > 0) {
+          pathDistanceUnits = RoomAcousticService.getReboundPathDistance(sourcePos, listenerPos, soundRadius, rayCount);
+        } else {
+          pathDistanceUnits = MufflingCalculatorService.getDistanceBetweenPoints(listenerPos, sourcePos);
+        }
+
+        if (pathDistanceUnits !== null) {
+          const speedOfSound = 1125;
+          delayTimeSeconds = WHEUtils.clamp(pathDistanceUnits / speedOfSound, 0.0, 1.5) ?? 0.05;
+
+          if (muffleIndex > 0) {
+            // Direct path blocked BUT rebound connects: bypass direct filter, dim dry gain, use wet gain
+            finalMuffleIndex = 0;
+            dryGain = 0.1;
+            wetGain = 0.8;
+          } else {
+            // Direct path open: no direct filter, dry gain 1.0, low wet gain
+            finalMuffleIndex = 0;
+            dryGain = 1.0;
+            wetGain = 0.2;
+          }
+
+          WHEUtils.log(
+            `[SoundManager] Echoes active for sound ${ambientSound.id}: S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, eff=${effectiveRoomSize.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+          );
+        }
+      }
     }
+
+    const mufflingLevel = MUFFLING_MAPPING[`level${finalMuffleIndex}`];
+    const shouldMufflingChange = this.hasMufflingChanged(currentTokenId, ambientSound.id, mufflingLevel);
 
     if (shouldMufflingChange) {
       this.storeMufflingLevel(currentTokenId, ambientSound.id, mufflingLevel);
-      const shouldBeMuffled = muffleIndex > 0;
-
+      const shouldBeMuffled = finalMuffleIndex > 0;
       const intensity = shouldBeMuffled ? mufflingLevel : 0;
       const type = shouldBeMuffled ? 'lowpass' : '';
 
-      WHEUtils.log(shouldBeMuffled ? `Muffling to: ${intensity}` : 'Should not be muffled');
       ambientSound.document.effects.muffled.type = type;
       ambientSound.document.effects.muffled.intensity = intensity;
 
@@ -118,17 +178,9 @@ export default class SoundManager {
           type: 'lowpass',
           intensity: intensity,
         });
-        WHEUtils.log('*** UPDATED EFFECT***', effect.intensity);
       }
-    } else {
-      WHEUtils.log('Cached muffling level WILL NOT change filter');
     }
 
-    // Reverberation & Echoes update
-    const isEchoEnabled = WHESettings.getInstance().getBoolean(WHEConstants.SETTING_ECHO_ENABLE, false);
-    const selectedToken = PlayerContext.getInstance().getSelectedToken();
-
-    // Ensure index 0 exists (initialized by Foundry)
     if (soundMediaSource.effects.length === 0) {
       ambientSound.initializeSoundSource();
     }
@@ -145,67 +197,12 @@ export default class SoundManager {
         (soundMediaSource as any).updateEffects(currentEffects);
       }
 
-      let delayTimeSeconds = 0;
-      let feedbackGain = 0;
-      let dampeningCutoff = 3000;
-      let wetGain = 0;
-
-      if (isEchoEnabled && selectedToken) {
-        const rayCount = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_RAYS, 8);
-        const threshold = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_EXTERIOR_THRESHOLD, 120);
-        const maxFeedback = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_FEEDBACK, 0.5);
-        dampeningCutoff = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_DAMPENING, 3000);
-
-        const sourcePos = {
-          x: ambientSound.x,
-          y: ambientSound.y,
-          z: (ambientSound.document as any).elevation?.bottom ?? (ambientSound.document as any).elevation ?? 0,
-        };
-
-        const listenerPos = {
-          x: selectedToken.center.x,
-          y: selectedToken.center.y,
-          z: ((selectedToken.document.elevation as any)?.bottom ?? selectedToken.document.elevation ?? 0) + 6,
-        };
-
-        const soundRadius = (ambientSound as any).soundRadius || (ambientSound as any).radius || 100;
-
-        const sRoom = RoomAcousticService.calculateRoomSize(sourcePos, soundRadius, rayCount, true);
-        const lRoom = RoomAcousticService.calculateRoomSize(listenerPos, soundRadius, rayCount, false);
-        const effectiveRoomSize = RoomAcousticService.getEffectiveRoomSize(sRoom, lRoom, threshold);
-
-        if (effectiveRoomSize !== null) {
-          feedbackGain = WHEUtils.clamp((effectiveRoomSize / threshold) * maxFeedback, 0.1, 0.95) ?? 0.5;
-
-          let pathDistanceUnits: number | null = null;
-          if (muffleIndex > 0) {
-            pathDistanceUnits = RoomAcousticService.getReboundPathDistance(
-              sourcePos,
-              listenerPos,
-              soundRadius,
-              rayCount,
-            );
-          } else {
-            pathDistanceUnits = MufflingCalculatorService.getDistanceBetweenPoints(listenerPos, sourcePos);
-          }
-
-          if (pathDistanceUnits !== null) {
-            const speedOfSound = 1125;
-            delayTimeSeconds = WHEUtils.clamp(pathDistanceUnits / speedOfSound, 0.0, 1.5) ?? 0.05;
-            wetGain = muffleIndex > 0 ? 0.8 : 0.2;
-
-            WHEUtils.log(
-              `[SoundManager] Echoes active for sound ${ambientSound.id}: S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, eff=${effectiveRoomSize.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, wet=${wetGain}`,
-            );
-          }
-        }
-      }
-
       reverbEffect.update({
         delayTime: delayTimeSeconds,
         feedback: feedbackGain,
         dampening: dampeningCutoff,
         wetGain: wetGain,
+        dryGain: dryGain,
       });
     }
   };
@@ -295,7 +292,12 @@ export default class SoundManager {
           const effectiveRoomSize = RoomAcousticService.getEffectiveRoomSize(sRoom, lRoom, threshold);
 
           if (effectiveRoomSize !== null) {
-            const feedbackGain = WHEUtils.clamp((effectiveRoomSize / threshold) * maxFeedback, 0.1, 0.95) ?? 0.5;
+            let delayTimeSeconds = 0;
+            let feedbackGain = 0;
+            let wetGain = 0;
+            let dryGain = 1.0;
+
+            feedbackGain = WHEUtils.clamp((effectiveRoomSize / threshold) * maxFeedback, 0.1, 0.95) ?? 0.5;
 
             let pathDistanceUnits: number | null = null;
             if (muffIntensity > 0) {
@@ -311,8 +313,21 @@ export default class SoundManager {
 
             if (pathDistanceUnits !== null) {
               const speedOfSound = 1125;
-              const delayTimeSeconds = WHEUtils.clamp(pathDistanceUnits / speedOfSound, 0.0, 1.5) ?? 0.05;
-              const wetGain = muffIntensity > 0 ? 0.8 : 0.2;
+              delayTimeSeconds = WHEUtils.clamp(pathDistanceUnits / speedOfSound, 0.0, 1.5) ?? 0.05;
+
+              if (muffIntensity > 0) {
+                // Direct path blocked BUT rebound connects: bypass direct filter, dim dry gain, use wet gain
+                dryGain = 0.1;
+                wetGain = 0.8;
+
+                const firstEffect = soundInstance.effects[0];
+                if (firstEffect) {
+                  firstEffect.update({ type: '', intensity: 0 });
+                }
+              } else {
+                dryGain = 1.0;
+                wetGain = 0.2;
+              }
 
               const reverbEffect = new RoomReverbEffect(soundInstance.context);
               reverbEffect.update({
@@ -320,6 +335,7 @@ export default class SoundManager {
                 feedback: feedbackGain,
                 dampening: dampeningCutoff,
                 wetGain: wetGain,
+                dryGain: dryGain,
               });
 
               const currentEffects = [...soundInstance.effects];
@@ -327,7 +343,7 @@ export default class SoundManager {
               soundInstance.updateEffects(currentEffects);
 
               WHEUtils.log(
-                `[SoundManager] Door Echoes active: S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, wet=${wetGain}`,
+                `[SoundManager] Door Echoes active: S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
               );
             }
           }

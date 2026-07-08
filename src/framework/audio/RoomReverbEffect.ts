@@ -53,12 +53,14 @@ export default class RoomReverbEffect {
    * @param {number} options.feedback - The feedback gain multiplier (0.0 to 0.95).
    * @param {number} options.dampening - The cutoff frequency in Hz.
    * @param {number} options.wetGain - The mix ratio for the wet path (0.0 to 1.0).
+   * @param {number} options.dryGain - The mix ratio for the dry path (0.0 to 1.0).
    */
-  public update(options: { delayTime: number; feedback: number; dampening: number; wetGain: number }) {
+  public update(options: { delayTime: number; feedback: number; dampening: number; wetGain: number; dryGain: number }) {
     this.delayNode.delayTime.value = options.delayTime;
     this.feedbackNode.gain.value = options.feedback;
     this.filterNode.frequency.value = options.dampening;
     this.wetGainNode.gain.value = options.wetGain;
+    this.dryGainNode.gain.value = options.dryGain;
   }
 
   public connect(destination: AudioNode) {
