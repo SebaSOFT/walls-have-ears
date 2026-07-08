@@ -141,18 +141,44 @@ export default class SoundManager {
             finalMuffleIndex = 0;
             dryGain = 0.1;
             wetGain = 0.8;
+            WHEUtils.log(
+              `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES REVERBERATION (Muffling bypassed). Rebound path connected. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+            );
           } else {
             // Direct path open: no direct filter, dry gain 1.0, low wet gain
             finalMuffleIndex = 0;
             dryGain = 1.0;
             wetGain = 0.2;
+            WHEUtils.log(
+              `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES REVERBERATION (Muffling bypassed). Direct path open. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+            );
           }
-
+        } else {
+          // Direct path blocked and no rebound connects: apply direct muffling
+          finalMuffleIndex = muffleIndex;
+          dryGain = 1.0;
+          wetGain = 0.0;
           WHEUtils.log(
-            `[SoundManager] Echoes active for sound ${ambientSound.id}: S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, eff=${effectiveRoomSize.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+            `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES MUFFLING (Reverberation disabled). No rebound path found. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, muffleIndex=${finalMuffleIndex}`,
           );
         }
+      } else {
+        // Outdoors: apply direct muffling, no reverb
+        finalMuffleIndex = muffleIndex;
+        dryGain = 1.0;
+        wetGain = 0.0;
+        WHEUtils.log(
+          `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES MUFFLING (Reverberation disabled). Outdoor environment. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, muffleIndex=${finalMuffleIndex}`,
+        );
       }
+    } else {
+      // Echoes disabled or no selected token: apply direct muffling, no reverb
+      finalMuffleIndex = muffleIndex;
+      dryGain = 1.0;
+      wetGain = 0.0;
+      WHEUtils.log(
+        `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES MUFFLING (Reverberation disabled). Echoes disabled or no selected token. muffleIndex=${finalMuffleIndex}`,
+      );
     }
 
     const mufflingLevel = MUFFLING_MAPPING[`level${finalMuffleIndex}`];
@@ -324,9 +350,15 @@ export default class SoundManager {
                 if (firstEffect) {
                   firstEffect.update({ type: '', intensity: 0 });
                 }
+                WHEUtils.log(
+                  `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES REVERBERATION (Muffling bypassed). Rebound path connected. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+                );
               } else {
                 dryGain = 1.0;
                 wetGain = 0.2;
+                WHEUtils.log(
+                  `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES REVERBERATION (Muffling bypassed). Direct path open. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+                );
               }
 
               const reverbEffect = new RoomReverbEffect(soundInstance.context);
@@ -341,12 +373,23 @@ export default class SoundManager {
               const currentEffects = [...soundInstance.effects];
               currentEffects[1] = reverbEffect;
               soundInstance.updateEffects(currentEffects);
-
+            } else {
+              // Direct path blocked and no rebound connects: apply direct muffling
               WHEUtils.log(
-                `[SoundManager] Door Echoes active: S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+                `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES MUFFLING (Reverberation disabled). No rebound path found. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, muffleIndex=${muffIntensity}`,
               );
             }
+          } else {
+            // Outdoors: apply direct muffling, no reverb
+            WHEUtils.log(
+              `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES MUFFLING (Reverberation disabled). Outdoor environment. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, muffleIndex=${muffIntensity}`,
+            );
           }
+        } else {
+          // Echoes disabled or no selected token: apply direct muffling, no reverb
+          WHEUtils.log(
+            `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES MUFFLING (Reverberation disabled). Echoes disabled or no selected token. muffleIndex=${muffIntensity}`,
+          );
         }
       });
   };
