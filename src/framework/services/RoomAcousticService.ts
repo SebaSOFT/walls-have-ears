@@ -4,13 +4,27 @@ import { Point3D } from './MufflingCalculatorService';
 import WHESettings from '../../settings/WHESettings';
 import { WHEConstants } from '../../utils/WHEConstants';
 
+interface CachedRoomSize {
+  size: number;
+  rays: {
+    start: { x: number; y: number };
+    end: { x: number; y: number };
+    isCollision: boolean;
+  }[];
+}
+
+interface CachedRebound {
+  distance: number | null;
+  bestReflectionPoint: { x: number; y: number } | null;
+}
+
 /**
  * Service responsible for calculating environmental acoustics, room sizes,
  * and multi-ray rebound propagation paths with in-memory caching.
  */
 export default class RoomAcousticService {
-  private static roomSizeCache = new Map<string, number>();
-  private static reboundCache = new Map<string, number | null>();
+  private static roomSizeCache = new Map<string, CachedRoomSize>();
+  private static reboundCache = new Map<string, CachedRebound>();
 
   /**
    * Clears all room size and rebound path calculations caches.
@@ -70,6 +84,7 @@ export default class RoomAcousticService {
    * @param {Point3D | foundry.canvas.Canvas.Point} position - The starting point coordinates.
    * @param {number} maxDistance - The maximum range to cast rays.
    * @param {number} rayCount - The number of radial rays to cast.
+   * @param {boolean} drawDebug - Whether to draw the visual debug rays on cache hit/miss.
    * @returns {number} The average distance to wall collisions in grid units.
    */
   public static calculateRoomSize = (
@@ -80,9 +95,20 @@ export default class RoomAcousticService {
   ): number => {
     const posZ = 'z' in position ? (position as Point3D).z : 0;
     const cacheKey = `${position.x.toFixed(1)},${position.y.toFixed(1)},${posZ.toFixed(1)},${maxDistance.toFixed(1)},${rayCount}`;
+    const typeLabel = drawDebug ? 'Sound' : 'Listener';
 
     if (RoomAcousticService.roomSizeCache.has(cacheKey)) {
-      return RoomAcousticService.roomSizeCache.get(cacheKey)!;
+      const cached = RoomAcousticService.roomSizeCache.get(cacheKey)!;
+      if (drawDebug) {
+        for (const ray of cached.rays) {
+          if (ray.isCollision) {
+            RoomAcousticService.drawDebugLine(ray.start, ray.end, 0x00ffff, 2, 0.6);
+          } else {
+            RoomAcousticService.drawDebugLine(ray.start, ray.end, 0x00ffff, 1, 0.2);
+          }
+        }
+      }
+      return cached.size;
     }
 
     const soundLayer = CONFIG.Canvas.polygonBackends.sound;
@@ -90,6 +116,7 @@ export default class RoomAcousticService {
     const grid = getGame()?.canvas?.grid;
     const pixelsPerUnit = grid ? grid.size / grid.distance : 1;
     const maxPixels = maxDistance * pixelsPerUnit;
+    const rays: { start: { x: number; y: number }; end: { x: number; y: number }; isCollision: boolean }[] = [];
 
     for (let i = 0; i < rayCount; i++) {
       const angle = (i * 2 * Math.PI) / rayCount;
@@ -116,17 +143,22 @@ export default class RoomAcousticService {
         const minDistanceUnits = minDistancePixels / pixelsPerUnit;
         sumDistances += minDistanceUnits;
 
+        const collisionPoint = {
+          x: position.x + minDistancePixels * Math.cos(angle),
+          y: position.y + minDistancePixels * Math.sin(angle),
+        };
+
+        rays.push({ start: { x: position.x, y: position.y }, end: collisionPoint, isCollision: true });
+
         // Draw debug ray to collision point
         if (drawDebug) {
-          const collisionPoint = {
-            x: position.x + minDistancePixels * Math.cos(angle),
-            y: position.y + minDistancePixels * Math.sin(angle),
-          };
           RoomAcousticService.drawDebugLine(position, collisionPoint, 0x00ffff, 2, 0.6);
         }
       } else {
         // No collision, ray travelled maximum distance
         sumDistances += maxDistance;
+
+        rays.push({ start: { x: position.x, y: position.y }, end: endPoint, isCollision: false });
 
         // Draw faint debug ray to max limit
         if (drawDebug) {
@@ -137,10 +169,10 @@ export default class RoomAcousticService {
 
     const avgDistance = sumDistances / rayCount;
     WHEUtils.log(
-      `[RoomAcousticService] Room size at (${position.x.toFixed(1)}, ${position.y.toFixed(1)}): ${avgDistance.toFixed(1)} units`,
+      `[RoomAcousticService] Room size at ${typeLabel} (${position.x.toFixed(1)}, ${position.y.toFixed(1)}): ${avgDistance.toFixed(1)} units`,
     );
 
-    RoomAcousticService.roomSizeCache.set(cacheKey, avgDistance);
+    RoomAcousticService.roomSizeCache.set(cacheKey, { size: avgDistance, rays });
     return avgDistance;
   };
 
@@ -165,7 +197,12 @@ export default class RoomAcousticService {
     const cacheKey = `${source.x.toFixed(1)},${source.y.toFixed(1)},${srcZ.toFixed(1)},${listener.x.toFixed(1)},${listener.y.toFixed(1)},${lstZ.toFixed(1)},${maxDistance.toFixed(1)},${rayCount}`;
 
     if (RoomAcousticService.reboundCache.has(cacheKey)) {
-      return RoomAcousticService.reboundCache.get(cacheKey)!;
+      const cached = RoomAcousticService.reboundCache.get(cacheKey)!;
+      if (cached.bestReflectionPoint) {
+        RoomAcousticService.drawDebugLine(source, cached.bestReflectionPoint, 0xff00ff, 3, 0.8);
+        RoomAcousticService.drawDebugLine(cached.bestReflectionPoint, listener, 0xffff00, 3, 0.8);
+      }
+      return cached.distance;
     }
 
     const soundLayer = CONFIG.Canvas.polygonBackends.sound;
@@ -243,7 +280,7 @@ export default class RoomAcousticService {
       }
     }
 
-    RoomAcousticService.reboundCache.set(cacheKey, result);
+    RoomAcousticService.reboundCache.set(cacheKey, { distance: result, bestReflectionPoint });
     return result;
   };
 

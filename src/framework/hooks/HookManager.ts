@@ -130,11 +130,12 @@ export default class HookManager {
         for (let j = 0; j < fields.length; j++) {
           const fieldGroup = fields.item(j);
           const field = fieldGroup?.getHTML();
-          if (field?.indexOf('"effects.muffled.type"') !== -1) {
-            fieldGroup?.setAttribute('style', 'display:none;');
-            foundFields = true;
-          }
-          if (field?.indexOf('"effects.muffled.intensity"') !== -1) {
+          if (
+            field &&
+            (field.includes('effects.muffled.type') ||
+              field.includes('effects.muffled.intensity') ||
+              field.includes('effects.muffled'))
+          ) {
             fieldGroup?.setAttribute('style', 'display:none;');
             foundFields = true;
           }
