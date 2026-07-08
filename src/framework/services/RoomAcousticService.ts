@@ -25,6 +25,7 @@ interface CachedRebound {
 export default class RoomAcousticService {
   private static roomSizeCache = new Map<string, CachedRoomSize>();
   private static reboundCache = new Map<string, CachedRebound>();
+  private static activeDebugGraphics = new Map<string, PIXI.Graphics>();
 
   /**
    * Clears all room size and rebound path calculations caches.
@@ -36,14 +37,59 @@ export default class RoomAcousticService {
   };
 
   /**
+   * Helper to draw a dashed line onto a PIXI.Graphics object.
+   */
+  public static drawDashedLine = (
+    graphics: PIXI.Graphics,
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+    dashLength = 10,
+    gapLength = 8,
+  ): void => {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const len = Math.hypot(dx, dy);
+    if (len === 0) return;
+
+    const normalX = dx / len;
+    const normalY = dy / len;
+
+    let progress = 0;
+    let draw = true;
+
+    graphics.moveTo(start.x, start.y);
+    while (progress < len) {
+      const currentLength = draw ? dashLength : gapLength;
+      if (progress + currentLength >= len) {
+        if (draw) {
+          graphics.lineTo(end.x, end.y);
+        }
+        break;
+      }
+      progress += currentLength;
+      const nextX = start.x + normalX * progress;
+      const nextY = start.y + normalY * progress;
+      if (draw) {
+        graphics.lineTo(nextX, nextY);
+      } else {
+        graphics.moveTo(nextX, nextY);
+      }
+      draw = !draw;
+    }
+  };
+
+  /**
    * Draw temporary debug lines in the Foundry canvas if debug mode is active.
    */
   public static drawDebugLine = (
+    key: string,
     start: { x: number; y: number },
     end: { x: number; y: number },
     color = 0x00ffff,
     thickness = 2,
     alpha = 0.8,
+    duration = 3000,
+    dashed = false,
   ): void => {
     if (typeof PIXI === 'undefined') return;
 
@@ -54,27 +100,64 @@ export default class RoomAcousticService {
     if (!canvas || !canvas.ready || !canvas.stage) return;
 
     try {
+      const stage = canvas.stage;
+
+      // Remove existing graphic for this key to prevent overlay piling
+      if (RoomAcousticService.activeDebugGraphics.has(key)) {
+        const oldG = RoomAcousticService.activeDebugGraphics.get(key)!;
+        if (!oldG.destroyed) {
+          stage.removeChild(oldG);
+          oldG.destroy();
+        }
+        RoomAcousticService.activeDebugGraphics.delete(key);
+      }
+
       const g = new PIXI.Graphics();
       g.lineStyle(thickness, color, alpha);
-      g.moveTo(start.x, start.y);
-      g.lineTo(end.x, end.y);
 
-      const stage = canvas.stage;
+      if (dashed) {
+        RoomAcousticService.drawDashedLine(g, start, end);
+      } else {
+        g.moveTo(start.x, start.y);
+        g.lineTo(end.x, end.y);
+      }
+
       stage.addChild(g);
+      RoomAcousticService.activeDebugGraphics.set(key, g);
 
-      // Remove the graphics element after 500ms
+      // Remove the graphics element after duration
       setTimeout(() => {
         try {
-          if (!g.destroyed) {
-            stage.removeChild(g);
-            g.destroy();
+          if (RoomAcousticService.activeDebugGraphics.get(key) === g) {
+            if (!g.destroyed) {
+              stage.removeChild(g);
+              g.destroy();
+            }
+            RoomAcousticService.activeDebugGraphics.delete(key);
           }
         } catch {
           // ignore
         }
-      }, 500);
+      }, duration);
     } catch (e) {
       console.error('WHE | Error drawing debug ray:', e);
+    }
+  };
+
+  /**
+   * Clear a specific debug line immediately.
+   */
+  public static clearDebugLine = (key: string): void => {
+    if (typeof PIXI === 'undefined') return;
+    const canvas = getGame()?.canvas;
+    const stage = canvas?.stage;
+    if (stage && RoomAcousticService.activeDebugGraphics.has(key)) {
+      const g = RoomAcousticService.activeDebugGraphics.get(key)!;
+      if (!g.destroyed) {
+        stage.removeChild(g);
+        g.destroy();
+      }
+      RoomAcousticService.activeDebugGraphics.delete(key);
     }
   };
 
@@ -85,6 +168,7 @@ export default class RoomAcousticService {
    * @param {number} maxDistance - The maximum range to cast rays.
    * @param {number} rayCount - The number of radial rays to cast.
    * @param {boolean} drawDebug - Whether to draw the visual debug rays on cache hit/miss.
+   * @param {string} keyPrefix - The prefix used to register the unique graphic debug keys.
    * @returns {number} The average distance to wall collisions in grid units.
    */
   public static calculateRoomSize = (
@@ -92,6 +176,7 @@ export default class RoomAcousticService {
     maxDistance: number,
     rayCount = 8,
     drawDebug = true,
+    keyPrefix = 'room',
   ): number => {
     const posZ = 'z' in position ? (position as Point3D).z : 0;
     const cacheKey = `${position.x.toFixed(1)},${position.y.toFixed(1)},${posZ.toFixed(1)},${maxDistance.toFixed(1)},${rayCount}`;
@@ -100,11 +185,13 @@ export default class RoomAcousticService {
     if (RoomAcousticService.roomSizeCache.has(cacheKey)) {
       const cached = RoomAcousticService.roomSizeCache.get(cacheKey)!;
       if (drawDebug) {
-        for (const ray of cached.rays) {
+        for (let i = 0; i < cached.rays.length; i++) {
+          const ray = cached.rays[i];
+          const key = `${keyPrefix}-ray-${i}`;
           if (ray.isCollision) {
-            RoomAcousticService.drawDebugLine(ray.start, ray.end, 0x00ffff, 2, 0.6);
+            RoomAcousticService.drawDebugLine(key, ray.start, ray.end, 0x00ffff, 2, 0.6, 3000);
           } else {
-            RoomAcousticService.drawDebugLine(ray.start, ray.end, 0x00ffff, 1, 0.2);
+            RoomAcousticService.drawDebugLine(key, ray.start, ray.end, 0x00ffff, 1, 0.2, 3000);
           }
         }
       }
@@ -152,7 +239,8 @@ export default class RoomAcousticService {
 
         // Draw debug ray to collision point
         if (drawDebug) {
-          RoomAcousticService.drawDebugLine(position, collisionPoint, 0x00ffff, 2, 0.6);
+          const key = `${keyPrefix}-ray-${i}`;
+          RoomAcousticService.drawDebugLine(key, position, collisionPoint, 0x00ffff, 2, 0.6, 3000);
         }
       } else {
         // No collision, ray travelled maximum distance
@@ -162,7 +250,8 @@ export default class RoomAcousticService {
 
         // Draw faint debug ray to max limit
         if (drawDebug) {
-          RoomAcousticService.drawDebugLine(position, endPoint, 0x00ffff, 1, 0.2);
+          const key = `${keyPrefix}-ray-${i}`;
+          RoomAcousticService.drawDebugLine(key, position, endPoint, 0x00ffff, 1, 0.2, 3000);
         }
       }
     }
@@ -198,10 +287,6 @@ export default class RoomAcousticService {
 
     if (RoomAcousticService.reboundCache.has(cacheKey)) {
       const cached = RoomAcousticService.reboundCache.get(cacheKey)!;
-      if (cached.bestReflectionPoint) {
-        RoomAcousticService.drawDebugLine(source, cached.bestReflectionPoint, 0xff00ff, 3, 0.8);
-        RoomAcousticService.drawDebugLine(cached.bestReflectionPoint, listener, 0xffff00, 3, 0.8);
-      }
       return cached.distance;
     }
 
@@ -272,16 +357,25 @@ export default class RoomAcousticService {
     if (shortestReboundDistance !== Infinity) {
       WHEUtils.log(`[RoomAcousticService] Found rebound path with distance: ${shortestReboundDistance} units`);
       result = shortestReboundDistance;
-
-      // Draw the best connecting rebound path: Magenta for sound->wall, Yellow for wall->listener
-      if (bestReflectionPoint) {
-        RoomAcousticService.drawDebugLine(source, bestReflectionPoint, 0xff00ff, 3, 0.8);
-        RoomAcousticService.drawDebugLine(bestReflectionPoint, listener, 0xffff00, 3, 0.8);
-      }
     }
 
     RoomAcousticService.reboundCache.set(cacheKey, { distance: result, bestReflectionPoint });
     return result;
+  };
+
+  /**
+   * Gets the cached best reflection point if it exists in the rebound cache.
+   */
+  public static getCachedBestReflectionPoint = (
+    source: Point3D | foundry.canvas.Canvas.Point,
+    listener: Point3D | foundry.canvas.Canvas.Point,
+    maxDistance: number,
+    rayCount = 8,
+  ): { x: number; y: number } | null => {
+    const srcZ = 'z' in source ? (source as Point3D).z : 0;
+    const lstZ = 'z' in listener ? (listener as Point3D).z : 0;
+    const cacheKey = `${source.x.toFixed(1)},${source.y.toFixed(1)},${srcZ.toFixed(1)},${listener.x.toFixed(1)},${listener.y.toFixed(1)},${lstZ.toFixed(1)},${maxDistance.toFixed(1)},${rayCount}`;
+    return RoomAcousticService.reboundCache.get(cacheKey)?.bestReflectionPoint ?? null;
   };
 
   /**

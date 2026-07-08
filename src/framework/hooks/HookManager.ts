@@ -49,12 +49,12 @@ export default class HookManager {
     Hooks.on('updateToken', async (_token, _updateData, _options, _userId) => {
       WHEUtils.log('WHEFramework Event: updateToken');
       RoomAcousticService.clearCache();
-      await this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling({ listenerMoved: true });
     });
     Hooks.on('refreshToken', async () => {
       WHEUtils.log('WHEFramework Event: refreshToken');
       RoomAcousticService.clearCache();
-      await this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling({ listenerMoved: true });
     });
     // When a Door is about to be opened
     Hooks.on('updateWall', async (_token, _updateData, _options, _userId) => {
@@ -70,7 +70,7 @@ export default class HookManager {
     // When the user starts controlling a token
     Hooks.on('controlToken', async (token, selected) => {
       await this._wheFramework.getPlayerContext().checkForChangedSelection(token, selected);
-      await this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling({ listenerMoved: true });
     });
     // When ambient sound is about to be moved
     Hooks.on('preUpdateAmbientSound', (ambientSound, formData, _options, _userId) => {
@@ -97,16 +97,16 @@ export default class HookManager {
           muffled: { type: 'lowpass', intensity: 0 },
         },
       });
-      await this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling({ soundMoved: true });
     });
     Hooks.on('refreshAmbientSound', async () => {
       WHEUtils.log('WHEFramework Event: refreshAmbientSound');
       RoomAcousticService.clearCache();
-      await this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling({ soundMoved: true });
     });
     Hooks.on('closeAmbientSoundConfig', async (_soundConfig) => {
       WHEUtils.log('WHEFramework Event: closeAmbientSoundConfig');
-      await this._wheFramework.performMuffling();
+      await this._wheFramework.performMuffling({ soundMoved: true });
     });
     Hooks.on('renderAmbientSoundConfig', (_app, html, _data, _options) => {
       this.modifySoundConfigForm(html);

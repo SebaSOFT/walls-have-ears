@@ -76,11 +76,13 @@ export default class SoundManager {
    * @param {foundry.canvas.placeables.AmbientSound} ambientSound - The ambient sound to modify.
    * @param {number} muffleIndex - The calculated muffling index (0-5).
    * @param {string} currentTokenId - The ID of the listening token, for caching purposes.
+   * @param {object} [options] - Options for movement tracking.
    */
   public applyMuffling = async (
     ambientSound: foundry.canvas.placeables.AmbientSound,
     muffleIndex: number,
     currentTokenId: string,
+    options?: { listenerMoved?: boolean; soundMoved?: boolean },
   ) => {
     const soundMediaSource = ambientSound.sound ?? (await awaitSound(ambientSound));
     if (!soundMediaSource) {
@@ -118,8 +120,20 @@ export default class SoundManager {
 
       const soundRadius = (ambientSound as any).soundRadius || (ambientSound as any).radius || 100;
 
-      const sRoom = RoomAcousticService.calculateRoomSize(sourcePos, soundRadius, rayCount, true);
-      const lRoom = RoomAcousticService.calculateRoomSize(listenerPos, soundRadius, rayCount, false);
+      const sRoom = RoomAcousticService.calculateRoomSize(
+        sourcePos,
+        soundRadius,
+        rayCount,
+        options?.soundMoved ?? false,
+        `${ambientSound.id}`,
+      );
+      const lRoom = RoomAcousticService.calculateRoomSize(
+        listenerPos,
+        soundRadius,
+        rayCount,
+        options?.listenerMoved ?? false,
+        'listener',
+      );
       const effectiveRoomSize = RoomAcousticService.getEffectiveRoomSize(sRoom, lRoom, threshold);
 
       if (effectiveRoomSize !== null) {
@@ -145,6 +159,63 @@ export default class SoundManager {
           }
         } else {
           pathDistanceUnits = null; // Direct path open -> we don't calculate or apply rebound echoes
+        }
+
+        const isDebugActive = WHESettings.getInstance().getBoolean(WHEConstants.SETTING_DEBUG, false);
+        if (isDebugActive) {
+          if (muffleIndex <= 0) {
+            // Direct path open -> Solid Green line for 3 seconds
+            RoomAcousticService.drawDebugLine(
+              `${ambientSound.id}-path-1`,
+              sourcePos,
+              listenerPos,
+              0x00ff00,
+              3,
+              0.8,
+              3000,
+            );
+            RoomAcousticService.clearDebugLine(`${ambientSound.id}-path-2`);
+          } else {
+            const bestReflectionPoint =
+              pathDistanceUnits !== null && !isOnDifferentFloors
+                ? RoomAcousticService.getCachedBestReflectionPoint(sourcePos, listenerPos, soundRadius, rayCount)
+                : null;
+
+            if (bestReflectionPoint) {
+              // Bouncing path connects -> Solid Yellow bounce lines for 3 seconds
+              RoomAcousticService.drawDebugLine(
+                `${ambientSound.id}-path-1`,
+                sourcePos,
+                bestReflectionPoint,
+                0xffff00,
+                3,
+                0.8,
+                3000,
+              );
+              RoomAcousticService.drawDebugLine(
+                `${ambientSound.id}-path-2`,
+                bestReflectionPoint,
+                listenerPos,
+                0xffff00,
+                3,
+                0.8,
+                3000,
+              );
+            } else {
+              // Muffling resolved with no bouncing path -> Dashed Magenta line for 3 seconds
+              RoomAcousticService.drawDebugLine(
+                `${ambientSound.id}-path-1`,
+                sourcePos,
+                listenerPos,
+                0xff00ff,
+                3,
+                0.8,
+                3000,
+                true,
+              );
+              RoomAcousticService.clearDebugLine(`${ambientSound.id}-path-2`);
+            }
+          }
         }
 
         if (pathDistanceUnits !== null) {
@@ -329,8 +400,14 @@ export default class SoundManager {
 
           const soundRadius = wall.soundRadius || 100;
 
-          const sRoom = RoomAcousticService.calculateRoomSize(doorPosition, soundRadius, rayCount, true);
-          const lRoom = RoomAcousticService.calculateRoomSize(earPosition, soundRadius, rayCount, false);
+          const sRoom = RoomAcousticService.calculateRoomSize(
+            doorPosition,
+            soundRadius,
+            rayCount,
+            false,
+            `door-${wall.id}`,
+          );
+          const lRoom = RoomAcousticService.calculateRoomSize(earPosition, soundRadius, rayCount, false, 'listener');
           const effectiveRoomSize = RoomAcousticService.getEffectiveRoomSize(sRoom, lRoom, threshold);
 
           if (effectiveRoomSize !== null) {
@@ -361,6 +438,63 @@ export default class SoundManager {
               }
             } else {
               pathDistanceUnits = null; // Direct path open -> we don't calculate or apply rebound echoes
+            }
+
+            const isDebugActive = WHESettings.getInstance().getBoolean(WHEConstants.SETTING_DEBUG, false);
+            if (isDebugActive) {
+              if (muffIntensity <= 0) {
+                // Direct path open -> Solid Green line for 3 seconds
+                RoomAcousticService.drawDebugLine(
+                  `door-${wall.id}-path-1`,
+                  doorPosition,
+                  earPosition,
+                  0x00ff00,
+                  3,
+                  0.8,
+                  3000,
+                );
+                RoomAcousticService.clearDebugLine(`door-${wall.id}-path-2`);
+              } else {
+                const bestReflectionPoint =
+                  pathDistanceUnits !== null && !isOnDifferentFloors
+                    ? RoomAcousticService.getCachedBestReflectionPoint(doorPosition, earPosition, soundRadius, rayCount)
+                    : null;
+
+                if (bestReflectionPoint) {
+                  // Bouncing path connects -> Solid Yellow bounce lines for 3 seconds
+                  RoomAcousticService.drawDebugLine(
+                    `door-${wall.id}-path-1`,
+                    doorPosition,
+                    bestReflectionPoint,
+                    0xffff00,
+                    3,
+                    0.8,
+                    3000,
+                  );
+                  RoomAcousticService.drawDebugLine(
+                    `door-${wall.id}-path-2`,
+                    bestReflectionPoint,
+                    earPosition,
+                    0xffff00,
+                    3,
+                    0.8,
+                    3000,
+                  );
+                } else {
+                  // Muffling resolved with no bouncing path -> Dashed Magenta line for 3 seconds
+                  RoomAcousticService.drawDebugLine(
+                    `door-${wall.id}-path-1`,
+                    doorPosition,
+                    earPosition,
+                    0xff00ff,
+                    3,
+                    0.8,
+                    3000,
+                    true,
+                  );
+                  RoomAcousticService.clearDebugLine(`door-${wall.id}-path-2`);
+                }
+              }
             }
 
             if (pathDistanceUnits !== null) {

@@ -58,7 +58,7 @@ export default class WHEFramework {
    * It iterates through all ambient sounds on the canvas, calculates the muffling level for the current player token,
    * and applies the corresponding audio effect.
    */
-  public performMuffling = async () => {
+  public performMuffling = async (options?: { listenerMoved?: boolean; soundMoved?: boolean }) => {
     const selectedToken = this._playerContext.getSelectedToken();
     if (!selectedToken) {
       return;
@@ -124,7 +124,7 @@ export default class WHEFramework {
           floorThickness,
         );
 
-        await this._soundManager.applyMuffling(currentAmbientSound, muffleIndex, selectedToken.id);
+        await this._soundManager.applyMuffling(currentAmbientSound, muffleIndex, selectedToken.id, options);
         getGame().audio.debug(`WHE | Dynamically muffled sound to level ${muffleIndex}.`);
       }
     }
