@@ -107,14 +107,14 @@ export default class SoundManager {
       dampeningCutoff = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_DAMPENING, 3000);
 
       const sourcePos = {
-        x: ambientSound.x,
-        y: ambientSound.y,
+        x: ambientSound.center?.x ?? ambientSound.x,
+        y: ambientSound.center?.y ?? ambientSound.y,
         z: (ambientSound.document as any).elevation?.bottom ?? (ambientSound.document as any).elevation ?? 0,
       };
 
       const listenerPos = {
-        x: selectedToken.center.x,
-        y: selectedToken.center.y,
+        x: selectedToken.center?.x ?? selectedToken.x,
+        y: selectedToken.center?.y ?? selectedToken.y,
         z: ((selectedToken.document.elevation as any)?.bottom ?? selectedToken.document.elevation ?? 0) + 6,
       };
 

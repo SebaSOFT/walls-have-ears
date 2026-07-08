@@ -93,6 +93,24 @@ export default class RoomAcousticService {
   ): void => {
     if (typeof PIXI === 'undefined') return;
 
+    if (
+      !start ||
+      typeof start.x !== 'number' ||
+      typeof start.y !== 'number' ||
+      !end ||
+      typeof end.x !== 'number' ||
+      typeof end.y !== 'number' ||
+      Number.isNaN(start.x) ||
+      Number.isNaN(start.y) ||
+      Number.isNaN(end.x) ||
+      Number.isNaN(end.y)
+    ) {
+      console.warn(
+        `WHE | Invalid coordinates passed to drawDebugLine: key=${key}, start=${JSON.stringify(start)}, end=${JSON.stringify(end)}`,
+      );
+      return;
+    }
+
     const isDebug = WHESettings.getInstance().getBoolean(WHEConstants.SETTING_DEBUG, false);
     if (!isDebug) return;
 
