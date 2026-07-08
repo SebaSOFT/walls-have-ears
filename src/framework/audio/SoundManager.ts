@@ -220,7 +220,7 @@ export default class SoundManager {
 
         const currentEffects = [...soundMediaSource.effects];
         currentEffects[1] = reverbEffect;
-        (soundMediaSource as any).updateEffects(currentEffects);
+        (soundMediaSource as any).applyEffects(currentEffects);
       }
 
       reverbEffect.update({
@@ -372,7 +372,7 @@ export default class SoundManager {
 
               const currentEffects = [...soundInstance.effects];
               currentEffects[1] = reverbEffect;
-              soundInstance.updateEffects(currentEffects);
+              soundInstance.applyEffects(currentEffects);
             } else {
               // Direct path blocked and no rebound connects: apply direct muffling
               WHEUtils.log(
