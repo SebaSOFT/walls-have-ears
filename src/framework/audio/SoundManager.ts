@@ -126,41 +126,57 @@ export default class SoundManager {
         feedbackGain = WHEUtils.clamp((effectiveRoomSize / threshold) * maxFeedback, 0.1, 0.95) ?? 0.5;
 
         let pathDistanceUnits: number | null = null;
+        const zMin = Math.min(sourcePos.z, listenerPos.z);
+        const zMax = Math.max(sourcePos.z, listenerPos.z);
+        const activeElevations = MufflingCalculatorService.getSurfaceElevations();
+        const elevationsBetween = activeElevations.filter((e: number) => e > zMin && e < zMax);
+        const isOnDifferentFloors = elevationsBetween.length > 0;
+
         if (muffleIndex > 0) {
-          pathDistanceUnits = RoomAcousticService.getReboundPathDistance(sourcePos, listenerPos, soundRadius, rayCount);
+          if (isOnDifferentFloors) {
+            pathDistanceUnits = null;
+          } else {
+            pathDistanceUnits = RoomAcousticService.getReboundPathDistance(
+              sourcePos,
+              listenerPos,
+              soundRadius,
+              rayCount,
+            );
+          }
         } else {
-          pathDistanceUnits = MufflingCalculatorService.getDistanceBetweenPoints(listenerPos, sourcePos);
+          pathDistanceUnits = null; // Direct path open -> we don't calculate or apply rebound echoes
         }
 
         if (pathDistanceUnits !== null) {
           const speedOfSound = 1125;
           delayTimeSeconds = WHEUtils.clamp(pathDistanceUnits / speedOfSound, 0.0, 1.5) ?? 0.05;
 
-          if (muffleIndex > 0) {
-            // Direct path blocked BUT rebound connects: bypass direct filter, dim dry gain, use wet gain
-            finalMuffleIndex = 0;
-            dryGain = 0.1;
-            wetGain = 0.8;
-            WHEUtils.log(
-              `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES REVERBERATION (Muffling bypassed). Rebound path connected. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
-            );
-          } else {
-            // Direct path open: no direct filter, dry gain 1.0, low wet gain
+          // Direct path blocked BUT rebound connects: bypass direct filter, dim dry gain, use wet gain
+          finalMuffleIndex = 0;
+          dryGain = 0.1;
+          wetGain = 0.8;
+          WHEUtils.log(
+            `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES REVERBERATION (Muffling bypassed). Rebound path connected. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+          );
+        } else {
+          if (muffleIndex <= 0) {
+            // Direct path open: no effects applied
             finalMuffleIndex = 0;
             dryGain = 1.0;
-            wetGain = 0.2;
+            wetGain = 0.0;
             WHEUtils.log(
-              `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES REVERBERATION (Muffling bypassed). Direct path open. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+              `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: NO EFFECTS APPLIED. Direct path open. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}`,
+            );
+          } else {
+            // Direct path blocked and no rebound connects: apply direct muffling
+            finalMuffleIndex = muffleIndex;
+            dryGain = 1.0;
+            wetGain = 0.0;
+            const reason = isOnDifferentFloors ? 'Blocked by vertical floor crossing' : 'No rebound path found';
+            WHEUtils.log(
+              `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES MUFFLING (Reverberation disabled). ${reason}. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, muffleIndex=${finalMuffleIndex}`,
             );
           }
-        } else {
-          // Direct path blocked and no rebound connects: apply direct muffling
-          finalMuffleIndex = muffleIndex;
-          dryGain = 1.0;
-          wetGain = 0.0;
-          WHEUtils.log(
-            `WHE | [SoundManager] Mutually Exclusive Acoustics for sound ${ambientSound.id}: APPLIES MUFFLING (Reverberation disabled). No rebound path found. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, muffleIndex=${finalMuffleIndex}`,
-          );
         }
       } else {
         // Outdoors: apply direct muffling, no reverb
@@ -326,40 +342,42 @@ export default class SoundManager {
             feedbackGain = WHEUtils.clamp((effectiveRoomSize / threshold) * maxFeedback, 0.1, 0.95) ?? 0.5;
 
             let pathDistanceUnits: number | null = null;
+            const zMin = Math.min(doorPosition.z, earPosition.z);
+            const zMax = Math.max(doorPosition.z, earPosition.z);
+            const activeElevations = MufflingCalculatorService.getSurfaceElevations();
+            const elevationsBetween = activeElevations.filter((e: number) => e > zMin && e < zMax);
+            const isOnDifferentFloors = elevationsBetween.length > 0;
+
             if (muffIntensity > 0) {
-              pathDistanceUnits = RoomAcousticService.getReboundPathDistance(
-                doorPosition,
-                earPosition,
-                soundRadius,
-                rayCount,
-              );
+              if (isOnDifferentFloors) {
+                pathDistanceUnits = null;
+              } else {
+                pathDistanceUnits = RoomAcousticService.getReboundPathDistance(
+                  doorPosition,
+                  earPosition,
+                  soundRadius,
+                  rayCount,
+                );
+              }
             } else {
-              pathDistanceUnits = distanceToDoor;
+              pathDistanceUnits = null; // Direct path open -> we don't calculate or apply rebound echoes
             }
 
             if (pathDistanceUnits !== null) {
               const speedOfSound = 1125;
               delayTimeSeconds = WHEUtils.clamp(pathDistanceUnits / speedOfSound, 0.0, 1.5) ?? 0.05;
 
-              if (muffIntensity > 0) {
-                // Direct path blocked BUT rebound connects: bypass direct filter, dim dry gain, use wet gain
-                dryGain = 0.1;
-                wetGain = 0.8;
+              // Direct path blocked BUT rebound connects: bypass direct filter, dim dry gain, use wet gain
+              dryGain = 0.1;
+              wetGain = 0.8;
 
-                const firstEffect = soundInstance.effects[0];
-                if (firstEffect) {
-                  firstEffect.update({ type: '', intensity: 0 });
-                }
-                WHEUtils.log(
-                  `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES REVERBERATION (Muffling bypassed). Rebound path connected. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
-                );
-              } else {
-                dryGain = 1.0;
-                wetGain = 0.2;
-                WHEUtils.log(
-                  `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES REVERBERATION (Muffling bypassed). Direct path open. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
-                );
+              const firstEffect = soundInstance.effects[0];
+              if (firstEffect) {
+                firstEffect.update({ type: '', intensity: 0 });
               }
+              WHEUtils.log(
+                `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES REVERBERATION (Muffling bypassed). Rebound path connected. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, dist=${pathDistanceUnits.toFixed(1)}, delay=${delayTimeSeconds.toFixed(3)}s, feedback=${feedbackGain.toFixed(2)}, dry=${dryGain.toFixed(2)}, wet=${wetGain}`,
+              );
 
               const reverbEffect = new RoomReverbEffect(soundInstance.context);
               reverbEffect.update({
@@ -374,10 +392,25 @@ export default class SoundManager {
               currentEffects[1] = reverbEffect;
               soundInstance.applyEffects(currentEffects);
             } else {
-              // Direct path blocked and no rebound connects: apply direct muffling
-              WHEUtils.log(
-                `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES MUFFLING (Reverberation disabled). No rebound path found. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, muffleIndex=${muffIntensity}`,
-              );
+              if (muffIntensity <= 0) {
+                // Direct path open: no effects applied
+                dryGain = 1.0;
+                wetGain = 0.0;
+
+                const firstEffect = soundInstance.effects[0];
+                if (firstEffect) {
+                  firstEffect.update({ type: '', intensity: 0 });
+                }
+                WHEUtils.log(
+                  `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: NO EFFECTS APPLIED. Direct path open. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}`,
+                );
+              } else {
+                // Direct path blocked and no rebound connects: apply direct muffling
+                const reason = isOnDifferentFloors ? 'Blocked by vertical floor crossing' : 'No rebound path found';
+                WHEUtils.log(
+                  `WHE | [SoundManager] Mutually Exclusive Acoustics for door sound: APPLIES MUFFLING (Reverberation disabled). ${reason}. S_room=${sRoom.toFixed(1)}, L_room=${lRoom.toFixed(1)}, muffleIndex=${muffIntensity}`,
+                );
+              }
             }
           } else {
             // Outdoors: apply direct muffling, no reverb
