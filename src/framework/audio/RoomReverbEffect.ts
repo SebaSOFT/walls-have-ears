@@ -103,11 +103,9 @@ export default class RoomReverbEffect extends BaseClass {
     return this.output.connect(destination as any, outputNum, inputNum);
   }
 
-  /**
-   * Overrides the native disconnect method to disconnect both internal and external connections.
-   */
   public disconnect(): void {
-    super.disconnect();
-    this.output.disconnect();
+    if (typeof this.output.disconnect === 'function') {
+      this.output.disconnect();
+    }
   }
 }

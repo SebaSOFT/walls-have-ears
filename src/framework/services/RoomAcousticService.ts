@@ -10,6 +10,7 @@ interface CachedRoomSize {
     start: { x: number; y: number };
     end: { x: number; y: number };
     isCollision: boolean;
+    isIgnored: boolean;
   }[];
 }
 
@@ -115,16 +116,16 @@ export default class RoomAcousticService {
     if (!isDebug) return;
 
     const canvas = getGame()?.canvas;
-    if (!canvas || !canvas.ready || !canvas.stage) return;
+    if (!canvas || !canvas.ready) return;
+    const layer = canvas.controls || canvas.stage;
+    if (!layer) return;
 
     try {
-      const stage = canvas.stage;
-
       // Remove existing graphic for this key to prevent overlay piling
       if (RoomAcousticService.activeDebugGraphics.has(key)) {
         const oldG = RoomAcousticService.activeDebugGraphics.get(key)!;
         if (!oldG.destroyed) {
-          stage.removeChild(oldG);
+          layer.removeChild(oldG);
           oldG.destroy();
         }
         RoomAcousticService.activeDebugGraphics.delete(key);
@@ -140,7 +141,7 @@ export default class RoomAcousticService {
         g.lineTo(end.x, end.y);
       }
 
-      stage.addChild(g);
+      layer.addChild(g);
       RoomAcousticService.activeDebugGraphics.set(key, g);
 
       // Remove the graphics element after duration
@@ -148,7 +149,7 @@ export default class RoomAcousticService {
         try {
           if (RoomAcousticService.activeDebugGraphics.get(key) === g) {
             if (!g.destroyed) {
-              stage.removeChild(g);
+              layer.removeChild(g);
               g.destroy();
             }
             RoomAcousticService.activeDebugGraphics.delete(key);
@@ -168,11 +169,11 @@ export default class RoomAcousticService {
   public static clearDebugLine = (key: string): void => {
     if (typeof PIXI === 'undefined') return;
     const canvas = getGame()?.canvas;
-    const stage = canvas?.stage;
-    if (stage && RoomAcousticService.activeDebugGraphics.has(key)) {
+    const layer = canvas?.controls || canvas?.stage;
+    if (layer && RoomAcousticService.activeDebugGraphics.has(key)) {
       const g = RoomAcousticService.activeDebugGraphics.get(key)!;
       if (!g.destroyed) {
-        stage.removeChild(g);
+        layer.removeChild(g);
         g.destroy();
       }
       RoomAcousticService.activeDebugGraphics.delete(key);
@@ -206,7 +207,9 @@ export default class RoomAcousticService {
         for (let i = 0; i < cached.rays.length; i++) {
           const ray = cached.rays[i];
           const key = `${keyPrefix}-ray-${i}`;
-          if (ray.isCollision) {
+          if (ray.isIgnored) {
+            RoomAcousticService.drawDebugLine(key, ray.start, ray.end, 0x555555, 1, 0.4, 3000);
+          } else if (ray.isCollision) {
             RoomAcousticService.drawDebugLine(key, ray.start, ray.end, 0x00ffff, 2, 0.6, 3000);
           } else {
             RoomAcousticService.drawDebugLine(key, ray.start, ray.end, 0x00ffff, 1, 0.2, 3000);
@@ -216,12 +219,28 @@ export default class RoomAcousticService {
       return cached.size;
     }
 
+    const activePortals = ((getGame()?.canvas?.regions as any)?.placeables || []).filter((r: any) =>
+      r.document?.behaviors?.some(
+        (b: any) =>
+          b.type === 'teleport' ||
+          b.type === 'changeLevel' ||
+          b.type === 'core.teleport' ||
+          b.type === 'core.changeLevel',
+      ),
+    );
+
     const soundLayer = CONFIG.Canvas.polygonBackends.sound;
-    let sumDistances = 0;
     const grid = getGame()?.canvas?.grid;
     const pixelsPerUnit = grid ? grid.size / grid.distance : 1;
     const maxPixels = maxDistance * pixelsPerUnit;
-    const rays: { start: { x: number; y: number }; end: { x: number; y: number }; isCollision: boolean }[] = [];
+    const rays: {
+      start: { x: number; y: number };
+      end: { x: number; y: number };
+      isCollision: boolean;
+      isIgnored: boolean;
+    }[] = [];
+    const distances: number[] = [];
+    const ignoredIndices = new Set<number>();
 
     for (let i = 0; i < rayCount; i++) {
       const angle = (i * 2 * Math.PI) / rayCount;
@@ -232,6 +251,9 @@ export default class RoomAcousticService {
 
       // Find all collisions along this segment
       const collisions = soundLayer.testCollision(position, endPoint, { type: 'sound', mode: 'all' }) || [];
+      let minDistanceUnits = maxDistance;
+      let collisionPoint = endPoint;
+      let isCollision = false;
 
       if (collisions.length > 0) {
         // Find closest collision
@@ -245,38 +267,109 @@ export default class RoomAcousticService {
           }
         }
         const minDistancePixels = Math.sqrt(minDistanceSq);
-        const minDistanceUnits = minDistancePixels / pixelsPerUnit;
-        sumDistances += minDistanceUnits;
-
-        const collisionPoint = {
+        minDistanceUnits = minDistancePixels / pixelsPerUnit;
+        collisionPoint = {
           x: position.x + minDistancePixels * Math.cos(angle),
           y: position.y + minDistancePixels * Math.sin(angle),
         };
+        isCollision = true;
+      }
 
-        rays.push({ start: { x: position.x, y: position.y }, end: collisionPoint, isCollision: true });
+      distances.push(minDistanceUnits);
 
-        // Draw debug ray to collision point
-        if (drawDebug) {
-          const key = `${keyPrefix}-ray-${i}`;
-          RoomAcousticService.drawDebugLine(key, position, collisionPoint, 0x00ffff, 2, 0.6, 3000);
+      // Check if this ray hits any portal
+      let hitsPortal = false;
+      for (const portal of activePortals) {
+        if (typeof portal.testPoint !== 'function') continue;
+        const steps = 5;
+        for (let s = 1; s <= steps; s++) {
+          const t = s / steps;
+          const samplePoint = {
+            x: position.x + (collisionPoint.x - position.x) * t,
+            y: position.y + (collisionPoint.y - position.y) * t,
+          };
+          if (portal.testPoint(samplePoint, posZ)) {
+            hitsPortal = true;
+            break;
+          }
         }
-      } else {
-        // No collision, ray travelled maximum distance
-        sumDistances += maxDistance;
+        if (hitsPortal) break;
+      }
 
-        rays.push({ start: { x: position.x, y: position.y }, end: endPoint, isCollision: false });
+      if (hitsPortal) {
+        ignoredIndices.add(i);
+        WHEUtils.log(`[RoomAcousticService] Ray ${i} hits portal region; marked for automatic exclusion.`);
+      }
 
-        // Draw faint debug ray to max limit
-        if (drawDebug) {
-          const key = `${keyPrefix}-ray-${i}`;
-          RoomAcousticService.drawDebugLine(key, position, endPoint, 0x00ffff, 1, 0.2, 3000);
+      rays.push({
+        start: { x: position.x, y: position.y },
+        end: collisionPoint,
+        isCollision,
+        isIgnored: hitsPortal,
+      });
+    }
+
+    // Outlier rejection (up to maxOutliers rays that are substantially different than the others)
+    const maxOutliers = rayCount >= 16 ? 3 : 2;
+    const remainingIndices = Array.from({ length: rayCount }, (_, i) => i).filter((i) => !ignoredIndices.has(i));
+
+    if (remainingIndices.length > 0) {
+      const activeDistances = remainingIndices.map((i) => distances[i]);
+      const sorted = [...activeDistances].sort((a, b) => a - b);
+      const median = sorted[Math.floor(sorted.length / 2)];
+
+      const candidateIndices = remainingIndices
+        .map((i) => ({ index: i, distance: distances[i], dev: Math.abs(distances[i] - median) }))
+        .sort((a, b) => b.dev - a.dev);
+
+      for (let k = 0; k < Math.min(maxOutliers, candidateIndices.length); k++) {
+        const candidate = candidateIndices[k];
+        const remainingRays = candidateIndices.slice(k + 1).map((c) => c.distance);
+        if (remainingRays.length === 0) break;
+
+        const remMean = remainingRays.reduce((sum, r) => sum + r, 0) / remainingRays.length;
+        const remDevs = remainingRays.map((r) => Math.abs(r - remMean));
+        const remAvgDev = remDevs.reduce((sum, r) => sum + r, 0) / remDevs.length;
+
+        const candidateDevFromMean = Math.abs(candidate.distance - remMean);
+        const threshold = Math.max(3.0 * remAvgDev, remMean * 0.25, 2.0);
+
+        if (candidateDevFromMean > threshold) {
+          ignoredIndices.add(candidate.index);
+          rays[candidate.index].isIgnored = true;
         }
       }
     }
 
-    const avgDistance = sumDistances / rayCount;
+    let sumDistances = 0;
+    let countRays = 0;
+    for (let i = 0; i < distances.length; i++) {
+      if (ignoredIndices.has(i)) {
+        WHEUtils.log(`[RoomAcousticService] Ignoring outlier/portal ray ${i} with distance ${distances[i].toFixed(1)}`);
+        continue;
+      }
+      sumDistances += distances[i];
+      countRays++;
+    }
+
+    // Draw debug rays using colors corresponding to active vs ignored/outlier status
+    if (drawDebug) {
+      for (let i = 0; i < rayCount; i++) {
+        const ray = rays[i];
+        const key = `${keyPrefix}-ray-${i}`;
+        if (ray.isIgnored) {
+          RoomAcousticService.drawDebugLine(key, ray.start, ray.end, 0x555555, 1, 0.4, 3000);
+        } else if (ray.isCollision) {
+          RoomAcousticService.drawDebugLine(key, ray.start, ray.end, 0x00ffff, 2, 0.6, 3000);
+        } else {
+          RoomAcousticService.drawDebugLine(key, ray.start, ray.end, 0x00ffff, 1, 0.2, 3000);
+        }
+      }
+    }
+
+    const avgDistance = sumDistances / (countRays || 1);
     WHEUtils.log(
-      `[RoomAcousticService] Room size at ${typeLabel} (${position.x.toFixed(1)}, ${position.y.toFixed(1)}): ${avgDistance.toFixed(1)} units`,
+      `[RoomAcousticService] Room size at ${typeLabel} (${position.x.toFixed(1)}, ${position.y.toFixed(1)}): ${avgDistance.toFixed(1)} units (${ignoredIndices.size} ray(s) ignored as outlier(s) or portal(s))`,
     );
 
     RoomAcousticService.roomSizeCache.set(cacheKey, { size: avgDistance, rays });
@@ -342,7 +435,13 @@ export default class RoomAcousticService {
 
         if (closestCollision) {
           // Now cast a direct ray from the reflection point to the listener
-          const isObstructed = soundLayer.testCollision(closestCollision, listener, { type: 'sound', mode: 'any' });
+          const isObstructed =
+            soundLayer.testCollision(closestCollision, listener, { type: 'sound', mode: 'any' }) ||
+            CONFIG.Canvas.polygonBackends.sight.testCollision(closestCollision, listener, {
+              type: 'sight',
+              mode: 'any',
+            }) ||
+            CONFIG.Canvas.polygonBackends.move.testCollision(closestCollision, listener, { type: 'move', mode: 'any' });
 
           if (!isObstructed) {
             // We found a clean rebound path!

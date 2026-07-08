@@ -99,6 +99,8 @@ export default class SoundManager {
 
     const isEchoEnabled = WHESettings.getInstance().getBoolean(WHEConstants.SETTING_ECHO_ENABLE, false);
     const selectedToken = PlayerContext.getInstance().getSelectedToken();
+    let effectiveRoomSize: number | null = null;
+    let pathDistanceUnits: number | null = null;
 
     if (isEchoEnabled && selectedToken) {
       const rayCount = WHESettings.getInstance().getNumber(WHEConstants.SETTING_ECHO_RAYS, 8);
@@ -134,12 +136,10 @@ export default class SoundManager {
         options?.listenerMoved ?? false,
         'listener',
       );
-      const effectiveRoomSize = RoomAcousticService.getEffectiveRoomSize(sRoom, lRoom, threshold);
+      effectiveRoomSize = RoomAcousticService.getEffectiveRoomSize(sRoom, lRoom, threshold);
 
       if (effectiveRoomSize !== null) {
         feedbackGain = WHEUtils.clamp((effectiveRoomSize / threshold) * maxFeedback, 0.1, 0.95) ?? 0.5;
-
-        let pathDistanceUnits: number | null = null;
         const zMin = Math.min(sourcePos.z, listenerPos.z);
         const zMax = Math.max(sourcePos.z, listenerPos.z);
         const activeElevations = MufflingCalculatorService.getSurfaceElevations();
@@ -271,52 +271,62 @@ export default class SoundManager {
     const mufflingLevel = MUFFLING_MAPPING[`level${finalMuffleIndex}`];
     const shouldMufflingChange = this.hasMufflingChanged(currentTokenId, ambientSound.id, mufflingLevel);
 
-    if (shouldMufflingChange) {
-      this.storeMufflingLevel(currentTokenId, ambientSound.id, mufflingLevel);
-      const shouldBeMuffled = finalMuffleIndex > 0;
-      const intensity = shouldBeMuffled ? mufflingLevel : 0;
-      const type = shouldBeMuffled ? 'lowpass' : '';
+    const effects: any[] = [];
+    const shouldBeMuffled = finalMuffleIndex > 0;
 
-      ambientSound.document.effects.muffled.type = type;
-      ambientSound.document.effects.muffled.intensity = intensity;
-
-      if (soundMediaSource.effects.length === 0) {
-        ambientSound.sync(ambientSound.isAudible, ambientSound.document.volume, {
-          muffled: shouldBeMuffled,
-        });
-        ambientSound.initializeSoundSource();
-      } else {
-        const effect = soundMediaSource.effects[0] as foundry.audio.BiquadFilterEffect;
-        effect.update({
+    // 1. Manage lowpass filter effect
+    if (shouldBeMuffled) {
+      let filterEffect = soundMediaSource.effects.find((e: any) => e.constructor.name === 'BiquadFilterEffect');
+      if (!filterEffect) {
+        const cfg = (CONFIG.soundEffects as any)['lowpass'] || (CONFIG.soundEffects as any)['lowPass'];
+        filterEffect = new cfg.effectClass(soundMediaSource.context, {
           type: 'lowpass',
-          intensity: intensity,
+          intensity: mufflingLevel,
+        });
+      } else {
+        (filterEffect as any).update({
+          type: 'lowpass',
+          intensity: mufflingLevel,
         });
       }
+      effects.push(filterEffect);
     }
 
-    if (soundMediaSource.effects.length === 0) {
-      ambientSound.initializeSoundSource();
-    }
-
-    if (soundMediaSource.effects.length > 0) {
+    // 2. Manage reverb effect
+    const hasReverbConfig = isEchoEnabled && selectedToken && effectiveRoomSize !== null && pathDistanceUnits !== null;
+    if (hasReverbConfig) {
       let reverbEffect = (soundMediaSource as any).roomReverbEffect;
       if (!reverbEffect) {
-        if (!soundMediaSource.context) return;
-        reverbEffect = new RoomReverbEffect(soundMediaSource.context as AudioContext);
-        (soundMediaSource as any).roomReverbEffect = reverbEffect;
-
-        const currentEffects = [...soundMediaSource.effects];
-        currentEffects[1] = reverbEffect;
-        (soundMediaSource as any).applyEffects(currentEffects);
+        if (soundMediaSource.context) {
+          reverbEffect = new RoomReverbEffect(soundMediaSource.context as AudioContext);
+          (soundMediaSource as any).roomReverbEffect = reverbEffect;
+        }
       }
+      if (reverbEffect) {
+        reverbEffect.update({
+          delayTime: delayTimeSeconds,
+          feedback: feedbackGain,
+          dampening: dampeningCutoff,
+          wetGain: wetGain,
+          dryGain: dryGain,
+        });
+        effects.push(reverbEffect);
+      }
+    }
 
-      reverbEffect.update({
-        delayTime: delayTimeSeconds,
-        feedback: feedbackGain,
-        dampening: dampeningCutoff,
-        wetGain: wetGain,
-        dryGain: dryGain,
-      });
+    // 3. Apply the compiled list of effects if it has changed
+    const currentEffects = soundMediaSource.effects;
+    const effectsChanged =
+      currentEffects.length !== effects.length || currentEffects.some((e: any, i: number) => e !== effects[i]);
+
+    if (effectsChanged) {
+      (soundMediaSource as any).applyEffects(effects);
+    }
+
+    if (shouldMufflingChange) {
+      this.storeMufflingLevel(currentTokenId, ambientSound.id, mufflingLevel);
+      ambientSound.document.effects.muffled.type = shouldBeMuffled ? 'lowpass' : '';
+      ambientSound.document.effects.muffled.intensity = shouldBeMuffled ? mufflingLevel : 0;
     }
   };
 
